@@ -7,13 +7,14 @@ OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = "-Wall"
+CFLAGS = -Wall -I../lib
+LDFLAGS = -L../lib
 
 ${PROGRAM}: ${OBJS}
 	${CC} -o $@ $(notdir ${OBJS})
 
 .c.o:
-	${CC} ${CFLAGS} -c $<
+	${CC} ${CFLAGS} ${LDFLAGS} -c $<
 
 .PHONY: clean depend
 clean:

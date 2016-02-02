@@ -2,7 +2,9 @@
 #define STACK_H
 
 /* user stack size. default is 255 */
-#define STACK_DEAPTH 255
+#ifndef STACK_DEAPTH
+# define STACK_DEAPTH 255
+#endif
 
 /* push to stack. stack size can be changed by STACK_DEAPTH */
 void push(uint32_t node, uint32_t* stack);

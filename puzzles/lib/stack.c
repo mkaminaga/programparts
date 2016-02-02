@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "stack.h"
 
+/* push to stack. stack size can be changed by STACK_DEAPTH */
 void push(uint32_t node, uint32_t* stack) {
     int32_t i = 0;
 
@@ -11,6 +12,7 @@ void push(uint32_t node, uint32_t* stack) {
     stack[0] = node;
 }
 
+/* pop from stack. stack size can be changed by STACK_DEAPTH */
 uint32_t pop(uint32_t* stack) {
     uint32_t i = 0;
     uint32_t temp = 0;
