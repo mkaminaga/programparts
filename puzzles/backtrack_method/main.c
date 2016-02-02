@@ -32,18 +32,57 @@ const uint32_t adjacent[N][N] = {
     {0, 0, 0, 0, 1, 0, 0}  // G 6
 };
 
-uint32_t open[STACK_DEAPTH] = {0};
-uint32_t close[STACK_DEAPTH] = {0};
-
+#define EMPTY N + 1
 int main(int argc, char const* argv[]) {
-    uint8_t i = 0;
 
-    for (i = 0; i < N; i++) {
-        if (adjacent[0][i] == 1) {
-            push(i, open);
+    /* stack for nodes linked to current node */
+    uint32_t open[STACK_DEAPTH] = {EMPTY};
+
+    /* array to memorize path */
+    uint32_t path[STACK_DEAPTH] = {EMPTY};
+
+    uint32_t node = EMPTY;
+    int32_t i = 0;
+    int32_t j = 0;
+
+NEXT_PATH:
+
+    /* set root node */
+    fill(EMPTY, open);
+    push(0, open);
+
+    for (i = 0; i < 20; i++) {
+
+        /* get current node */
+        node = pop(open);
+
+        /* exit status */
+        if (node == EMPTY) {
+            printf("path not found\n");
+            return 0;
+        }
+
+        /* memorize path */
+        push(node, path);
+
+        /* 4. goal status */
+        if (node == 6) {
+            printf("path found\n");
+            printf("trial:%u\n", i);
+            for (j = i; j >= 0; j--) printf("%c ", (path[j] + 'A'));
+            printf("\n");
+
+            push(node, open);
+            goto NEXT_PATH;
+        }
+
+        /* 5. check for all nodes linked to current node and add to the stack */
+        for (j = 0; j < N; j++) {
+            if (adjacent[node][j] == 1 && !exist(j, path, STACK_DEAPTH)) {
+                push(j, open);
+            }
         }
     }
 
-    for (i = 0; i < N; i++) printf("%u ", open[i]);
-    printf("\n");
+    return 0;
 }
