@@ -1,7 +1,7 @@
 /*
  * Date:2015/02/01
  *
- * Q:How to search the best way form A to J?
+ * Q:How to search the best way form A to O?
  *
  *           A
  *          /|\
@@ -23,7 +23,9 @@
 #include <stdint.h>
 
 #define STACK_DEAPTH 255
+#define QUE_DEPTH    255
 #include "../lib/stack.h"
+#include "../lib/que.h"
 
 #define N 15
 
@@ -66,12 +68,12 @@ int main(int argc, char const* argv[]) {
     int32_t j = 0;
 
     /* set root node 'A' */
-    push(0, open);
+    put_que(0, open);
 
     for (i = 0; i < 50; i++) {
 
         /* get current node */
-        node = pop(open);
+        node = take_out_que(open);
 
         /* exit status */
         if (node == EMPTY) {
@@ -82,8 +84,8 @@ int main(int argc, char const* argv[]) {
         /* memorize log */
         push(node, log);
 
-        /* goal status is 'J' */
-        if (node == 9) {
+        /* goal status is 'O' */
+        if (node == 14) {
             printf("route found\n");
             printf("log:");
             for (j = i; j >= 0; j--) {
@@ -94,9 +96,9 @@ int main(int argc, char const* argv[]) {
         }
 
         /* check for all nodes linked to current node and add to the stack */
-        for (j = N - 1; j >= 0; j--) {
+        for (j = 0; j < N; j++) {
             if (adjacent[node][j] == 1 && !exist(j, log, STACK_DEAPTH)) {
-                push(j, open);
+                put_que(j, open);
             }
         }
     }
