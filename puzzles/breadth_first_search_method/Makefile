@@ -18,7 +18,7 @@ ${PROGRAM}: ${OBJS}
 
 .PHONY: clean depend
 clean:
-	-${RM} ${PROGRAM} ${OBJS} ${DEPENDS}
+	-${RM} ${PROGRAM} $(notdir ${OBJS}) $(notdir ${DEPENDS})
 
 %.d: %.c
 	@set -e; $(CC) -M ${CPPFLAGS} $< \
