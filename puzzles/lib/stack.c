@@ -54,4 +54,3 @@ uint8_t exist(uint32_t value, uint32_t* stack, uint32_t depth) {
     }
     return 0;
 }
-
