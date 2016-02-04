@@ -1,2 +1,20 @@
+Introduction:
 This repository includes frgments of programs.
-Each c file has each main functons.
+
+DirStructure:
+lib
+    includes functions to be able to used in a lot of puroses.
+    for example, you can use gauss_jordan_iteration to solve
+    liner algebra problem by including /lib/gauss_jordan_iteration_method.h.
+
+src
+    includes programs to test my functions.
+    There two types of programs.
+
+    One is to test functions in /lib. in subdir, you can build these
+    programs using makefile.
+
+    Another is to test standard functions of C language.
+    These programs are not depending to /lib functions.
+    You can just make programs by gcc xxx.c.
+
