@@ -25,8 +25,8 @@ Description:
     includes subfolders and .c files.
     Naked .c files are independent from lib/*.h, and be able to
     compiled without make file.
-    Subfolders has Make file suited for main.c. The main.c file in the subfolder
-    is depending on lib/*.h. You can use Make file to build.
+    Subfolders has Makefile suited for main.c. The main.c file in the subfolder
+    is depending on lib/*.h. You can use Makefile to build.
 
 Feature:
     cording rules:
@@ -41,7 +41,7 @@ Feature:
        unexpected overflow.
 
     2. Give the comment for all fuctions.
-       This is for maintainanility.
+       This is for maintainability.
 
        It is necessary for proper use of these funcions.
        The comment must be the same in source file and header file.
