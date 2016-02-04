@@ -24,8 +24,8 @@
 
 #define STACK_DEAPTH 255
 #define QUE_DEPTH    255
-#include "../lib/stack.h"
-#include "../lib/que.h"
+#include "../../lib/stack.h"
+#include "../../lib/que.h"
 
 #define N 15
 

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "../lib/que.h"
+#include "../../lib/que.h"
 
 #define QUE_DEPTH 255
 uint32_t que[QUE_DEPTH] = {0};

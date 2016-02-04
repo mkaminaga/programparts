@@ -1,5 +1,5 @@
 /*
- * Date:2015/02/03
+ * Date:2015/02/01
  *
  * Q:How to search the best way form A to J?
  *
@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #define STACK_DEAPTH 255
-#include "../lib/stack.h"
+#include "../../lib/stack.h"
 
 #define N 15
 
@@ -52,10 +52,6 @@ const uint32_t adjacent[N][N] = {
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}  // O 04
 };
 
-const uint32_t depth[N] = {
-    1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4
-};
-
 #define EMPTY N + 1
 int main(int argc, char const* argv[]) {
 
@@ -66,38 +62,21 @@ int main(int argc, char const* argv[]) {
     uint32_t log[STACK_DEAPTH] = {EMPTY};
 
     uint32_t node = EMPTY;
-    uint32_t cutoff = 1;
     int32_t i = 0;
     int32_t j = 0;
 
-    /* set initial cutoff */
-    cutoff = 1;
-
-LABEL:
     /* set root node 'A' */
     push(0, open);
 
-    for (i = 0;1;i++) {//infinite loop
+    for (i = 0; i < 50; i++) {
 
         /* get current node */
         node = pop(open);
 
         /* exit status */
         if (node == EMPTY) {
-            /* show result */
-            printf("cutoff:%u, route not found\n", cutoff);
-            printf("log:");
-            for (j = i - 1; j >= 0; j--) {
-                printf("%c%s", (log[j] + 'A'), ((j == 0) ? "." : "->"));
-            }
-            printf("\n\n");
-
-            /* clean stack */
-            fill(EMPTY, open);
-            fill(EMPTY, log);
-
-            cutoff++; //add cutoff
-            goto LABEL;
+            printf("%u: another route not found\n", i);
+            return 0;
         }
 
         /* memorize log */
@@ -105,24 +84,18 @@ LABEL:
 
         /* goal status is 'J' */
         if (node == 9) {
-            /* show result */
             printf("route found\n");
             printf("log:");
             for (j = i; j >= 0; j--) {
                 printf("%c%s", (log[j] + 'A'), ((j == 0) ? "." : "->"));
             }
             printf("\n\n");
-
-            /* exit loop */
             return 0;
         }
 
-        /* check for all nodes linked to current node and add to the stack.
-         * cutoff is limitting the depth for searching */
+        /* check for all nodes linked to current node and add to the stack */
         for (j = N - 1; j >= 0; j--) {
-            if (   adjacent[node][j] == 1
-                && !exist(j, log, STACK_DEAPTH)
-                && depth[j] <= cutoff) {
+            if (adjacent[node][j] == 1 && !exist(j, log, STACK_DEAPTH)) {
                 push(j, open);
             }
         }

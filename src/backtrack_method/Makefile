@@ -2,13 +2,13 @@
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 
 PROGRAM = main
-SRC = main.c ../lib/stack.c
+SRC = main.c ../../lib/stack.c
 OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = -Wall -I../lib
-LDFLAGS = -L../lib
+CFLAGS = -Wall -I../../lib
+LDFLAGS = -L../../lib
 
 ${PROGRAM}: ${OBJS}
 	${CC} -o $@ $(notdir ${OBJS})

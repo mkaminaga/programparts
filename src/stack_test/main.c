@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "../lib/stack.h"
+#include "../../lib/stack.h"
 
 #define STACK_DEAPTH 255
 uint32_t stack[STACK_DEAPTH] = {0};
