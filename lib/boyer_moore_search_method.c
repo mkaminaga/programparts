@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include "boyer_moore_method.h"
+#include "boyer_moore_search_method.h"
 
 /* uint32_t max(uint32_t, uint32_t)
  * returns largear one from given two arguments

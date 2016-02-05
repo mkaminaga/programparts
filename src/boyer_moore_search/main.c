@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "../../lib/boyer_moore_method.h"
+#include "../../lib/boyer_moore_search_method.h""
 
 int main() {
     uint8_t text[] = "This is a test of word searching. Have a nice year!";
