@@ -6,7 +6,7 @@
 int main() {
     uint8_t text[] = "This is a test of word searching. Have a nice year!";
     uint32_t text_len = sizeof(text) - 1;
-    uint8_t string[] = "ear"
+    uint8_t string[] = "ear";
     uint32_t str_len = sizeof(string) - 1;
     uint32_t hit_index[255];
     uint32_t hit_num = 0;

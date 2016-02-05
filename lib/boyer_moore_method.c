@@ -1,4 +1,4 @@
-#include <stdio.>
+#include <stdio.h>
 #include <stdint.h>
 #include "boyer_moore_method.h"
 
@@ -18,7 +18,7 @@ uint32_t max(uint32_t a, uint32_t b);
  * arg6: result of search, index of hit string */
 void boyer_moore_search(
         uint8_t text[], uint32_t text_len, uint8_t str[], uint32_t str_len,
-        uint32_t* hit_num, uint32_t hit_index[] ) {
+        uint32_t* hit_num_p, uint32_t hit_index[] ) {
 
     uint32_t skip[256];
     uint32_t i = 0;
@@ -29,16 +29,16 @@ void boyer_moore_search(
     for (i = 0; i < str_len - 1; i++) skip[str[i]] = str_len - i - 1;
 
     /* initialize hit counter */
-    hit_num = 0;
+    *hit_num_p = 0;
 
     for (i = str_len - 1; i < text_len; i += max(skip[text[i]], str_len - j)) {
 
         /* search string backward */
-        for (j = str_len - 1 ;text[i] == str[j] ; i--, j--) {
+        for (j = str_len - 1; text[i] == str[j]; i--, j--) {
             if (j == 0) {
                 /* hit! */
-                hit_index[hit_num] = i;
-                hit_num++;
+                hit_index[*hit_num_p] = i;
+                *hit_num_p = *hit_num_p + 1;
                 break;
             }
         }
