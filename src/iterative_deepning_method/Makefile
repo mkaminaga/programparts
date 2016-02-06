@@ -18,10 +18,9 @@ ${PROGRAM}: ${OBJS}
 
 .PHONY: clean depend
 clean:
-	-${RM} ${PROGRAM} $(notdir ${OBJS}) $(notdir ${DEPENDS})
-
+	-
 %.d: %.c
 	@set -e; $(CC) -M ${CPPFLAGS} $< \
-		| sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' > $@; \
-		[ -s $@ ] || rm -f $@
--include $(DEPENDS)
+		| sed 's/\($*\)\.o[ :]*/\1.o $(notdir $@) : /g' > $(notdir $@); \
+		[ -s $(notdir $@) ] || rm -f $(notdir $@)
+-${RM} ${PROGRAM} $(notdir ${OBJS}) $(notdir ${DEPENDS})
