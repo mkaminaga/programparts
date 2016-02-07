@@ -1,24 +1,43 @@
 #ifndef STACK_H
 #define STACK_H
 
-/* user stack size. default is 255 */
-#ifndef STACK_DEAPTH
-# define STACK_DEAPTH 255
+#ifndef STACK_DEPTH
+# define STACK_DEPTH 255
 #endif
 
-/* push to stack. stack size can be changed by STACK_DEAPTH */
-void push(uint32_t node, uint32_t* stack);
+typedef struct {
+    uint32_t box[STACK_DEPTH];
+    uint32_t top;
+} stack_t;
 
-/* pop from stack. stack size can be changed by STACK_DEAPTH */
-uint32_t pop(uint32_t* stack);
+/* void init_stack(stack_t*)
+ * initialize pointer of stack.
+ * arg1: pointer to the stack */
+void init_stack(stack_t* s);
 
-/* clean the stack */
-void clean(uint32_t* stack);
+/* void push(stack_t*, uint32_t)
+ * push to the stack.
+ * arg1: pointer to the stack */
+void push(stack_t* s, uint32_t data);
 
-/* fill the stack with specific value */
-void fill(uint32_t value, uint32_t* stack);
+/* void pop(stack_t*)
+ * pop from stack.
+ * arg1: pointer to the stack */
+void pop(stack_t* s);
 
-/* show the existence of specific value in the stack in designated depth */
-uint8_t exist(uint32_t value, uint32_t* stack, uint32_t depth);
+/* uint32_t stack_is_empty(stack_t*)
+ * return true when stack is empty.
+ * arg1: pointer to the stack */
+uint32_t stack_is_empty(stack_t* s);
+
+/* uint32_t get_top_of_stack(stack_t*)
+ * get top member of the stack.
+ * arg1: pointer to the stack */
+uint32_t get_top_of_stack(stack_t* s);
+
+/* void show_inside_stack(stack_t*)
+ * show stack elements for debug purpose.
+ * arg1: pointer to the stack */
+void show_inside_stack(stack_t* s);
 
 #endif /* STACK_H */
