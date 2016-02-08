@@ -57,7 +57,6 @@ const uint32_t depth[N] = {
     1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4
 };
 
-#define EMPTY N + 1
 int main(int argc, char const* argv[]) {
 
     /* stack for nodes linked to current node */
