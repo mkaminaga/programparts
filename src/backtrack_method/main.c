@@ -98,7 +98,7 @@ int main(int argc, char const* argv[]) {
             return 0;
         }
 
-        /* memorize log */
+        /* take log */
         log[log_i] = node;
         log_i++;
 
