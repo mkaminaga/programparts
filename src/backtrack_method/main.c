@@ -1,7 +1,7 @@
 /*
  * Date:2015/02/01
  *
- * Q:How to search the best way form A to J?
+ * Q:How to search the way form A to J?
  *
  *           A
  *          /|\
@@ -21,11 +21,12 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #define STACK_DEAPTH 255
 #include "../../lib/stack.h"
 
-#define N 15
+#define N ('O' - 'A' + 1)
 
 /*
  * In the node indicated by row, if you have branches to node indicated by
@@ -52,51 +53,64 @@ const uint32_t adjacent[N][N] = {
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}  // O 04
 };
 
-#define EMPTY N + 1
 int main(int argc, char const* argv[]) {
 
     /* stack for nodes linked to current node */
-    uint32_t open[STACK_DEAPTH] = {EMPTY};
+    stack_t open;
 
-    /* array to memorize log */
-    uint32_t log[STACK_DEAPTH] = {EMPTY};
+    /* array for log */
+    uint32_t log[STACK_DEAPTH];
+    uint32_t log_i = 0;
 
-    uint32_t node = EMPTY;
+    uint32_t node = 0;
+    uint32_t flag = 0;
     int32_t i = 0;
-    int32_t j = 0;
+    uint32_t j = 0;
+
+    /* initialize stack */
+    init_stack(&open);
 
     /* set root node 'A' */
-    push(0, open);
+    push(&open, 'A');
 
-    for (i = 0; i < 50; i++) {
+    for (;;) {
+
+        /* show process */
+        printf("%2u:", log_i);
+        for (i = 0; i < log_i; i++) {
+            printf("%c%s", (char) log[i], ((i == log_i - 1) ? "\n":"->"));
+        }
+        if (log_i == 0) printf("\n");
+
+        if (node == 'J') {
+            printf("route found\n");
+            return 0;
+        }
+        usleep(5E5);
 
         /* get current node */
-        node = pop(open);
+        node = get_top_of_stack(&open);
+        pop(&open);
 
-        /* exit status */
-        if (node == EMPTY) {
-            printf("%u: another route not found\n", i);
+        /* search fail */
+        if (node == 0) {
+            printf("route not found\n");
             return 0;
         }
 
         /* memorize log */
-        push(node, log);
-
-        /* goal status is 'J' */
-        if (node == 9) {
-            printf("route found\n");
-            printf("log:");
-            for (j = i; j >= 0; j--) {
-                printf("%c%s", (log[j] + 'A'), ((j == 0) ? "." : "->"));
-            }
-            printf("\n\n");
-            return 0;
-        }
+        log[log_i] = node;
+        log_i++;
 
         /* check for all nodes linked to current node and add to the stack */
-        for (j = N - 1; j >= 0; j--) {
-            if (adjacent[node][j] == 1 && !exist(j, log, STACK_DEAPTH)) {
-                push(j, open);
+        for (i = N - 1; i >= 0; i--) {
+            /* skip node already registerd in stack */
+            flag = 1;
+            for (j = 0; j <= log_i; j++) {
+                if (log[j] == i + 'A') flag = 0;
+            }
+            if (adjacent[node - 'A'][i] == 1 && flag == 1) {
+                push(&open, i + 'A');
             }
         }
     }

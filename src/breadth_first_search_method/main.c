@@ -85,12 +85,11 @@ int main(int argc, char const* argv[]) {
             printf("route found\n");
             return 0;
         }
+        usleep(5E5);
 
         /* get current node */
         node = get_top_of_queue(&open);
         take_out(&open);
-
-        usleep(5E5);
 
         /* take log */
         log[log_i] = node;
@@ -104,8 +103,8 @@ int main(int argc, char const* argv[]) {
 
         /* check for all nodes linked to current node and add to the queue */
         for (i = 0; i < N; i++) {
-            flag = 1;
             /* skip node already registerd in queue */
+            flag = 1;
             for (j = open.head; j <= open.tail; j++) {
                 if (open.box[j] == i + 'A') flag = 0;
             }

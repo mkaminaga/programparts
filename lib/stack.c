@@ -20,8 +20,8 @@ void push(stack_t* s, uint32_t data) {
 
     if (s->top >= STACK_DEPTH) return;
 
+    s->top++; //shift index forward
     s->box[s->top] = data;
-    s->top++; //shift indef forward
 }
 
 /* void pop(stack_t*)
@@ -54,6 +54,6 @@ uint32_t get_top_of_stack(stack_t* s) {
 void show_inside_stack(stack_t* s) {
     uint32_t i = 0;
 
-    for (i = 0; i < (uint32_t) s->top; i++) printf("%u:%u ", i, s->box[i]);
+    for (i = 1; i < (uint32_t) s->top; i++) printf("%u:%u ", i, s->box[i]);
     printf("\n");
 }
