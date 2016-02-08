@@ -72,12 +72,6 @@ int main(int argc, char const* argv[]) {
     int32_t i = 0;
     uint32_t j = 0;
 
-    /* initialize stack */
-    init_stack(&open);
-
-    /* set root node 'A' */
-    push(&open, 'A');
-
     /* set initial cutoff */
     cutoff = 1;
 
