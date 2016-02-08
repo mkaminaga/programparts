@@ -1,7 +1,7 @@
 /*
  * Date:2015/02/01
  *
- * Q:How to search the best way form A to O?
+ * Q:How to EXIT_BRANCH the way form A to O?
  *
  *           A
  *          /|\
@@ -21,13 +21,12 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
 
-#define STACK_DEAPTH 255
 #define QUE_DEPTH    255
-#include "../../lib/stack.h"
-#include "../../lib/que.h"
+#include "../../lib/queue.h"
 
-#define N 15
+#define N ('O' - 'A' + 1)
 
 /*
  * In the node indicated by row, if you have branches to node indicated by
@@ -37,68 +36,81 @@
 const uint32_t adjacent[N][N] = {
   // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14
   // A  B  C  D  E  F  G  H  I  J  K  L  M  N  O
-    {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // A 0
-    {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // B 0
-    {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0}, // C 2
-    {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, // D 3
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // E 4
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0}, // F 5
-    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // G 6
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}, // H 7
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // I 8
-    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // J 9
-    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // K 00
-    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // L 00
-    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // M 02
-    {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}, // N 03
-    {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}  // O 04
+    {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // A  0
+    {0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // B  0
+    {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0}, // C  2
+    {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, // D  3
+    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // E  4
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0}, // F  5
+    {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // G  6
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1}, // H  7
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // I  8
+    {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // J  9
+    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // K 10
+    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // L 10
+    {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // M 12
+    {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}, // N 13
+    {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}  // O 14
 };
 
-#define EMPTY N + 1
 int main(int argc, char const* argv[]) {
 
     /* stack for nodes linked to current node */
-    uint32_t open[STACK_DEAPTH] = {EMPTY};
+    queue_t open;
 
-    /* array to memorize log */
-    uint32_t log[STACK_DEAPTH] = {EMPTY};
+    /* array for log */
+    uint32_t log[QUE_DEPTH];
+    uint32_t log_i = 0;
 
-    uint32_t node = EMPTY;
-    int32_t i = 0;
-    int32_t j = 0;
+    uint32_t node = 0;
+    uint32_t flag = 0;
+    uint32_t i = 0;
+    uint32_t j = 0;
+
+    /* initialize queue */
+    init_queue(&open);
 
     /* set root node 'A' */
-    put_que(0, open);
+    insert(&open, 'A');
 
-    for (i = 0; i < 50; i++) {
+    for (;;) {
+        /* show process */
+        printf("%2u:", log_i);
+        for (i = 0; i < log_i; i++) {
+            printf("%c%s", (char) log[i], ((i == log_i - 1) ? "\n":"->"));
+        }
+        if (log_i == 0) printf("\n");
+
+        if (node == 'O') {
+            printf("route found\n");
+            return 0;
+        }
 
         /* get current node */
-        node = take_out_que(open);
+        node = get_top_of_queue(&open);
+        take_out(&open);
 
-        /* exit status */
-        if (node == EMPTY) {
-            printf("%u: another route not found\n", i);
+        usleep(5E5);
+
+        /* take log */
+        log[log_i] = node;
+        log_i++;
+
+        /* search fail */
+        if (node == 0) {
+            printf("route not found\n");
             return 0;
         }
 
-        /* memorize log */
-        push(node, log);
-
-        /* goal status is 'O' */
-        if (node == 14) {
-            printf("route found\n");
-            printf("log:");
-            for (j = i; j >= 0; j--) {
-                printf("%c%s", (log[j] + 'A'), ((j == 0) ? "." : "->"));
+        /* check for all nodes linked to current node and add to the queue */
+        for (i = 0; i < N; i++) {
+            flag = 1;
+            /* skip node already registerd in queue */
+            for (j = open.head; j <= open.tail; j++) {
+                if (open.box[j] == i + 'A') flag = 0;
             }
-            printf("\n\n");
-            return 0;
-        }
-
-        /* check for all nodes linked to current node and add to the stack */
-        for (j = 0; j < N; j++) {
-            if (adjacent[node][j] == 1 && !exist(j, log, STACK_DEAPTH)) {
-                put_que(j, open);
+            if (adjacent[node - 'A'][i] == 1 && flag == 1) {
+                insert(&open, i + 'A');
             }
         }
     }

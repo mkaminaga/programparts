@@ -6,6 +6,10 @@
  * initialize pointer of stack.
  * arg1: pointer to the stack */
 void init_stack(stack_t* s) {
+    uint32_t i = 0;
+
+    for (i = 0; i < STACK_DEPTH; i++) s->box[i] = 0;
+
     s->top = 0;
 }
 

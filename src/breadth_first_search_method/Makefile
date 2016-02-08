@@ -2,7 +2,7 @@
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 
 PROGRAM = main
-SRC = main.c ../../lib/stack.c ../../lib/que.c
+SRC = main.c ../../lib/queue.c
 OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 

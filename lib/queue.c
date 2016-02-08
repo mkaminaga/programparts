@@ -6,6 +6,10 @@
  * initialize queue.
  * arg1: pointer to the queue */
 void init_queue(queue_t* q) {
+    uint32_t i = 0;
+
+    for (i = 0; i < QUE_DEPTH; i++) q->box[i] = 0;
+
     q->head = 0;
     q->tail = 0;
 }
