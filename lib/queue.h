@@ -1,5 +1,5 @@
-#ifndef QUE_H
-#define QUE_H
+#ifndef QUEUEH
+#define QUEUEH
 
 /* user stack size. default is 255 */
 #ifndef QUEUE_MAX
@@ -43,4 +43,4 @@ uint32_t get_top_of_queue(queue_t* q);
  * arg1: pointer to the queue */
 void show_inside_of_queue(queue_t* q);
 
-#endif /* QUE_H */
+#endif /* QUEUEH */

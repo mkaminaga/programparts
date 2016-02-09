@@ -7,7 +7,7 @@ OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = -Wall -I../../lib -DQUE_MAX=255
+CFLAGS = -Wall -I../../lib -DQUEUE_MAX=255
 LDFLAGS = -L../../lib
 
 ${PROGRAM}: ${OBJS}
