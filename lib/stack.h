@@ -1,12 +1,12 @@
 #ifndef STACK_H
 #define STACK_H
 
-#ifndef STACK_DEPTH
-# define STACK_DEPTH 255
+#ifndef STACK_MAX
+# define STACK_MAX 255
 #endif
 
 typedef struct {
-    uint32_t box[STACK_DEPTH];
+    uint32_t box[STACK_MAX];
     uint32_t top;
 } stack_t;
 

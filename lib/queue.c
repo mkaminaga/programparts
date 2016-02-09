@@ -8,7 +8,7 @@
 void init_queue(queue_t* q) {
     uint32_t i = 0;
 
-    for (i = 0; i < QUE_DEPTH; i++) q->box[i] = 0;
+    for (i = 0; i < QUE_MAX; i++) q->box[i] = 0;
 
     q->head = 0;
     q->tail = 0;
@@ -19,7 +19,7 @@ void init_queue(queue_t* q) {
  * arg1: pointer to the queue */
 void insert(queue_t* q, uint32_t data) {
 
-    if (q->tail >= QUE_DEPTH) return;
+    if (q->tail >= QUE_MAX) return;
 
     q->box[q->tail] = data;
     q->tail++;
@@ -30,7 +30,7 @@ void insert(queue_t* q, uint32_t data) {
  * arg1: pointer to the queue */
 void take_out(queue_t* q) {
 
-    if (q->head >= QUE_DEPTH) return;
+    if (q->head >= QUE_MAX) return;
 
     q->head++;
 }

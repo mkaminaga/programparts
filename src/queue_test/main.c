@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "../../lib/queue.h"
 
-#define QUE_DEPTH 255
+#define QUE_MAX 255
 queue_t queue;
 
 int main(int argc, char const* argv[]) {

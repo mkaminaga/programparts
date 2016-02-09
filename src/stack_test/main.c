@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include "../../lib/stack.h"
 
-#define STACK_DEAPTH 255
+#define STACK_MAX 255
 stack_t stack;
 
 int main(int argc, char const* argv[]) {

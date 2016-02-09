@@ -8,7 +8,7 @@
 void init_stack(stack_t* s) {
     uint32_t i = 0;
 
-    for (i = 0; i < STACK_DEPTH; i++) s->box[i] = 0;
+    for (i = 0; i < STACK_MAX; i++) s->box[i] = 0;
 
     s->top = 0;
 }
@@ -18,7 +18,7 @@ void init_stack(stack_t* s) {
  * arg1: pointer to the stack */
 void push(stack_t* s, uint32_t data) {
 
-    if (s->top >= STACK_DEPTH) return;
+    if (s->top >= STACK_MAX) return;
 
     s->top++; //shift index forward
     s->box[s->top] = data;

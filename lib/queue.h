@@ -2,12 +2,12 @@
 #define QUE_H
 
 /* user stack size. default is 255 */
-#ifndef QUE_DEPTH
-# define QUE_DEPTH 255
+#ifndef QUE_MAX
+# define QUE_MAX 255
 #endif
 
 typedef struct {
-    uint32_t box[QUE_DEPTH];
+    uint32_t box[QUE_MAX];
     uint32_t head;
     uint32_t tail;
 } queue_t;
