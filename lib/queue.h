@@ -2,14 +2,15 @@
 #define QUE_H
 
 /* user stack size. default is 255 */
-#ifndef QUE_MAX
-# define QUE_MAX 255
+#ifndef QUEUE_MAX
+# define QUEUE_MAX 255
 #endif
 
 typedef struct {
-    uint32_t box[QUE_MAX];
+    uint32_t box[QUEUE_MAX];
     uint32_t head;
     uint32_t tail;
+    uint32_t flag : 1;
 } queue_t;
 
 /* void init_queue(queue_t*)
@@ -28,7 +29,7 @@ void insert(queue_t* q, uint32_t data);
 void take_out(queue_t* q);
 
 /* uint32_t queue_is_empty(queue_t*)
- * return true if queue_is_empty.
+ * return true if queue_is_empty or que overflow.
  * arg1: pointer to the queue */
 uint32_t queue_is_empty(queue_t* q);
 

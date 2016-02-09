@@ -22,8 +22,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
-
-#define QUE_DEPTH    255
 #include "../../lib/queue.h"
 
 #define N ('O' - 'A' + 1)
@@ -59,7 +57,7 @@ int main(int argc, char const* argv[]) {
     queue_t open;
 
     /* array for log */
-    uint32_t log[QUE_DEPTH];
+    uint32_t log[QUEUE_MAX];
     uint32_t log_i = 0;
 
     uint32_t node = 0;

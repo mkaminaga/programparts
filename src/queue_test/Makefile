@@ -7,7 +7,7 @@ OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = -Wall -I../../lib
+CFLAGS = -Wall -I../../lib -DQUEUE_MAX=10
 LDFLAGS = -L../../lib
 
 ${PROGRAM}: ${OBJS}
@@ -22,6 +22,5 @@ clean:
 
 %.d: %.c
 	@set -e; $(CC) -M ${CPPFLAGS} $< \
-		| sed 's/\($*\)\.o[ :]*/\1.o $(notdir $@) : /g' > $(notdir $@); \
-		[ -s $(notdir $@) ] || rm -f $(notdir $@)
+		| sed 's/$*.o[ :]*/1.o $@ : /g' > $(notdir $@);
 -include $(DEPENDS)

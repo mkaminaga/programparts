@@ -8,10 +8,11 @@
 void init_queue(queue_t* q) {
     uint32_t i = 0;
 
-    for (i = 0; i < QUE_MAX; i++) q->box[i] = 0;
+    for (i = 0; i < QUEUE_MAX; i++) q->box[i] = 0;
 
-    q->head = 0;
+    q->head = 1;
     q->tail = 0;
+    q->flag = 0;
 }
 
 /* void insert(queue_t*, uint32_t)
@@ -19,10 +20,16 @@ void init_queue(queue_t* q) {
  * arg1: pointer to the queue */
 void insert(queue_t* q, uint32_t data) {
 
-    if (q->tail >= QUE_MAX) return;
+    q->tail++;
+
+    /* manage ling buffer */
+    if (q->tail == QUEUE_MAX) {
+        q->tail = 1;
+        if (q->flag == 0) q->flag = 1;
+        else q->flag = 0;
+    }
 
     q->box[q->tail] = data;
-    q->tail++;
 }
 
 /* void delete(queue_t*)
@@ -30,16 +37,22 @@ void insert(queue_t* q, uint32_t data) {
  * arg1: pointer to the queue */
 void take_out(queue_t* q) {
 
-    if (q->head >= QUE_MAX) return;
-
     q->head++;
+
+    /* manage ling buffer */
+    if (q->head == QUEUE_MAX) {
+        q->head = 1;
+        if (q->flag == 0) q->flag = 1;
+        else q->flag = 0;
+    }
 }
 
 /* uint32_t queue_is_empty(queue_t*)
- * return true if queue_is_empty.
+ * return true if queue_is_empty or que overflow.
  * arg1: pointer to the queue */
 uint32_t queue_is_empty(queue_t* q) {
-    return (q->tail < q->head);
+    if (q->flag == 0) return (q->tail < q->head);
+    return (q->tail >= q->head);
 }
 
 /* uint32_t get_top_of_queue(queue_t*)
@@ -55,10 +68,14 @@ uint32_t get_top_of_queue(queue_t* q) {
 void show_inside_of_queue(queue_t* q) {
     uint32_t i = 0;
 
-    if (queue_is_empty(q)) return;
-
-    for (i = (uint32_t) q->head; i < (uint32_t) q->tail; i++) {
-        printf("%u:%u ", i, q->box[i]);
+    if (q->flag == 0) {
+        for (i = q->head; i <= q->tail; i++)
+            printf("%u:%u ", i, q->box[i]);
+    } else {
+        for (i = q->head; i != q->tail + 1 && !queue_is_empty(q); i++){
+            if (i == QUEUE_MAX) i = 1;
+            printf("%u:%u ", i, q->box[i]);
+        }
     }
     printf("\n");
 }

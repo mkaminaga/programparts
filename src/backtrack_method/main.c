@@ -22,8 +22,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
-
-#define STACK_DEAPTH 255
 #include "../../lib/stack.h"
 
 #define N ('O' - 'A' + 1)
