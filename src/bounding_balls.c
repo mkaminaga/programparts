@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdint.h> //uint32_t
-#include <math.h> //pow()
 #include <unistd.h> //usleep()
 
 #define X_MAX 15
@@ -27,6 +26,9 @@ void control_ball();
 // ========== screen related functions ==========
 //
 
+/* screen cache */
+uint8_t g_screen_cache[Y_MAX][X_MAX];
+
 /* void clear_screen_cache()
  * clear screen buffer. */
 void clear_screen_cache();
@@ -44,32 +46,29 @@ void set_screen_cache(uint32_t x, uint32_t y, char c);
  * arg2: y cordinate of the screen */
 char get_screen_cache(uint32_t x, uint32_t y);
 
-/* void frash_screen()
+/* void flash_screen()
  * output characters to screen cached in screen buffer. */
-void frash_screen();
-
-/* buffer */
-uint8_t g_screen_buffer[Y_MAX][X_MAX];
+void flash_screen();
 
 int main() {
 
     for (;;) {
-        /* clear buffer */
+        /* clear campus */
         clear_screen_cache();
 
         /* draw static wall */
         draw_static_wall();
 
-        /* draw x moving wall */
+        /* draw moving wall */
         draw_moving_wall();
 
         /* draw ball */
         control_ball();
 
-        /* draw */
-        frash_screen();
+        /* draw on the screen */
+        flash_screen();
 
-        /* frash rate */
+        /* speed adjustment */
         usleep(1E5); //0.1sec
     }
 
@@ -189,7 +188,7 @@ void clear_screen_cache() {
 
     for (y = 0; y < Y_MAX; y++)
         for (x = 0; x < X_MAX; x++)
-            g_screen_buffer[y][x] = ' ';
+            g_screen_cache[y][x] = ' ';
 }
 
 /* void set_screen_cache(uint32_t, uint32_t, uint8_t)
@@ -198,41 +197,41 @@ void clear_screen_cache() {
  * arg2: y cordinate of the screen
  * arg3: character set to (x, y) */
 void set_screen_cache(uint32_t x, uint32_t y, char c) {
-    if (x > X_MAX || x < 0) {
+    if (x >= X_MAX || x < 0) {
         printf("x exceeds limit\n");
         return;
     }
-    if (y > Y_MAX || y < 0){
+    if (y >= Y_MAX || y < 0){
         printf("y exceeds limit\n");
         return;
     }
-    g_screen_buffer[y][x] = c;
+    g_screen_cache[y][x] = c;
 }
 
 /* char get_screen_cache(uint32_t, uint32_t)
  * get charactor of designated point cached in the screen */
 char get_screen_cache(uint32_t x, uint32_t y) {
-    if (x > X_MAX || x < 0) {
+    if (x >= X_MAX || x < 0) {
         printf("x exceeds limit\n");
         return -1;
     }
-    if (y > Y_MAX || y < 0){
+    if (y >= Y_MAX || y < 0){
         printf("y exceeds limit\n");
         return -1;
     }
-    return g_screen_buffer[y][x];
+    return g_screen_cache[y][x];
 }
 
-/* void frash_screen()
+/* void flash_screen()
  * output characters to screen cached in screen buffer. */
-void frash_screen() {
+void flash_screen() {
     uint32_t x = 0;
     uint32_t y = 0;
 
     /* draw all cashe */
     for (y = 0; y < Y_MAX; y++) {
         for (x = 0; x < X_MAX; x++)
-            printf("%c", g_screen_buffer[y][x]);
+            printf("%c", g_screen_cache[y][x]);
         printf("\n");
     }
     printf("\n");
