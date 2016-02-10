@@ -4,7 +4,6 @@
 
 #define X_MAX 15
 #define Y_MAX 8
-#define BALL_NUM 5
 
 //
 // ========== draw related functions
