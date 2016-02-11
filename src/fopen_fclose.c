@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	if ((p = fopen(argv[1], "r")) == NULL) {
+	if ((fp = fopen(argv[1], "r")) == NULL) {
 		printf("\nfailed to open %s", argv[1]);
 	}
 	printf("\n%s is successfully opened!", argv[1]);
