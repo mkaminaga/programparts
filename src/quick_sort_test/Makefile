@@ -22,5 +22,5 @@ clean:
 
 %.d: %.c
 	@set -e; $(CC) -M ${CPPFLAGS} $< \
-		| sed -e 's/"$*"\.o[ :]*/"$*"\.o $@ : /g' > $(notdir $@);
+		| sed -e 's/"$*\.o[ :]*"/"$*\.o $@ : "/g' > $(notdir $@);
 -include $(DEPENDS)

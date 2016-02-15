@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef GRAPHICS_H
+#define GRAPHICS_H
 
 /* void draw_static_wall()
  * draw wall. */
@@ -13,4 +13,4 @@ void draw_moving_wall();
  * draw ball bounding on wall. */
 void control_ball();
 
-#endif /* GAME_H */
+#endif /* GRAPHICS_H */

@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include "screen_cache.h"
-#include "game.h"
+#include "graphics.h"
 
 extern screen_cache_t g_cache;
 
