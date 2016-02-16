@@ -7,7 +7,7 @@ OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = -Wall -DX_MAX=32 -DY_MAX=16
+CFLAGS = -Wall -DX_MAX=30 -DY_MAX=15
 LDFLAGS =
 
 ${PROGRAM}: ${OBJS}
