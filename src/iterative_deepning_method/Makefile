@@ -23,6 +23,6 @@ clean:
 
 %.d: %.c
 	@set -e; ${CC} -M ${CPPFLAGS} $< \
-		| echo generating $(notdir $*).d
+		| echo checking dependance: $(notdir $*).d
 
 -include $(DEPENDS)
