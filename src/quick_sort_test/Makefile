@@ -2,7 +2,7 @@
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 
 PROGRAM = main
-SRC = main.c  ../../lib/quick_sort.c ../../lib/stack.c
+SRC = main.c ../../lib/quick_sort.c ../../lib/stack.c
 OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
@@ -21,6 +21,7 @@ clean:
 	-${RM} ${PROGRAM} $(notdir ${OBJS}) $(notdir ${DEPENDS})
 
 %.d: %.c
-	@set -e; $(CC) -M ${CPPFLAGS} $< \
-		| sed -e 's/"$*\.o[ :]*"/"$*\.o $@ : "/g' > $(notdir $@);
+	@set -e; ${CC} -M ${CPPFLAGS} $< \
+		| echo generating $(notdir $*).d
+
 -include $(DEPENDS)

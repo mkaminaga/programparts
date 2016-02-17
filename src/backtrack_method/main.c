@@ -57,7 +57,7 @@ int main(int argc, char const* argv[]) {
     stack_t open;
 
     /* array for log */
-    uint32_t log[STACK_DEAPTH];
+    uint32_t log[STACK_MAX];
     uint32_t log_i = 0;
 
     uint32_t node = 0;

@@ -21,6 +21,7 @@ clean:
 	-${RM} ${PROGRAM} $(notdir ${OBJS}) $(notdir ${DEPENDS})
 
 %.d: %.c
-	@set -e; $(CC) -M ${CPPFLAGS} $< \
-		| sed 's/$*.o[ :]*/1.o $@ : /g' > $(notdir $@);
+	@set -e; ${CC} -M ${CPPFLAGS} $< \
+		| echo generating $(notdir $*).d
+
 -include $(DEPENDS)

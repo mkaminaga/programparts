@@ -2,12 +2,12 @@
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 
 PROGRAM = main
-SRC = main.c ../../lib/bubble_sort.c
+SRC = main.c  ../../lib/quick_sort.c ../../lib/stack.c
 OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = -Wall -I../../lib
+CFLAGS = -Wall -I../../lib -DSTACK_MAX=255 -DDEBUG
 LDFLAGS = -L../../lib
 
 ${PROGRAM}: ${OBJS}
