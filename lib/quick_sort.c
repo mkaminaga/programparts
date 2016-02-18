@@ -7,7 +7,7 @@
 #include <unistd.h>
 #endif
 
-/* void qsort_dig(uint32_t, uint32_t, uint32_t*, uint32_t)
+/* void set_parts(uint32_t, uint32_t, uint32_t*, uint32_t)
  * diveide array A into A1 and A2.
  * A1 has members same or smaller than A[0].
  * A2 has members same or larger than A[0].
@@ -16,7 +16,7 @@
  * arg3: A's index max (larger part's tail)
  * arg4: solution, smaller part's tail
  * arg5, solution, larger part's head */
-void qsort_dig(uint32_t a[], uint32_t head, uint32_t tail,
+void set_parts(uint32_t a[], uint32_t head, uint32_t tail,
         uint32_t* ss_tail_p, uint32_t* ls_head_p);
 
 /* void quick_sort(uint32_t[], uint32_t)
@@ -26,9 +26,8 @@ void qsort_dig(uint32_t a[], uint32_t head, uint32_t tail,
 void quick_sort(uint32_t a[], uint32_t length) {
 
     stack_t stack;
-
-    uint32_t i = 0;
-    uint32_t j = 0;
+    uint32_t ss_tail = 0;
+    uint32_t ls_head = 0;
     uint32_t head = 0;
     uint32_t tail = 0;
 
@@ -41,14 +40,6 @@ void quick_sort(uint32_t a[], uint32_t length) {
 
     while (!stack_is_empty(&stack)) {
 
-#if defined(DEBUG)
-        for (uint32_t k = 0; k < length; k++)
-            printf("%u ", a[k]);
-        printf("\n");
-        /* show_inside_stack(&stack); */
-        usleep(5E5);
-#endif
-
         /* get next pare */
         head = get_top_of_stack(&stack);
         pop(&stack);
@@ -56,21 +47,42 @@ void quick_sort(uint32_t a[], uint32_t length) {
         pop(&stack);
 
         /* process parts */
-        qsort_dig(a, head, tail, &i, &j);
+        set_parts(a, head, tail, &ss_tail, &ls_head);
 
-        if (head < j) {
-            push(&stack, j);
+#if defined(DEBUG)
+        uint32_t k = 0;
+
+        /* all */
+        for (k = 0; k < length; k++) printf("%u ", a[k]);
+        printf("\n");
+
+        /* small fraction */
+        printf("ss:%u-%u:", head, ss_tail);
+        for (k = head; k <= ss_tail; k++) printf("%u ", a[k]);
+        printf("\n");
+
+        /* large fraction */
+        printf("ls:%u-%u:", ls_head, tail);
+        for (k = ls_head; k <= tail; k++) printf("%u ", a[k]);
+        printf("\n");
+
+        printf("\n");
+        usleep(5E5);
+#endif
+
+        if (head < ss_tail) {
+            push(&stack, ss_tail);
             push(&stack, head);
         }
 
-        if (i < tail) {
+        if (ls_head < tail) {
             push(&stack, tail);
-            push(&stack, i);
+            push(&stack, ls_head);
         }
     }
 }
 
-/* void qsort_dig(uint32_t, uint32_t, uint32_t*, uint32_t)
+/* void set_parts(uint32_t, uint32_t, uint32_t*, uint32_t)
  * diveide array A into A1 and A2.
  * A1 has members same or smaller than A[0].
  * A2 has members same or larger than A[0].
@@ -79,26 +91,20 @@ void quick_sort(uint32_t a[], uint32_t length) {
  * arg3: A's index max (larger part's tail)
  * arg4: solution, smaller part's tail
  * arg5, solution, larger part's head */
-void qsort_dig(uint32_t a[], uint32_t head, uint32_t tail,
+void set_parts(uint32_t a[], uint32_t head, uint32_t tail,
         uint32_t* ss_tail_p, uint32_t* ls_head_p) {
 
-    int32_t i = 0;
-    int32_t j = 0;
-    uint32_t thr = 0; //threshold value
+    uint32_t i = 0; //start from ls
+    uint32_t j = 0; //start from rs
     uint32_t temp = 0; //swap bucket
 
-    thr = a[head];
     i = head;
     j = tail;
 
     while (i <= j) {
 
-#if defined(DEBUG)
-        printf("i:%u, j:%u\n", i, j);
-#endif
-
-        while (a[i] < thr) i++; //go foward
-        while (a[j] > thr) j--; //go backward
+        while (a[i] < a[head]) i++; //go foward
+        while (a[j] > a[head]) j--; //go backward
 
         /* swap */
         if (i <= j) {
@@ -110,6 +116,6 @@ void qsort_dig(uint32_t a[], uint32_t head, uint32_t tail,
         }
     }
 
-    *ss_tail_p = i;
-    *ls_head_p = j;
+    *ss_tail_p = j;
+    *ls_head_p = i;
 }

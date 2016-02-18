@@ -1,5 +1,5 @@
 /* 2016/02/12
- * How to sort 0 to 9 using merge sort? */
+ * How to sort 0 to 9 using quick sort? */
 #include <stdio.h>
 #include <stdint.h>
 #include "../../lib/quick_sort.h"
@@ -9,7 +9,7 @@
 int main(int argc, char const* argv[]) {
 
     uint32_t a[ARRAY_MAX] = {
-        2, 6, 1, 4, 0, 5, 9, 7, 8, 3,
+        2, 6, 1, 4, 0, 5, 9, 7, 8, 3
     };
     uint32_t i = 0;
 
