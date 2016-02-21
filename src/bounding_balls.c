@@ -13,11 +13,11 @@
  * draw wall. */
 void draw_static_wall();
 
-/* void draw_moving_wall(ball_t*)
+/* void draw_moving_wall()
  * draw moving wall. */
 void draw_moving_wall();
 
-/* void control_ball(ball_t*)
+/* void control_ball()
  * draw ball bounding on wall. */
 void control_ball();
 
@@ -101,7 +101,7 @@ void draw_static_wall() {
             set_screen_cache(x, y, wall[y][x]);
 }
 
-/* void draw_moving_wall(ball_t*)
+/* void draw_moving_wall()
  * draw moving wall. */
 void draw_moving_wall() {
     /* x way moving wall difinition */
@@ -136,7 +136,7 @@ void draw_moving_wall() {
     set_screen_cache(s_x_wall.x + 2, s_x_wall.y, s_x_wall.str[2]);
 }
 
-/* void control_ball(ball_t*)
+/* void control_ball()
  * draw ball bounding on wall. */
 void control_ball() {
     /* charactor data definition */
