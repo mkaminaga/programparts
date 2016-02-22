@@ -7,7 +7,7 @@
 #include <unistd.h>
 #endif
 
-/* void set_parts(uint32_t, uint32_t, uint32_t*, uint32_t)
+/* void set_parts(data_t, uint32_t, uint32_t*, uint32_t)
  * diveide array A into A1 and A2.
  * A1 has members same or smaller than A[0].
  * A2 has members same or larger than A[0].
@@ -16,14 +16,14 @@
  * arg3: A's index max (larger part's tail)
  * arg4: solution, smaller part's tail
  * arg5, solution, larger part's head */
-void set_parts(uint32_t a[], uint32_t head, uint32_t tail,
+void set_parts(data_t a[], uint32_t head, uint32_t tail,
         uint32_t* ss_tail_p, uint32_t* ls_head_p);
 
-/* void quick_sort(uint32_t[], uint32_t)
+/* void quick_sort(data_t[], uint32_t)
  * sort data by quick sort algolthm.
  * arg1: pointer to the data array
  * arg2: data array length */
-void quick_sort(uint32_t a[], uint32_t length) {
+void quick_sort(data_t a[], uint32_t length) {
 
     stack_t stack;
     uint32_t ss_tail = 0;
@@ -82,7 +82,7 @@ void quick_sort(uint32_t a[], uint32_t length) {
     }
 }
 
-/* void set_parts(uint32_t, uint32_t, uint32_t*, uint32_t)
+/* void set_parts(data_t, uint32_t, uint32_t*, uint32_t)
  * diveide array A into A1 and A2.
  * A1 has members same or smaller than A[0].
  * A2 has members same or larger than A[0].
@@ -91,7 +91,7 @@ void quick_sort(uint32_t a[], uint32_t length) {
  * arg3: A's index max (larger part's tail)
  * arg4: solution, smaller part's tail
  * arg5, solution, larger part's head */
-void set_parts(uint32_t a[], uint32_t head, uint32_t tail,
+void set_parts(data_t a[], uint32_t head, uint32_t tail,
         uint32_t* ss_tail_p, uint32_t* ls_head_p) {
 
     uint32_t i = 0; //start from ls

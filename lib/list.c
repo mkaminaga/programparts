@@ -16,11 +16,11 @@ void init_list(element_t** e_pp) {
         (*e_pp)->data = 0; //dammy data
 }
 
-/* void insert_to_list(element_t*, uint32_t, uint32_t)
+/* void insert_to_list(element_t*, uint32_t, data_t)
  * insert new element to the list.
  * arg1: the pointer to the head of the list
  * arg2: index of the element to be inserted */
-void insert_to_list(element_t* e, uint32_t k, uint32_t data) {
+void insert_to_list(element_t* e, uint32_t k, data_t data) {
     element_t* new_e = NULL;
 
     /* trail to the index */
@@ -42,11 +42,11 @@ void insert_to_list(element_t* e, uint32_t k, uint32_t data) {
     }
 }
 
-/* void add_to_list(element_t*, uint32_t)
+/* void add_to_list(element_t*, data_t)
  * add new element to the list
  * arg1: the pointer to the head of the list
  * arg2: data to be added */
-void add_to_list(element_t* e, uint32_t data) {
+void add_to_list(element_t* e, data_t data) {
     element_t* new_e = NULL;
 
     /* create new instance to be added */
@@ -62,10 +62,10 @@ void add_to_list(element_t* e, uint32_t data) {
     e->next = new_e;
 }
 
-/* void delete_from_list(element_t*, uint32_t)
+/* void delete_from_list(element_t*, data_t)
  * arg1: the pointer to the head of the list
  * arg2: index of the element to be deleted */
-void delete_from_list(element_t* e, uint32_t k) {
+void delete_from_list(element_t* e, data_t k) {
     element_t* temp;
 
     /* trail to the index */

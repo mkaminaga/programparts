@@ -26,4 +26,3 @@ int main(int argc, char const* argv[]) {
         show_inside_heap(&heap);
     }
 }
-

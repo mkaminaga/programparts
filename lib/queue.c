@@ -15,10 +15,10 @@ void init_queue(queue_t* q) {
     q->flag = 0;
 }
 
-/* void insert(queue_t*, uint32_t)
+/* void insert(queue_t*, data_t)
  * insert new element to the queue
  * arg1: pointer to the queue */
-void insert(queue_t* q, uint32_t data) {
+void insert(queue_t* q, data_t data) {
 
     q->tail++;
 
@@ -47,18 +47,18 @@ void take_out(queue_t* q) {
     }
 }
 
-/* uint32_t queue_is_empty(queue_t*)
+/* data_t queue_is_empty(queue_t*)
  * return true if queue_is_empty or que overflow.
  * arg1: pointer to the queue */
-uint32_t queue_is_empty(queue_t* q) {
+data_t queue_is_empty(queue_t* q) {
     if (q->flag == 0) return (q->tail < q->head);
     return (q->tail >= q->head);
 }
 
-/* uint32_t get_top_of_queue(queue_t*)
+/* data_t get_top_of_queue(queue_t*)
  * return the oldest element of the queue.
  * arg1: pointer to the queue */
-uint32_t get_top_of_queue(queue_t* q) {
+data_t get_top_of_queue(queue_t* q) {
     return q->box[q->head];
 }
 

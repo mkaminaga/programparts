@@ -13,10 +13,10 @@ void init_stack(stack_t* s) {
     s->top = 0;
 }
 
-/* void push(stack_t*, uint32_t)
+/* void push(stack_t*, data_t)
  * push to the stack.
  * arg1: pointer to the stack */
-void push(stack_t* s, uint32_t data) {
+void push(stack_t* s, data_t data) {
 
     if (s->top >= STACK_MAX) return;
 
@@ -34,17 +34,17 @@ void pop(stack_t* s) {
     s->top--; //shift index backward
 }
 
-/* uint32_t stack_is_empty(stack_t*)
+/* data_t stack_is_empty(stack_t*)
  * return true when stack is empty.
  * arg1: pointer to the stack */
-uint32_t stack_is_empty(stack_t* s) {
+data_t stack_is_empty(stack_t* s) {
     return (s->top == 0); //if empty, true
 }
 
-/* uint32_t get_top_of_stack(stack_t*)
+/* data_t get_top_of_stack(stack_t*)
  * get top member of the stack.
  * arg1: pointer to the stack */
-uint32_t get_top_of_stack(stack_t* s) {
+data_t get_top_of_stack(stack_t* s) {
     return s->box[s->top];
 }
 

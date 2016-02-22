@@ -21,7 +21,7 @@
 
 int main(int argc, char const* argv[]) {
 
-    uint32_t a[ARRAY_MAX] = {
+    data_t a[ARRAY_MAX] = {
         2, 6, 1, 4, 0, 5, 9, 7, 8, 3,
     };
     uint32_t i = 0;

@@ -2,12 +2,6 @@
 #include <stdint.h>
 #include "heap.h"
 
-/* void swap(uint32_t*, uint32_t*)
- * swap the two vwlues in designated address.
- * arg1: value1
- * arg2: value */
-void swap(uint32_t*, uint32_t*);
-
 /* void init_heap(heap_t*)
  * init the heap.
  * arg1: the pointer of heap */
@@ -15,11 +9,11 @@ void init_heap(heap_t* h) {
     h->size = 0;
 }
 
-/* void insert_to_heap(heap_t*, uint32_t)
+/* void insert_to_heap(heap_t*, data_t)
  * insert data to the heap.
  * arg1: the pointer to the heap
  * arg2: data to be added */
-void insert_to_heap(heap_t* h, uint32_t data) {
+void insert_to_heap(heap_t* h, data_t data) {
     uint32_t i = 0;
 
     /* set data to leaf */
@@ -31,10 +25,10 @@ void insert_to_heap(heap_t* h, uint32_t data) {
         swap(&h->box[i], &h->box[i / 2]);
 }
 
-/*uint32_t get_min_of_heap(heap_t*)
+/*data_t get_min_of_heap(heap_t*)
  * get minimum member of the heap.
  * agr1: the pointer to the heap */
-uint32_t get_min_of_heap(heap_t* h) {
+data_t get_min_of_heap(heap_t* h) {
     return h->box[1];
 }
 
@@ -68,11 +62,11 @@ void show_inside_heap(heap_t* h) {
     printf("\n");
 }
 
-/* void swap(uint32_t*, uint32_t*)
+/* void swap(data_t*, data_t*)
  * swap the two vwlues in designated address.
  * arg1: value1
  * arg2: value */
-void swap(uint32_t* ptr1, uint32_t* ptr2) {
+void swap(data_t* ptr1, data_t* ptr2) {
     uint32_t temp = 0;
 
     temp = *ptr1;
