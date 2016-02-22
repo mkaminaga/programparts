@@ -14,7 +14,7 @@ element_t* new();
  * arg1: the pointer to be new head of the list */
 element_t* init_list(element_t* e) {
     if ((e = new()) != NULL)
-        e->next = NULL;
+        e->data = 0; //dammy data
     return e;
 }
 
@@ -24,7 +24,6 @@ element_t* init_list(element_t* e) {
  * arg1: the pointer to the head of the list
  * arg2: index of the element to be inserted */
 element_t* insert_to_list(element_t* e, uint32_t k, uint32_t data) {
-    element_t* temp;
 
     /* trail to the index */
     while (k > 1 && e != NULL) {
@@ -36,15 +35,15 @@ element_t* insert_to_list(element_t* e, uint32_t k, uint32_t data) {
         return NULL; //index size error
 
     /* replace the element */
-    if ((temp = new()) == NULL) {
-        return temp;
+    if ((e = new()) == NULL) {
+        return e;
     } else {
-        temp->data = data;
-        temp->next = e->next;
-        e->next = temp;
+        e->data = data;
+        e->next = e->next;
+        e->next = e;
     }
 
-    return temp;
+    return e;
 }
 
 /* uint32_t add_to_list(element_t*, uint32_t)
@@ -53,22 +52,22 @@ element_t* insert_to_list(element_t* e, uint32_t k, uint32_t data) {
  * arg1: the pointer to the head of the list
  * arg2: data to be added */
 element_t* add_to_list(element_t* e, uint32_t data) {
-    element_t* q;
+    element_t* new_e = NULL;
 
-    /* track to the end of the list */
-    while (e != NULL)
-        e = e->next; //shift index forward
+    /* create new instance to be added */
+    /* if ((new_e = new()) == NULL) */
+    /*     return new_e; */
+    /* else new_e->data = data; //set data */
 
-    /* replace tail of the list */
-    if ((q = new()) == NULL) {
-        return q;
-    } else {
-        q->data = data;
-        q->next = e->next;
-        e->next = q;
-    }
+    /* go to the end of the list */
+    printf("e:%p\n", e);
+    while (e->next != NULL)
+        e = e->next;
 
-    return q;
+    /* add new instance to the list */
+    /* e->next = new_e; */
+
+    return new_e;
 }
 
 /* void delete_from_list(element_t*, uint32_t)
@@ -101,9 +100,13 @@ void free_list(element_t* e) {
     while (e != NULL) {
         temp = e->next; //save pointer to be released
         free(e);
+
+#if defined(DEBUG)
+    printf("freed:%p\n", e);
+#endif
+
         e = temp; //shift index backward
     }
-    printf("free successful\n");
 }
 
 /* void show_inside_of_list(element_t*)
@@ -122,5 +125,14 @@ void show_inside_of_list(element_t* e) {
  * allocate new element_t object in heep memory.
  * return: pointer to the instance*/
 element_t* new() {
-    return (element_t*) malloc(sizeof(element_t));
+    element_t* q;
+
+    q = (element_t*) malloc(sizeof(element_t));
+    q->next = NULL;
+
+#if defined(DEBUG)
+    printf("allocated:%p\n", q);
+#endif
+
+    return q;
 }

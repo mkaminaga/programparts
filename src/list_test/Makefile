@@ -7,7 +7,7 @@ OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 
 CC = gcc
-CFLAGS = -Wall -I../../lib
+CFLAGS = -Wall -I../../lib -DDEBUG
 LDFLAGS = -L../../lib
 
 ${PROGRAM}: ${OBJS}

@@ -10,26 +10,29 @@ element_t* list_p;
 int main(int argc, char const* argv[]) {
     int32_t i = 0;
 
+    /* null definition on your patform */
+    printf("NULL = %p\n", NULL);
+
     /* initialize list */
     printf("init\n");
-    if (init_list(list_p) == NULL) {
+    if (init_list(list_p) == NULL)
         printf("memory allocation failed\n");
-    }
 
-#if 0
     /* add elements to the list */
     printf("add\n");
     for (i = 0; i < 'G' - 'A'; i++) {
-        add_to_list(&list, i + 'A');
-        show_inside_of_list(&list);
+        if (add_to_list(list_p, i + 'A') == NULL)
+            printf("memory allocation failed\n");
+            /* show_inside_of_list(list_p); */
     }
     printf("\n");
 
+#if 0
     /* delete form list */
     printf("delete\n");
     for (i = 'G' - 'A' + 1; i >= 0; i++) {
-        delete_from_list(&list, i);
-        show_inside_of_list(&list);
+        delete_from_list(list_p, i);
+        show_inside_of_list(list_p);
     }
     printf("\n");
 #endif
