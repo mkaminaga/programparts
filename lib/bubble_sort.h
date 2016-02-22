@@ -4,8 +4,7 @@
 /* data type of array */
 typedef uint32_t data_t;
 
-/*
- * void bubble_sort(data_t, uint32_t)
+/* void bubble_sort(data_t, uint32_t)
  * sort given data by bubble sort.
  * arg1: given data
  * arg3: depth of index to be sorted */
