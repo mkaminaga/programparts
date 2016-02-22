@@ -15,29 +15,29 @@ int main(int argc, char const* argv[]) {
 
     /* initialize list */
     printf("init\n");
-    if (init_list(list_p) == NULL)
-        printf("memory allocation failed\n");
+    init_list(&list_p);
 
-    /* add elements to the list */
-    printf("add\n");
-    for (i = 0; i < 'G' - 'A'; i++) {
-        if (add_to_list(list_p, i + 'A') == NULL)
-            printf("memory allocation failed\n");
-            /* show_inside_of_list(list_p); */
-    }
-    printf("\n");
-
-#if 0
-    /* delete form list */
-    printf("delete\n");
-    for (i = 'G' - 'A' + 1; i >= 0; i++) {
-        delete_from_list(list_p, i);
+    /* add 6 elements to the list */
+    printf("add 0 to 5\n");
+    for (i = 0; i < 6; i++) {
+        add_to_list(list_p, i + 'A');
         show_inside_of_list(list_p);
     }
     printf("\n");
-#endif
+
+    /* delete specific index form list */
+    printf("delete index 2\n");
+    delete_from_list(list_p, 2);
+    show_inside_of_list(list_p);
+    printf("\n");
+
+    /* insert specific index to list */
+    printf("insert to index 3\n");
+    insert_to_list(list_p, 3, 'A');
+    show_inside_of_list(list_p);
+    printf("\n");
 
     /* free list */
-    printf("free\n");
+    printf("free all\n");
     free_list(list_p);
 }

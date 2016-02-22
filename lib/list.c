@@ -8,66 +8,58 @@
  * return: memory allocation result */
 element_t* new();
 
-/* element_t* init_list(element_t*)
+/* void init_list(element_t**)
  * initialize list with given element head.
- * return: memory allocation result
- * arg1: the pointer to be new head of the list */
-element_t* init_list(element_t* e) {
-    if ((e = new()) != NULL)
-        e->data = 0; //dammy data
-    return e;
+ * arg1: the pointer to be new head pointer of the list */
+void init_list(element_t** e_pp) {
+    if ((*e_pp = new()) != NULL)
+        (*e_pp)->data = 0; //dammy data
 }
 
-/* element_t* insert_to_list(element_t*, uint32_t, uint32_t)
+/* void insert_to_list(element_t*, uint32_t, uint32_t)
  * insert new element to the list.
- * return: memory allocation result
  * arg1: the pointer to the head of the list
  * arg2: index of the element to be inserted */
-element_t* insert_to_list(element_t* e, uint32_t k, uint32_t data) {
+void insert_to_list(element_t* e, uint32_t k, uint32_t data) {
+    element_t* new_e = NULL;
 
     /* trail to the index */
-    while (k > 1 && e != NULL) {
+    while (e != NULL && k > 1) {
         e = e->next; //shift index forward
         k--;
     }
 
     if (k > 1)
-        return NULL; //index size error
+        return; //index size error
 
     /* replace the element */
-    if ((e = new()) == NULL) {
-        return e;
+    if ((new_e = new()) == NULL) {
+        return;
     } else {
-        e->data = data;
-        e->next = e->next;
-        e->next = e;
+        new_e->data = data;
+        new_e->next = e->next;
+        e->next = new_e;
     }
-
-    return e;
 }
 
-/* uint32_t add_to_list(element_t*, uint32_t)
+/* void add_to_list(element_t*, uint32_t)
  * add new element to the list
- * return: memory allocation result
  * arg1: the pointer to the head of the list
  * arg2: data to be added */
-element_t* add_to_list(element_t* e, uint32_t data) {
+void add_to_list(element_t* e, uint32_t data) {
     element_t* new_e = NULL;
 
     /* create new instance to be added */
-    /* if ((new_e = new()) == NULL) */
-    /*     return new_e; */
-    /* else new_e->data = data; //set data */
+    if ((new_e = new()) == NULL)
+        return;
+    else new_e->data = data; //set data
 
     /* go to the end of the list */
-    printf("e:%p\n", e);
     while (e->next != NULL)
         e = e->next;
 
     /* add new instance to the list */
-    /* e->next = new_e; */
-
-    return new_e;
+    e->next = new_e;
 }
 
 /* void delete_from_list(element_t*, uint32_t)
@@ -77,7 +69,7 @@ void delete_from_list(element_t* e, uint32_t k) {
     element_t* temp;
 
     /* trail to the index */
-    while (k > 1 && e != NULL) {
+    while (e != NULL && k > 1) {
         e = e->next; //shift index forward
         k--;
     }
@@ -85,7 +77,7 @@ void delete_from_list(element_t* e, uint32_t k) {
     if (k > 1)
         return; //index size error
 
-    temp = e; //save pointer to be releaced
+    temp = e->next; //save pointer to be releaced
     e->next = e->next->next;
     free(temp);
 }
