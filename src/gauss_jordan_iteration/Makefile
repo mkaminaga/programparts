@@ -2,7 +2,7 @@
 # http://www.gnu.org/software/make/manual/html_node/Automatic-Prerequisites.html#Automatic-Prerequisites
 
 PROGRAM = main
-SRC = main.c ../../lib/gauss_jordan_iteration_method.c
+SRC = main.c ../../lib/gauss_jordan_iteration.c
 OBJS = $(patsubst %.c,%.o,${SRC})
 DEPENDS = $(patsubst %.c,%.d,${SRC})
 

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "gauss_jordan_iteration_method.h"
-#include "least_square_method.h"
+#include "gauss_jordan_iteration.h"
+#include "least_square.h"
 
 double get_sum(double x[], uint32_t n);
 double get_crossed_sum(double x[], double y[], uint32_t n);

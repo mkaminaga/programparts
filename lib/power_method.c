@@ -4,7 +4,7 @@
 #include "vector_matrix.h"
 #include "power_method.h"
 
-/* power_method(double[], double[], double[], double[], uint32_t)
+/* power(double[], double[], double[], double[], uint32_t)
  * arg1: cubic matrix (A[i][j] = A[i * cubic_matrix_size + j])
  * arg2: eigenvalue  (the largest one comes first)
  * arg3: eigenvector (coresponding to eigenvalue)

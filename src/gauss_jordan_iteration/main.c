@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "../../lib/gauss_jordan_iteration_method.h"
+#include "../../lib/gauss_jordan_iteration.h"
 
 #define N 4
 

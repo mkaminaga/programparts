@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include "brute_force_search_method.h"
+#include "brute_force_search.h"
 
 /* void brute_force_search(uint8_t[], uint32_t[], uint8_t[], uint32_t, uint32_t[], uint32_t*)
  * search a specific word in a text by brute force search.

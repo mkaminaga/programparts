@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include "../../lib/least_square_method.h"
+#include "../../lib/least_square.h"
 
 #define PLOT_NUM 10
 #define ORDER 3 //if x^3, set 4

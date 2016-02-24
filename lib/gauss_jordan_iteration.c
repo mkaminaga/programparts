@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include "gauss_jordan_iteration_method.h"
+#include "gauss_jordan_iteration.h"
 
 /* gauss_jordan_iteration(uint32_t, double, double, double)
  * arg1: Square matrix row (column) size
