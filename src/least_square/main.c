@@ -5,7 +5,6 @@
 
 #define PLOT_NUM 10
 #define ORDER 3 //if x^3, set 4
-#define ROW ORDER + 1
 
 int main(int argc, char* argv[]){
     double x[PLOT_NUM] = {
