@@ -6,6 +6,10 @@ miscellaneous snippets for programming.<br>
 ----
 I made these programs to learn C language when I was new to the language.
 
-[win32template](win32template/)
+[win32_template](win32_template/)
 ----
 This is a template project for Win32 application.<br>
+
+[win32_calendar](win32_calendar/)
+----
+This is a test for month calendar control.<br>
