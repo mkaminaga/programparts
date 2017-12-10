@@ -26,6 +26,9 @@ BOOL OnCreate(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
       ICON_BIG,
       (LPARAM) LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICON1)));
 
+  // Controls are initialized.
+  InitCommonControls();
+
   // The edit is initialized.
   wchar_t buf[32] = {0};
   swprintf_s(buf, 10, L"%d", 0);
