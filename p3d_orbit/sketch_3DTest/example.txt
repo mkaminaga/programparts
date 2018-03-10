@@ -1,0 +1,99 @@
+Data Updated: 2018 Mar 10 (Day 69)
+
+2018/1/1=58119.00000(MJD)
+
+http://www.celestrak.com/NORAD/elements/weather.txt
+HIMAWARI-9               
+1 41836U 16064A   18068.14575707 -.00000292  00000-0  00000+0 0  9991
+2 41836   0.0117 266.9256 0001096  81.3782  11.6936  1.00272584  5004
+epoch year:18
+epoch days:68.14575958
+
+final float t0=58187.14575958;
+final float w0=1.420317;  /* (rad) */
+final float incl=0.000204;  /* (rad) */
+final float omega0=4.658731;  /* (rad) */
+final float e=0.000110;
+final float n0=1.002726;  /* (rev/day) */
+final float dndt=0.000000;  /* (rev/day^2) */
+final float l0=0.031776;  /* (rev) */
+
+http://www.celestrak.com/NORAD/elements/resource.txt
+LANDSAT 8               
+1 39084U 13008A   18068.84047902  .00000048  00000-0  20634-4 0  9994
+2 39084  98.1912 140.4770 0001319  93.0871 267.0478 14.57122761269749
+epoch year:18
+epoch days:68.84047699
+
+final float t0=58187.84047699;
+final float w0=1.624676;  /* (rad) */
+final float incl=1.713760;  /* (rad) */
+final float omega0=2.451786;  /* (rad) */
+final float e=0.000132;
+final float n0=14.571228;  /* (rev/day) */
+final float dndt=0.000000;  /* (rev/day^2) */
+final float l0=0.725673;  /* (rev) */
+
+http://www.celestrak.com/NORAD/elements/resource.txt
+ALOS-2               
+1 39766U 14029A   18068.84446580  .00000156  00000-0  27829-4 0  9993
+2 39766  97.9193 167.3619 0001632  89.6507 270.4883 14.79472632204880
+epoch year:18
+epoch days:68.84446716
+
+final float t0=58187.84446716;
+final float w0=1.564700;  /* (rad) */
+final float incl=1.709014;  /* (rad) */
+final float omega0=2.921016;  /* (rad) */
+final float e=0.000163;
+final float n0=14.794726;  /* (rev/day) */
+final float dndt=0.000000;  /* (rev/day^2) */
+final float l0=0.735023;  /* (rev) */
+
+http://www.celestrak.com/NORAD/elements/geo.txt
+QZS-1 (MICHIBIKI)               
+1 37158U 10045A   18066.55879231 -.00000232  00000-0  00000-0 0  9993
+2 37158  41.0138 155.5121 0759902 270.4319  77.1849  1.00253207 27422
+epoch year:18
+epoch days:66.55879211
+
+final float t0=58185.55879211;
+final float w0=4.719927;  /* (rad) */
+final float incl=0.715826;  /* (rad) */
+final float omega0=2.714198;  /* (rad) */
+final float e=0.075990;
+final float n0=1.002532;  /* (rev/day) */
+final float dndt=0.000000;  /* (rev/day^2) */
+final float l0=0.209742;  /* (rev) */
+
+http://www.celestrak.com/NORAD/elements/molniya.txt
+MOLNIYA 3-50               
+1 25847U 99036A   18068.42969053  .00000115  00000-0 -43806-2 0  9995
+2 25847  62.1122 209.7818 7190625 268.8400  15.7742  2.00660496136802
+epoch year:18
+epoch days:68.42968750
+
+final float t0=58187.42968750;
+final float w0=4.692143;  /* (rad) */
+final float incl=1.084062;  /* (rad) */
+final float omega0=3.661383;  /* (rad) */
+final float e=0.719063;
+final float n0=2.006605;  /* (rev/day) */
+final float dndt=0.000000;  /* (rev/day^2) */
+final float l0=0.042865;  /* (rev) */
+
+http://www.celestrak.com/NORAD/elements/cubesat.txt
+ITF-2               
+1 41932U 98067KU  18069.08963067  .00021331  00000-0  17599-3 0  9996
+2 41932  51.6369 129.2178 0002599 172.5444 187.5592 15.70282581 65167
+epoch year:18
+epoch days:69.08963013
+
+final float t0=58188.08963013;
+final float w0=3.011468;  /* (rad) */
+final float incl=0.901234;  /* (rad) */
+final float omega0=2.255276;  /* (rad) */
+final float e=0.000260;
+final float n0=15.702826;  /* (rev/day) */
+final float dndt=0.000000;  /* (rev/day^2) */
+final float l0=0.509672;  /* (rev) */

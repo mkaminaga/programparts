@@ -307,7 +307,6 @@ void draw() {
     rotateZ(-omega);
     rotateX(-incl);
     rotateZ(-w);
-    translate(-a*e*weight, 0.0, 0.0);
     /* Orbital plane */
     //hint(DISABLE_DEPTH_TEST);
     //stroke(255,255,255,200);
@@ -328,6 +327,7 @@ void draw() {
     strokeWeight(1);
 
     /* Trace */
+    translate(-a*e*weight, 0.0, 0.0);
     stroke(100, 100, 100);
     noFill();
     ellipseMode(RADIUS);
