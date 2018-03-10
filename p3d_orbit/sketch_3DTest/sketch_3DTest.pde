@@ -397,7 +397,8 @@ void draw() {
       strokeWeight(1);
       /* Radious */
       stroke(255, 255, 0);
-      line(0.0, 0.0, 0.0, p2x*a/ae, p2y*a/ae, p2z*a/ae);
+      float dist=sqrt(x2[0]*x2[0]+x2[1]*x2[1]+x2[2]*x2[2]);  /* (m) */
+      line(0.0, 0.0, 0.0, p2x*dist/ae, p2y*dist/ae, p2z*dist/ae);
       popMatrix();
     }
   }
