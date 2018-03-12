@@ -255,17 +255,14 @@ void draw() {
     stroke(255, 0, 0);
     fill(100, 0, 0);
     line(s1*1.5, 0.0, 0.0, -s1, 0.0, 0.0);
-    text("x*", s1*1.5, 0.0, 0.0);  /* x label */
     // Y axis
     stroke(0, 100, 0);
     fill(0, 100, 0);
     line(0.0, s1, 0.0, 0.0, -s1, 0.0);
-    text("y*", 0.0, s1, 0.0);  /* y label */
     // Z axis
     stroke(0, 0, 100);
     fill(0, 0, 100);
     line(0.0, 0.0, s1, 0.0, 0.0, -s1);
-    text("z*", 0.0, 0.0, s1);  /* z label */
     // End axis setting
     strokeWeight(1);
     popMatrix();
@@ -317,13 +314,17 @@ void draw() {
     /* Draw axis of orbital plane */
     strokeWeight(2);
     // X* axis
-    stroke(255, 0, 255);
-    fill(255, 0, 255);
-    line(s1, 0.0, 0.0, -s1*0.2, 0.0, 0.0);
-    // Y* axis
     stroke(255, 128, 0);
     fill(255, 128, 0);
-    line(0.0, s1, 0.0, 0.0, -s1*0.2, 0.0);
+    line(s1, 0.0, 0.0, -s1*0.2, 0.0, 0.0);
+    // Y* axis
+    stroke(255, 0, 255);
+    fill(255, 0, 255);
+    line(0.0, s1*0.2, 0.0, 0.0, -s1, 0.0);
+    // Z* axis
+    stroke(0, 128, 255);
+    fill(0, 128, 255);
+    line(0.0, 0.0, -s1*0.2, 0.0, 0.0, s1);
     strokeWeight(1);
 
     /* Trace */
