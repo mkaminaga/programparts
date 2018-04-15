@@ -19,8 +19,8 @@
 #define TREE_LEVEL_LIMIT        (9)
 
 namespace {
-const int kOffserToLevel[TREE_LEVEL_LIMIT] = {
-  0, 1, 5, 21, 85, 341, 1365, 5461, 21845,
+const int kOffserToLevel[TREE_LEVEL_LIMIT + 2] = {
+  0, 1, 5, 21, 85, 341, 1365, 5461, 21845, 87381, 349525,
 };
 }  // namespace
 
@@ -172,7 +172,7 @@ bool LinerQuaternaryTree::Initialize(double width, double height, int level) {
   level_ = level;
 
   // The memory size is limited.
-  if ((level <= 0) || (level >= TREE_LEVEL_LIMIT)) {
+  if ((level <= 0) || (level > TREE_LEVEL_LIMIT)) {
     return false;
   }
 
