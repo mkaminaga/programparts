@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
       tree.RegisterObject(objects[0].get());
       tree.RegisterObject(objects[1].get());
 
-      // The tree is resented.
+      // The tree is reset.
       tree.GetCollisionList(&collision_list);
 
       wprintf(L"==========\n");
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
       tree.RegisterObject(objects[0].get());
       tree.RegisterObject(objects[1].get());
 
-      // The tree is resented.
+      // The tree is reset.
       tree.GetCollisionList(&collision_list);
 
       wprintf(L"==========\n");
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
       tree.RegisterObject(objects[0].get());
       tree.RegisterObject(objects[1].get());
 
-      // The tree is resented.
+      // The tree is reset.
       tree.GetCollisionList(&collision_list);
 
       wprintf(L"==========\n");
