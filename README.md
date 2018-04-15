@@ -21,3 +21,7 @@ This is a test for spin control.<br>
 [win32\_edit](win32_edit/)
 ----
 This is a test for edit control.<br>
+
+[liner\_quaternary\_tree](liner_quaternary_tree/)
+----
+The implementation of the liner quaternary tree.
