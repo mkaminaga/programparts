@@ -40,8 +40,7 @@ int GetMortonNumberForPoint(double x, double y, double w, double h, int level) {
       SlideBits(static_cast<uint32_t>(x / unit_width)) |
       (SlideBits(static_cast<uint32_t>(y / unit_height)) << 1));
 #if defined(DEBUG)
-  wprintf(L"point Morton : %d\n", morton_number);
-  fflush(stdout);
+  wprintf(L"point Morton number : %d\n", morton_number);
 #endif
 
   return morton_number;
@@ -181,12 +180,11 @@ bool LinerQuaternaryTree::Initialize(double width, double height, int level) {
   cells_.resize(kOffserToLevel[level + 1]);
 
 #if defined(DEBUG)
-  wprintf(L"==== Initialize ====\n");
+  wprintf(L"---- Initialization of LQT ----\n");
   wprintf(L"width : %d\n", width_);
   wprintf(L"height : %d\n", height_);
   wprintf(L"level : %d\n", level_);
   wprintf(L"buffer size : %d\n", cells_.size());
-  fflush(stdout);
 #endif
   return true;
 }
@@ -202,8 +200,7 @@ void LinerQuaternaryTree::Finalize() {
 bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
   assert(object);
 #if defined(DEBUG)
-  wprintf(L"----\n");
-  fflush(stdout);
+  wprintf(L"---- Object registration ----\n");
 #endif
 
   // The previous registration is released.
@@ -241,17 +238,15 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
   // allocated yet.
   const int index = morton_number + kOffserToLevel[cell_level];
 #if defined(DEBUG)
-  wprintf(L"Box Morton : %d\n", morton_number);
-  wprintf(L"level: %d, index : %d\n", cell_level, index);
-  fflush(stdout);
+  wprintf(L"box Morton number : %d, level: %d, index : %d\n",
+      morton_number, cell_level, index);
 #endif
   if (cells_[index] == nullptr) {
     for (int i = index; cells_[i] == nullptr;
         i = (i - 1) / 4) {
       cells_[i] = new TreeCell();
 #if defined(DEBUG)
-      wprintf(L"create index : %d\n", i);
-      fflush(stdout);
+      wprintf(L"create node : %d\n", i);
 #endif
     }
   }
@@ -261,8 +256,7 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
       i = (i - 1) / 4) {
     cells_[i]->serial_number_ = serial_number_;
 #if defined(DEBUG)
-    wprintf(L"update index : %d\n", i);
-    fflush(stdout);
+    wprintf(L"update node : %d, serial number : %d\n", i, serial_number_);
 #endif
 
     if (i == 0) {
@@ -277,8 +271,7 @@ bool LinerQuaternaryTree::GetCollisionList(
     std::vector<TreeObject*>* collision_list) {
   assert(collision_list);
 #if defined(DEBUG)
-  wprintf(L"==== Patrol the tree ====\n");
-  fflush(stdout);
+  wprintf(L"---- Patrol the tree ----\n");
 #endif
 
   // Check if the tree has content.
@@ -298,8 +291,7 @@ bool LinerQuaternaryTree::GetCollisionList(
 LOOP_HEAD:
   while (true) {
 #if defined(DEBUG)
-    wprintf(L"---- index %d ---- \n", index);
-    fflush(stdout);
+    wprintf(L"current index : %d\n", index);
 #endif
     //
     // Descend the tree.
@@ -308,10 +300,6 @@ LOOP_HEAD:
       const int size = cells_[index]->size_;
       if (size > 0) {
         if (size == 1) {
-#if defined(DEBUG)
-          wprintf(L"index: %d, size == 1\n", index);
-          fflush(stdout);
-#endif
           TreeObject* object = cells_[index]->head_;
 
           // The collision among the object in the cell and stacked objects.
@@ -320,10 +308,6 @@ LOOP_HEAD:
             collision_list->push_back(it);
           }
         } else {
-#if defined(DEBUG)
-          wprintf(L"index: %d, size > 1\n", index);
-          fflush(stdout);
-#endif
           TreeObject* object = cells_[index]->head_;
           TreeObject* pair = object->next_;
           for (int i = 0; i < size; ++i) {
@@ -360,8 +344,7 @@ LOOP_HEAD:
             index = child_index;
             is_descend = true;
 #if defined(DEBUG)
-            wprintf(L"descend to %d\n", child_index);
-            fflush(stdout);
+            wprintf(L"descend index : %d\n", child_index);
 #endif
             goto LOOP_HEAD;
           }
@@ -380,8 +363,7 @@ LOOP_HEAD:
               index = child_index;
               is_descend = true;
 #if defined(DEBUG)
-              wprintf(L"descend to %d\n", child_index);
-              fflush(stdout);
+              wprintf(L"descend index : %d\n", child_index);
 #endif
               goto LOOP_HEAD;
             }
@@ -408,8 +390,7 @@ LOOP_HEAD:
     index = (child_index - 1) / 4;
     is_descend = false;
 #if defined(DEBUG)
-    wprintf(L"ascend to %d\n", index);
-    fflush(stdout);
+    wprintf(L"ascend index : %d\n", index);
 #endif
   }
 LOOP_EXIT:

@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <wchar.h>
+#include <memory>
 #include <string>
 #include "./liner_quaternary_tree.h"
 
@@ -15,11 +16,18 @@ class TestObject : public TreeObject {
  public:
   TestObject() { }
   TestObject(
-      const std::basic_string<wchar_t>& name,
+      const wchar_t* name,
       double x,
       double y,
       double width,
-      double height) : x_(x), y_(y), width_(width), height_(height), name_() { }
+      double height) :
+    x_(x),
+    y_(y),
+    width_(width),
+    height_(height),
+    name_(name) {
+      wprintf(L"%ls is created at %.1lf, %.1lf\n", name, x, y);
+    }
   ~TestObject() { }
 
   void GetBoundaryBox(
@@ -57,6 +65,20 @@ int main(int argc, char* argv[]) {
   const double height = 100.0;
   const int level = 3;
 
+  if (argc < 2) {
+    wprintf(L"Argument is required, \'a\', \'b\', \'c\', \'d\' or \'e\'\n");
+    return -1;
+  } else {
+    if ((argv[1][0] != L'a') &&
+        (argv[1][0] != L'b') &&
+        (argv[1][0] != L'c') &&
+        (argv[1][0] != L'd') &&
+        (argv[1][0] != L'e')) {
+      wprintf(L"Invalid argument : %ls \n", argv[1]);
+      return -1;
+    }
+  }
+
   // The liner Quaternary Tree is initialized.
   LinerQuaternaryTree tree;
   if (!tree.Initialize(width, height, level)) {
@@ -64,13 +86,67 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  // Object registration.
-  TestObject object[9];
-  object[0] = TestObject(L"object 0", 48, 80, 0.1, 0.1);
-  tree.RegisterObject(&object[0]);
+  // The test is done.
+  wprintf(L"=~=~=~=~=~= Test case %c =~=~=~=~=~=\n", argv[1][0]);
+
+  std::unique_ptr<TestObject> objects[3];
+  std::vector<TreeObject*> collision_list;
+  switch (argv[1][0]) {
+    case L'a':
+      objects[0].reset(new TestObject(L"object A", 50, 0, 40, 40));
+      objects[1].reset(new TestObject(L"object B", 50, 50, 20, 20));
+      tree.RegisterObject(objects[0].get());
+      tree.RegisterObject(objects[1].get());
+      break;
+    case L'b':
+      objects[0].reset(new TestObject(L"object A", 50, 0, 40, 40));
+      objects[1].reset(new TestObject(L"object B", 50, 0, 20, 20));
+      tree.RegisterObject(objects[0].get());
+      tree.RegisterObject(objects[1].get());
+      break;
+    case L'c':
+      objects[0].reset(new TestObject(L"object A", 50, 0, 40, 40));
+      objects[1].reset(new TestObject(L"object B", 50, 0, 20, 20));
+      tree.RegisterObject(objects[0].get());
+      tree.RegisterObject(objects[1].get());
+
+      // The tree is resented.
+      tree.GetCollisionList(&collision_list);
+
+      wprintf(L"==========\n");
+      objects[2].reset(new TestObject(L"object C", 0, 0, 40, 40));
+      tree.RegisterObject(objects[2].get());
+      break;
+    case L'd':
+      objects[0].reset(new TestObject(L"object A", 50, 0, 40, 40));
+      objects[1].reset(new TestObject(L"object B", 50, 0, 20, 20));
+      tree.RegisterObject(objects[0].get());
+      tree.RegisterObject(objects[1].get());
+
+      // The tree is resented.
+      tree.GetCollisionList(&collision_list);
+
+      wprintf(L"==========\n");
+      objects[2].reset(new TestObject(L"object C", 50, 0, 20, 20));
+      tree.RegisterObject(objects[2].get());
+      break;
+    case L'e':
+      objects[0].reset(new TestObject(L"object A", 50, 0, 40, 40));
+      objects[1].reset(new TestObject(L"object B", 50, 0, 20, 20));
+      tree.RegisterObject(objects[0].get());
+      tree.RegisterObject(objects[1].get());
+
+      // The tree is resented.
+      tree.GetCollisionList(&collision_list);
+
+      wprintf(L"==========\n");
+      objects[2].reset(new TestObject(L"object C", 50, 25, 20, 20));
+      tree.RegisterObject(objects[2].get());
+    default:
+      break;
+  }
 
   // The collision check.
-  std::vector<TreeObject*> collision_list;
   tree.GetCollisionList(&collision_list);
 
   wprintf(L"==== Collision Pairs ====\n");
@@ -81,6 +157,8 @@ int main(int argc, char* argv[]) {
 
   // The liner Quaternary Tree is finalized.
   tree.Finalize();
+
+  fflush(stdout);
 
   (void) argc;
   (void) argv;
