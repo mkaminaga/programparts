@@ -33,12 +33,10 @@ class TreeObject {
   virtual void Collide(TreeObject* object) {
     (void) object;
   }
+  bool RemoveFromCell();  // No overload.
 
   friend class TreeCell;
   friend class LinerQuaternaryTree;
-
- private:
-  bool RemoveFromCell();  // No overload.
 
  private:
   TreeCell* cell_;  // The cell that this object is belonging.
