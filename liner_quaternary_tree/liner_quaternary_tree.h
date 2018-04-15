@@ -33,7 +33,7 @@ class TreeObject {
   virtual void Collide(TreeObject* object) {
     (void) object;
   }
-  bool RemoveFromCell();  // No overload.
+  bool RemoveFromTree();  // No overload.
 
   friend class TreeCell;
   friend class LinerQuaternaryTree;

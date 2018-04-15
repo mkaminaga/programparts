@@ -91,7 +91,7 @@ bool GetMortonNumberForBox(
   //
 TreeObject::TreeObject() : cell_(nullptr), prev_(nullptr), next_(nullptr) { }
 TreeObject::~TreeObject() = default;
-bool TreeObject::RemoveFromCell() {
+bool TreeObject::RemoveFromTree() {
   if (cell_ == nullptr) {
     // The object is not belonging to a cell, so there is no need of removal.
     return false;
@@ -204,7 +204,7 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
 #endif
 
   // The previous registration is released.
-  object->RemoveFromCell();
+  object->RemoveFromTree();
 
   // The object's boundary box is acquired.
   double top_left_x = 0.0;
