@@ -1,6 +1,6 @@
   // @file liner_quaternary_tree.h
   // @brief Implementation of Liner Quaternary Tree algorithm.
-  // See also the source code of LQT implementation distributed by IKD.
+  // See also the source code of LQT distributed at the following web page:
   //   http://marupeke296.com
   // @author Mamoru Kaminaga
   // @date 2018-04-12 15:43:57
@@ -23,12 +23,12 @@ class TreeObject {
   virtual void GetBoundaryBox(
       double* top_left_x,
       double* top_left_y,
-      double* rigth_bottom_x,
-      double* right_bottom_y) {
+      double* bottom_right_x,
+      double* bottom_right_y) {
     (void) top_left_x;
     (void) top_left_y;
-    (void) rigth_bottom_x;
-    (void) right_bottom_y;
+    (void) bottom_right_x;
+    (void) bottom_right_y;
   }
   virtual void Collide(TreeObject* object) {
     (void) object;
@@ -59,9 +59,9 @@ class TreeCell {
   friend class LinerQuaternaryTree;
 
  private:
-  int size_;
-  int serial_number_;
-  TreeObject* head_;
+  int size_;  // The count of objects in the node.
+  int serial_number_;  // NOLINT Updated when the latest object is registered to this node or it's child node.
+  TreeObject* head_;  // The root pointer of the object link list.
 };
 
   // The Liner Quaternary Tree (LQT) class.
@@ -77,10 +77,10 @@ class LinerQuaternaryTree {
   bool GetCollisionList(std::vector<TreeObject*>* collision_list);
 
  private:
-  int level_;
-  int serial_number_;
-  double width_;
-  double height_;
-  std::vector<TreeCell*> cells_;
+  int level_;  // The LQT divide level.
+  int serial_number_;  // The latest serial number.
+  double width_;  // The monitoring region width.
+  double height_;  // The monitoring region height.
+  std::vector<TreeCell*> cells_;  // The cell buffer.
 };
 #endif  // LINER_QUATERNARY_TREE_H_

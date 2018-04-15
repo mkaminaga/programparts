@@ -1,6 +1,6 @@
   // @file liner_quaternary_tree.h
   // @brief Implementation of Liner Quaternary Tree algorithm.
-  // See also the source code of LQT implementation distributed by IKD.
+  // See also the source code of LQT distributed at the following web page:
   //   http://marupeke296.com
   // @author Mamoru Kaminaga
   // @date 2018-04-12 15:43:57
@@ -17,7 +17,6 @@
 #endif
 
 #define TREE_LEVEL_LIMIT        (9)
-#define INVALID_MORTON_NUMBER   (-1)
 
 namespace {
 const int kOffserToLevel[TREE_LEVEL_LIMIT] = {
@@ -50,8 +49,8 @@ int GetMortonNumberForPoint(double x, double y, double w, double h, int level) {
 bool GetMortonNumberForBox(
     double top_left_x,
     double top_left_y,
-    double rigth_bottom_x,
-    double right_bottom_y,
+    double bottom_right_x,
+    double bottom_right_y,
     double w,
     double h,
     int level,
@@ -63,15 +62,15 @@ bool GetMortonNumberForBox(
       w,
       h,
       level);
-  const int right_bottom_morton_number = GetMortonNumberForPoint(
-      rigth_bottom_x,
-      right_bottom_y,
+  const int bottom_right_morton_number = GetMortonNumberForPoint(
+      bottom_right_x,
+      bottom_right_y,
       w,
       h,
       level);
 
   int shift_count = 0;
-  for (int highest_bits = top_left_morton_number ^ right_bottom_morton_number;
+  for (int highest_bits = top_left_morton_number ^ bottom_right_morton_number;
       highest_bits != 0; highest_bits = highest_bits >> 2) {
     ++shift_count;
   }
@@ -80,7 +79,8 @@ bool GetMortonNumberForBox(
   *morton_number = top_left_morton_number >> (shift_count * 2);
   const int division_count = (1 << level) * (1 << level);
   if (*morton_number > division_count) {
-    *morton_number = INVALID_MORTON_NUMBER;
+    *cell_level = 0;
+    *morton_number = 0;
     return false;
   }
   return true;
@@ -212,13 +212,13 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
   // The object's boundary box is acquired.
   double top_left_x = 0.0;
   double top_left_y = 0.0;
-  double rigth_bottom_x = 0.0;
-  double right_bottom_y = 0.0;
+  double bottom_right_x = 0.0;
+  double bottom_right_y = 0.0;
   object->GetBoundaryBox(
       &top_left_x,
       &top_left_y,
-      &rigth_bottom_x,
-      &right_bottom_y);
+      &bottom_right_x,
+      &bottom_right_y);
 
   // The Morton number of the boundary box is acquired.
   int cell_level = 0;
@@ -226,8 +226,8 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
   bool result = GetMortonNumberForBox(
       top_left_x,
       top_left_y,
-      rigth_bottom_x,
-      right_bottom_y,
+      bottom_right_x,
+      bottom_right_y,
       width_,
       height_,
       level_,
@@ -240,6 +240,11 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
   // Memories for cells are created recursively when the memory is not
   // allocated yet.
   const int index = morton_number + kOffserToLevel[cell_level];
+#if defined(DEBUG)
+  wprintf(L"Box Morton : %d\n", morton_number);
+  wprintf(L"level: %d, index : %d\n", cell_level, index);
+  fflush(stdout);
+#endif
   if (cells_[index] == nullptr) {
     for (int i = index; cells_[i] == nullptr;
         i = (i - 1) / 4) {
@@ -250,14 +255,8 @@ bool LinerQuaternaryTree::RegisterObject(TreeObject* object) {
 #endif
     }
   }
-#if defined(DEBUG)
-  wprintf(L"level : %d\n", cell_level);
-  wprintf(L"Box Morton : %d\n", morton_number);
-  wprintf(L"index : %d\n", index);
-  fflush(stdout);
-#endif
 
-  // The serial number is copied for the next tree search.
+  // The serial number is copied for the next tree patrol.
   for (int i = index; cells_[i]->serial_number_ != serial_number_;
       i = (i - 1) / 4) {
     cells_[i]->serial_number_ = serial_number_;
@@ -278,7 +277,7 @@ bool LinerQuaternaryTree::GetCollisionList(
     std::vector<TreeObject*>* collision_list) {
   assert(collision_list);
 #if defined(DEBUG)
-  wprintf(L"==== Collision Judge ====\n");
+  wprintf(L"==== Patrol the tree ====\n");
   fflush(stdout);
 #endif
 

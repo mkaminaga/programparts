@@ -1,13 +1,13 @@
-  // @file main.cc
-  // @brief liner Quaternary Tree test.
+  // @file liner_quaternary_tree.h
+  // @brief The test of Liner Quaternary Tree implementation.
+  // See also the source code of LQT distributed at the following web page:
+  //   http://marupeke296.com
   // @author Mamoru Kaminaga
-  // @date 2018-04-12 15:28:05
-  // Copyright 2018 Mamoru Kaminaga
+  // @date 2018-04-12 15:43:57
+  // Copyright 2017 Mamoru Kaminaga
 #include <assert.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <wchar.h>
-#include <windows.h>
 #include <string>
 #include "./liner_quaternary_tree.h"
 
@@ -25,12 +25,16 @@ class TestObject : public TreeObject {
   void GetBoundaryBox(
       double* top_left_x,
       double* top_left_y,
-      double* rigth_bottom_x,
-      double* right_bottom_y) {
+      double* bottom_right_x,
+      double* bottom_right_y) {
+    assert(top_left_x);
+    assert(top_left_y);
+    assert(bottom_right_x);
+    assert(bottom_right_y);
     *top_left_x = x_;
     *top_left_y = y_;
-    *rigth_bottom_x = x_ + width_;
-    *right_bottom_y = y_ + height_;
+    *bottom_right_x = x_ + width_;
+    *bottom_right_y = y_ + height_;
   }
   void Collide(TreeObject* pair_object) {
     assert(pair_object);
@@ -69,8 +73,8 @@ int main(int argc, char* argv[]) {
   std::vector<TreeObject*> collision_list;
   tree.GetCollisionList(&collision_list);
 
-  wprintf(L"==== Collision Result ====\n");
-  wprintf(L"collision pairs : %d\n", collision_list.size() / 2);
+  wprintf(L"==== Collision Pairs ====\n");
+  wprintf(L"count of pairs : %d\n", collision_list.size() / 2);
   for (int i = 0; i < static_cast<int>(collision_list.size()) / 2; ++i) {
     collision_list[i * 2]->Collide(collision_list[i * 2 + 1]);
   }
