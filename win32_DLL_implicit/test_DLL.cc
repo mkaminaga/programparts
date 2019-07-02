@@ -12,4 +12,4 @@
 
 DLLAPI void HelloWorld() { printf("Hello World!\n"); }
 DLLAPI int Increment(int v) { return v + 1; }
-DLLAPI int Decrement(int v) { return v + 1; }
+DLLAPI int Decrement(int v) { return v - 1; }
