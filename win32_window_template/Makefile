@@ -32,4 +32,4 @@ $(TARGET): $(OBJ) $(RES)
 	$(CC) $(CPPFLAGS) /Fo"$(TMPDIR)\\" /c $<
 
 clean:
-	rm $(TARGET) $(OBJ) $(TMPDIR)\* *.map *.pdb *.ilk *.obj *.lib
+	rm $(TARGET) $(OBJ) *.map *.pdb *.ilk *.obj *.lib
