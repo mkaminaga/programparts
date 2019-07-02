@@ -25,3 +25,11 @@ This is a test for edit control.<br>
 [liner\_quaternary\_tree](liner_quaternary_tree/)
 ----
 The implementation of the liner quaternary tree.
+
+[win32\_DLL\_implicit](win32_DLL_implicit/)
+----
+Implicit use of dynamic link library.
+
+[win32\_DLL\_explicit](win32_DLL_explicit/)
+----
+Explicit use of dynamic link library.
