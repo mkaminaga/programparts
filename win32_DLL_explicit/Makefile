@@ -9,7 +9,6 @@ MAP = main.map
 RES =
 SRC = main.cc test_DLL.cc
 OBJ = $(OBJDIR)\main.obj
-MYLIB = test_DLL.lib
 DLL = test_DLL.dll
 OBJDIR = build
 
@@ -23,8 +22,8 @@ LFLAGS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" \
 
 ALL: $(TARGET)
 
-$(TARGET): $(OBJ) $(MYLIB) $(DLL) $(RES)
-	$(LINK) $(MYLIB) $(LFLAGS) /OUT:$(TARGET) /PDB:"$(PDB)" /MAP:"$(MAP)" \
+$(TARGET): $(OBJ) $(DLL) $(RES)
+	$(LINK) $(LFLAGS) /OUT:$(TARGET) /PDB:"$(PDB)" /MAP:"$(MAP)" \
 	$(OBJ) $(RES)
 
 .cc{$(OBJDIR)}.obj:
@@ -32,7 +31,7 @@ $(TARGET): $(OBJ) $(MYLIB) $(DLL) $(RES)
 	$(CC) $(CPPFLAGS) /Fo"$(OBJDIR)\\" /c $<
 
 # Create dynamic link library and its corresponding static link library.
-.cc.lib:
+.cc.dll:
 	$(CC) $(CPPFLAGS) /LD $<
 
 # Phony target for clean.
