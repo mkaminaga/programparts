@@ -10,7 +10,6 @@
 *.exe
 *.out
 *.stackdump
-# *.ico
 *.sdf
 *.res
 *.sln
@@ -18,9 +17,11 @@
 *.bmp
 *.opendb
 *.bak
-build/
+*.dll
+*.exp
 
 # release files
+build/
 release/
 
 # Visual Studio profiler
@@ -41,6 +42,7 @@ release/
 *.jpg
 *.gif
 *.bmp
+# *.ico
 
 # data files
 *.dat
