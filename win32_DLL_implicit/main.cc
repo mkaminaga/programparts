@@ -1,9 +1,9 @@
 //
 // @file main.cc
 // @brief Test for dynamic link library (loaded implicitly).
-// @author
+// @author Mamoru Kaminaga
 // @date 2019-07-02 10:28:02
-// Copyright 2019
+// Copyright 2019 Mamoru Kaminaga
 //
 #include "./test_DLL.h"
 
