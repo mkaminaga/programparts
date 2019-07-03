@@ -21,11 +21,6 @@ constexpr wchar_t CLASS_NAME[] = L"Template class";
 BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) {
   (void)hWnd;
   (void)lpCreateStruct;
-
-  // Initialization of Component Object Model (COM) for SHBrowseForFolder.
-  // COINIT_APARTMENTTHREADED flag is required.
-  // https://docs.microsoft.com/ja-jp/windows/win32/api/shlobj_core/nf-shlobj_core-shbrowseforfoldera
-  CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
   return TRUE;
 }
 
@@ -53,8 +48,7 @@ void Cls_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,
 
   // Show folder dialog with default root path.
   wchar_t selected_dir[MAX_PATH] = {0};
-  if (!GetDirectoryName(hwnd, L"root = default directory", NULL,
-                        selected_dir)) {
+  if (!GetDirectoryName(hwnd, L"Desktop", NULL, selected_dir)) {
 #ifdef DEBUG
     fwprintf(stderr, L"Error on folder select\n");
 #endif
@@ -79,8 +73,7 @@ void Cls_OnRButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y,
   GetCurrentDirectory(MAX_PATH, root_dir);
 
   wchar_t selected_dir[MAX_PATH] = {0};
-  if (!GetDirectoryName(hwnd, L"root = Current directory", root_dir,
-                        selected_dir)) {
+  if (!GetDirectoryName(hwnd, root_dir, root_dir, selected_dir)) {
 #ifdef DEBUG
     fwprintf(stderr, L"Error on folder select\n");
 #endif
@@ -110,6 +103,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPTSTR lpsCmdLine, int nCmdShow) {
   (void)hPrevInstance;
   (void)lpsCmdLine;
+
+  // Initialization of COM.
+  CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
 #ifdef DEBUG
   FILE* fp = nullptr;
@@ -157,5 +153,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifdef DEBUG
   FreeConsole();
 #endif
+
+  CoUninitialize();
   return 0;
 }

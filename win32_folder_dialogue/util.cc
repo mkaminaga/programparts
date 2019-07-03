@@ -29,11 +29,8 @@ static int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam,
     case BFFM_VALIDATEFAILED:
       // The user typed an invalid name into the dialog's edit box.
       // A nonexistent folder is considered an invalid name.
-#ifdef DEBUG
-      fwprintf(stderr, L"Invalid name:%ls\n", (wchar_t *)lParam);
-      fwprintf(stderr, L"\n");
-#endif
-      return 1;  // Keep the dialog box open.
+      MessageBox(hWnd, L"Invalid folder name!", L"Error", MB_OK);
+      return 1;
     case BFFM_SELCHANGED:
       // The selection has changed in the dialog box.
       pidl = (ITEMIDLIST *)lParam;
@@ -74,13 +71,7 @@ bool GetDirectoryName(HWND hwnd, const wchar_t *title, const wchar_t *root_dir,
   bi.pidlRoot = pidlRoot;
   bi.pszDisplayName = (LPWSTR)selected_dir;
   bi.lpszTitle = title;
-#if 0
-  bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_DONTGOBELOWDOMAIN |
-               BIF_VALIDATE | BIF_USENEWUI;
-  bi.ulFlags &= (~BIF_BROWSEFILEJUNCTIONS);  // Don't display compressed files.
-#else
-  bi.ulFlags = BIF_USENEWUI;  // Don't display compressed files.
-#endif
+  bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_VALIDATE | BIF_USENEWUI;
   bi.lpfn = BrowseCallbackProc;
   bi.lParam = (LPARAM)root_dir;
 
