@@ -33,9 +33,9 @@ static int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam,
       return 1;
     case BFFM_SELCHANGED:
       // The selection has changed in the dialog box.
+#ifdef DEBUG
       pidl = (ITEMIDLIST *)lParam;
       SHGetPathFromIDList(pidl, dir);
-#ifdef DEBUG
       fwprintf(stderr, L"Select changed:%ls\n", dir);
       fwprintf(stderr, L"\n");
 #endif
