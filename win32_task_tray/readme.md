@@ -1,5 +1,4 @@
-﻿programparts/win32_template
+﻿programparts/win32_task_tray
 ====
-This is a template project for win32 application.<br>
-The dialog is modifiable by changing resource script and dialog procedure.<br>
-Have fun!
+This is a mock up for task tray program.<br>
+Menu items can be selected.<br>
