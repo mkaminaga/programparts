@@ -66,7 +66,7 @@ bool GetDirectoryName(HWND hwnd, const wchar_t *title, const wchar_t *root_dir,
 
   // Set information about the folder dialog.
   BROWSEINFO bi;
-  memset(&bi, 0, sizeof(BROWSEINFO));
+  memset(&bi, 0, sizeof(bi));
   bi.hwndOwner = hwnd;
   bi.pidlRoot = pidlRoot;
   bi.pszDisplayName = (LPWSTR)selected_dir;
