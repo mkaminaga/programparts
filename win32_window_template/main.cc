@@ -16,35 +16,35 @@ constexpr wchar_t WINDOW_NAME[] = L"Template window";
 constexpr wchar_t CLASS_NAME[] = L"Template class";
 }  // namespace
 
-BOOL Cls_OnCreate(HWND hWnd, LPCREATESTRUCT lpCreateStruct) {
-  (void)hWnd;
+BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+  (void)hwnd;
   (void)lpCreateStruct;
   return TRUE;
 }
 
-void Cls_OnDestroy(HWND hWnd) {
-  (void)hWnd;
+void Cls_OnDestroy(HWND hwnd) {
+  (void)hwnd;
   PostQuitMessage(0);
 }
 
-void Cls_OnClose(HWND hWnd) { DestroyWindow(hWnd); }
+void Cls_OnClose(HWND hwnd) { DestroyWindow(hwnd); }
 
-void Cls_OnCommand(HWND hWnd, int id, HWND hWndCtl, UINT codeNotify) {
-  (void)hWnd;
+void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
+  (void)hwnd;
   (void)id;
   (void)hWndCtl;
   (void)codeNotify;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam,
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam,
                          LPARAM lParam) {
   switch (message) {
-    HANDLE_MSG(hWnd, WM_CREATE, Cls_OnCreate);
-    HANDLE_MSG(hWnd, WM_DESTROY, Cls_OnDestroy);
-    HANDLE_MSG(hWnd, WM_COMMAND, Cls_OnCommand);
-    HANDLE_MSG(hWnd, WM_CLOSE, Cls_OnClose);
+    HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
+    HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
+    HANDLE_MSG(hwnd, WM_COMMAND, Cls_OnCommand);
+    HANDLE_MSG(hwnd, WM_CLOSE, Cls_OnClose);
     default:
-      return DefWindowProc(hWnd, message, wParam, lParam);
+      return DefWindowProc(hwnd, message, wParam, lParam);
   }
 }
 
@@ -81,14 +81,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return FALSE;
   }
 
-  HWND hWnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_OVERLAPPEDWINDOW,
+  HWND hwnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_OVERLAPPEDWINDOW,
                            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                            CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
-  if (hWnd == NULL) {
+  if (hwnd == NULL) {
     return FALSE;
   }
-  ShowWindow(hWnd, nCmdShow);
-  UpdateWindow(hWnd);
+  ShowWindow(hwnd, nCmdShow);
+  UpdateWindow(hwnd);
 
   MSG msg;
   while (GetMessage(&msg, NULL, 0, 0) > 0) {
