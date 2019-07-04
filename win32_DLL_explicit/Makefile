@@ -7,18 +7,19 @@ TARGET = main.exe
 PDB = main.pdb
 MAP = main.map
 RES =
-SRC = main.cc test_DLL.cc
+SRC = main.cc util.cc
 OBJ = $(OBJDIR)\main.obj
-DLL = test_DLL.dll
+DLL = util.dll
 OBJDIR = build
 
 CC = "$(VCINSTALLDIR)\cl.exe"
 LINK = "$(VCINSTALLDIR)\link.exe"
-CPPFLAGS = /nologo /W4 /Zi /O2 /MT /EHsc /Fd"$(OBJDIR)/" /DDEBUG
+CPPFLAGS = /nologo /W4 /Zi /O2 /MT /EHsc /Fd"$(TMPDIR)/" /DUNICODE /D_UNICODE \
+					 /DDEBUG
 LFLAGS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" \
 				 "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" \
 				 "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" "libcmt.lib" \
-				 /NOLOGO /SUBSYSTEM:CONSOLE /DEBUG /PROFILE
+				 /NOLOGO /SUBSYSTEM:CONSOLE /DEBUG
 
 ALL: $(TARGET)
 
@@ -30,10 +31,8 @@ $(TARGET): $(OBJ) $(DLL) $(RES)
 	@[ -d $(OBJDIR) ] || mkdir $(OBJDIR)
 	$(CC) $(CPPFLAGS) /Fo"$(OBJDIR)\\" /c $<
 
-# Create dynamic link library and its corresponding static link library.
 .cc.dll:
 	$(CC) $(CPPFLAGS) /LD $<
 
-# Phony target for clean.
 clean:
 	rm $(OBJ) $(TARGET) *.map *.pdb *.ilk *.obj *.lib *.dll *.exp

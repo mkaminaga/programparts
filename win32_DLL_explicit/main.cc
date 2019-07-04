@@ -7,52 +7,29 @@
 //
 #include <stdio.h>
 #include <windows.h>
+#include "./util.h"
 
 int main(int argc, char* argv[]) {
   (void)argc;
   (void)argv;
 
-  // Load DLL in explicit way.
-  HINSTANCE hDLL = LoadLibrary("test_DLL.dll");
-  if (hDLL == nullptr) {
-    fprintf(stderr, "Failed to load DLL\n");
+  // Load DLL.
+  HINSTANCE hDLL = LoadLibrary(L"util.dll");
+  if (hDLL == NULL) {
+    fwprintf(stderr, L"Failed to load DLL\n");
     return 1;
   }
 
-  // Load "Hello World" function.
-  void (*hello_func)() = nullptr;
-  hello_func = (void (*)())GetProcAddress(hDLL, "HelloWorld");
-  if (hello_func == nullptr) {
-    fprintf(stderr, "Failed to load function HelloWorld\n");
+  // Load DLL function.
+  void (*func)() = NULL;
+  func = (void (*)())GetProcAddress(hDLL, "HelloWorld");
+  if (func == NULL) {
+    fwprintf(stderr, L"Failed to get function\n");
   } else {
-    hello_func();
+    func();
   }
 
-  int v = 10;
-  printf("v = %d\n", v);
-
-  // Load increment function.
-  int (*increment_func)(int v) = nullptr;
-  increment_func = (int (*)(int))GetProcAddress(hDLL, "Increment");
-  if (increment_func == nullptr) {
-    fprintf(stderr, "Failed to load function Increment\n");
-  } else {
-    v = increment_func(v);
-    printf("Incremented, v = %d\n", v);
-  }
-
-  // Load decrement function.
-  int (*decrement_func)(int v) = nullptr;
-  decrement_func = (int (*)(int))GetProcAddress(hDLL, "Decrement");
-  if (decrement_func == nullptr) {
-    fprintf(stderr, "Failed to load function Decrement\n");
-    return 1;
-  } else {
-    v = decrement_func(v);
-    printf("Decremented, v = %d\n", v);
-  }
-
-  // Release dynamic link library.
+  // Release DLL.
   FreeLibrary(hDLL);
 
   return 0;
