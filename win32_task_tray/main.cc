@@ -34,14 +34,14 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
   nid.uCallbackMessage = WM_TASKTRAY;
   nid.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-  StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Test application");
+  StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Task tray test");
 
   if (Shell_NotifyIcon(NIM_ADD, &nid) != TRUE) {
 #ifdef DEBUG
-    fwprintf(stderr, L"Failed to add icon on task tray!\n");
+    fwprintf(stderr, L"Failed to add an icon on task tray!\n");
 #endif
+    return FALSE;
   }
-
   return TRUE;
 }
 
@@ -67,6 +67,21 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)id;
   (void)hWndCtl;
   (void)codeNotify;
+
+  switch (id) {
+    case IDM_FOLDER:
+#ifdef DEBUG
+      fwprintf(stderr, L"Folder is clicked\n");
+#endif
+      break;
+    case IDM_QUIT:
+#ifdef DEBUG
+      fwprintf(stderr, L"Quit is clicked\n");
+#endif
+      break;
+    default:
+      break;
+  }
 }
 
 void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
@@ -76,8 +91,16 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
     return;
   }
   switch (uMsg) {
-    case WM_RBUTTONDOWN:
-      break;
+    case WM_RBUTTONDOWN: {
+      // Display menu when right button is clicked on task tray icon.
+      POINT point;
+      GetCursorPos(&point);
+      HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+      HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
+      HMENU hSubMenu = GetSubMenu(hMenu, 0);
+      TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
+                     point.y, 0, hwnd, NULL);
+    } break;
     default:
       break;
   }
@@ -123,20 +146,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
   wc.hCursor = LoadCursor(NULL, IDC_ARROW);
   wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-  wc.lpszMenuName = 0;
+  wc.lpszMenuName = NULL;
   wc.lpszClassName = CLASS_NAME;
   if (!RegisterClass(&wc)) {
     return FALSE;
   }
 
-  HWND hWnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_OVERLAPPEDWINDOW,
-                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                           CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+  HWND hWnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_DISABLED, CW_USEDEFAULT,
+                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL,
+                           NULL, hInstance, NULL);
   if (hWnd == NULL) {
     return FALSE;
   }
-  ShowWindow(hWnd, nCmdShow);
-  UpdateWindow(hWnd);
 
   MSG msg;
   while (GetMessage(&msg, NULL, 0, 0) > 0) {

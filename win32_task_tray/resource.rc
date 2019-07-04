@@ -12,7 +12,22 @@
 
 
 //
+// Menu resources
+//
+LANGUAGE LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN
+IDR_MENU1 MENU
+{
+    POPUP "PopupMenu"
+    {
+        MENUITEM "Folder", IDM_FOLDER
+        MENUITEM "Quit", IDM_QUIT
+    }
+}
+
+
+
+//
 // Icon resources
 //
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+LANGUAGE LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN
 IDI_ICON1          ICON           ".\\icon.ico"
