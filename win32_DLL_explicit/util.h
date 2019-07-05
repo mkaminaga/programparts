@@ -5,7 +5,8 @@
 // @date 2019-07-02 10:09:01
 // Copyright 2019 Mamoru Kaminaga
 //
-#ifndef _TEST_DLL_H_
+#ifndef _UTIL_H_
+#define _UTIL_H_
 
 #include <stdio.h>
 
@@ -15,4 +16,4 @@
 
 DLLAPI void HelloWorld();
 
-#endif  // _TEST_DLL_H_
+#endif  // _UTIL_H_
