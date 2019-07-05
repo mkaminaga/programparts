@@ -56,9 +56,9 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
   const UINT vk = (UINT)wParam;
   const BOOL fDown = ((lParam & 0x80000000) == 0) ? TRUE : FALSE;
   if (fDown == TRUE) {
-    fwprintf(stderr, L"key down, %d:\n", vk);
+    fwprintf(stderr, L"key down, %2x:\n", vk);
   } else {
-    fwprintf(stderr, L"key up, %d:\n", vk);
+    fwprintf(stderr, L"key up, %2x:\n", vk);
   }
 }
 

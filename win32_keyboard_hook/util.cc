@@ -47,10 +47,6 @@ DLLAPI bool StartKeyboardHook(HWND hwnd) {
   }
   // The destination of the hook signal.
   hWndDest = hwnd;
-#ifdef DEBUG
-  fwprintf(stderr, L"1 StartKeyboardHook is called.\n");
-  fwprintf(stdout, L"2 StartKeyboardHook is called.\n");
-#endif
   return true;
 }
 
