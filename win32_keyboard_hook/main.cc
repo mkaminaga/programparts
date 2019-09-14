@@ -21,7 +21,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   (void)hwnd;
   (void)lpCreateStruct;
   // Start the keyboard hook.
-  if (!StartKeyboardHook(hwnd)) {
+  if (!SetKeyHook(hwnd)) {
 #ifdef DEBUG
     fwprintf(stderr, L"Failed to start hook\n");
 #endif
@@ -34,7 +34,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
   // Stop the keyboard hook.
-  if (!StopKeyboardHook()) {
+  if (!RemoveKeyHook()) {
 #ifdef DEBUG
     fwprintf(stderr, L"Failed to stop hook\n");
 #endif

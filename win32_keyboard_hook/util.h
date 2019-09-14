@@ -21,7 +21,7 @@
 #define HANDLE_WM_KEYHOOK(hwnd, wParam, lParam, fn) \
   ((fn)((hwnd), (WPARAM)(wParam), (LPARAM)(lParam)), 0L)
 
-DLLAPI bool StartKeyboardHook(HWND hWnd);
-DLLAPI bool StopKeyboardHook();
+DLLAPI bool SetKeyHook(HWND hWnd);
+DLLAPI bool RemoveKeyHook();
 
 #endif  // _UTIL_H_

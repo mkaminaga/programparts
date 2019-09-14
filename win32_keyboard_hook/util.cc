@@ -11,20 +11,21 @@
 #include <stdio.h>
 #include <windows.h>
 
-#pragma data_seg(".key_hook")
-HHOOK hKeyHook = 0;
-HWND hWndDest = 0;
+#pragma data_seg(".shared")
+DLLAPI HWND hWndDest = NULL;
+DLLAPI HHOOK hHook = NULL;
 #pragma data_seg()
+#pragma comment(linker, "/Section:.shared,rws")
 
 namespace {
 HINSTANCE hInstance;
 }  // namespace
 
-DLLAPI LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam) {
+DLLAPI LRESULT CALLBACK KeyProc(int code, WPARAM wParam, LPARAM lParam) {
   if (code < 0) {
     // The hook procedure must pass the message to the CallNextHookEx
     // without further processing, then should return the return value.
-    return CallNextHookEx(hKeyHook, code, wParam, lParam);
+    return CallNextHookEx(hHook, code, wParam, lParam);
   }
   switch (code) {
     case HC_ACTION:
@@ -35,37 +36,34 @@ DLLAPI LRESULT CALLBACK KeyboardProc(int code, WPARAM wParam, LPARAM lParam) {
     default:
       break;
   }
-  return CallNextHookEx(hKeyHook, code, wParam, lParam);
+  return CallNextHookEx(hHook, code, wParam, lParam);
 }
 
-DLLAPI bool StartKeyboardHook(HWND hwnd) {
-  // Set the keyboard hook.
-  hKeyHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, hInstance, 0);
-  if (hKeyHook == NULL) {
+DLLAPI bool SetKeyHook(HWND hwnd) {
+  hHook = SetWindowsHookEx(WH_KEYBOARD, KeyProc, hInstance, 0);
+  if (hHook == NULL) {
     hWndDest = NULL;
     return false;
   }
-  // The destination of the hook signal.
   hWndDest = hwnd;
   return true;
 }
 
-DLLAPI bool StopKeyboardHook() {
-  // Reset the keyboard hook.
-  if (UnhookWindowsHookEx(hKeyHook) == 0) {
+DLLAPI bool RemoveKeyHook() {
+  if (UnhookWindowsHookEx(hHook) == 0) {
     return false;
   }
-  hKeyHook = NULL;
+  hHook = NULL;
   hWndDest = NULL;
   return true;
 }
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD dwReason, LPVOID lpvReserved) {
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
   (void)lpvReserved;
-  switch (dwReason) {
+  switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
       hInstance = hinstDLL;
-      hKeyHook = NULL;
+      hHook = NULL;
       hWndDest = NULL;
       break;
     case DLL_THREAD_ATTACH:
