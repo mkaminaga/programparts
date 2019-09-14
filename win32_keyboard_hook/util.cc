@@ -15,7 +15,7 @@
 DLLAPI HWND hWndDest = NULL;
 DLLAPI HHOOK hHook = NULL;
 #pragma data_seg()
-#pragma comment(linker, "/Section:.shared,rws")
+#pragma comment(linker, "/SECTION:.shared,rws")
 
 namespace {
 HINSTANCE hInstance;

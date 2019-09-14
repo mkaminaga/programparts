@@ -108,14 +108,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return FALSE;
   }
 
-  HWND hwnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_OVERLAPPEDWINDOW,
-                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                           CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
-  if (hwnd == NULL) {
+  HWND hWnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_DISABLED, CW_USEDEFAULT,
+                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL,
+                           NULL, hInstance, NULL);
+  if (hWnd == NULL) {
     return FALSE;
   }
-  ShowWindow(hwnd, nCmdShow);
-  UpdateWindow(hwnd);
+  //ShowWindow(hWnd, nCmdShow);
+  UpdateWindow(hWnd);
 
   MSG msg;
   while (GetMessage(&msg, NULL, 0, 0) > 0) {
