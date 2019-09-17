@@ -8,7 +8,7 @@ OBJDIR = build
 TARGET = main.exe
 PDB = main.pdb
 MAP = main.map
-RES = resource.res
+RES =
 SRC = main.cc util.cc
 OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj
 

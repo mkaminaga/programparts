@@ -6,18 +6,32 @@
 // Copyright 2019 Mamoru Kaminaga
 //
 #include "./util.h"
+#include <assert.h>
 #include <png.h>
 
 bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
              png_infop* info_ptr_out) {
+  assert(file_name);
+  assert(fp_out);
+  assert(png_ptr_out);
+  assert(info_ptr_out);
   (*fp_out) = NULL;
   (*png_ptr_out) = NULL;
   (*info_ptr_out) = NULL;
 
-  // Image file is opened.
   FILE* fp = NULL;
   _wfopen_s(&fp, file_name, L"rb");
   if (!fp) {
+    return false;
+  }
+
+  png_byte sig[8] = {0};
+  fread(sig, sizeof(sig), 1, fp);
+  if (png_sig_cmp(sig, 0, sizeof(sig)) != 0) {
+#ifdef DEBUG
+    fwprintf(stderr, L"ERROR... Image is not PNG.\n");
+#endif
+    fclose(fp);
     return false;
   }
 
@@ -42,6 +56,7 @@ bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
   }
 
   png_init_io(png_ptr, fp);
+  png_set_sig_bytes(png_ptr, sizeof(sig));  // Tell skipped bytes to libpng.
   png_read_info(png_ptr, info_ptr);
 
   (*fp_out) = fp;

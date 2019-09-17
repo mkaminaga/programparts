@@ -20,7 +20,11 @@ int main(int argc, char* argv[]) {
   (void)argc;
   (void)argv;
   fwprintf(stderr, L"libpng test program.\n");
+  fwprintf(stderr, L"\n");
 
+  ////////////////////////////////////////
+  // PNG file is opened.
+  ////////////////////////////////////////
   FILE* fp = NULL;
   png_structp png_ptr = NULL;
   png_infop info_ptr = NULL;
@@ -28,7 +32,10 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  volatile png_bytep row = NULL;
+  ////////////////////////////////////////
+  // Information is read from data.
+  ////////////////////////////////////////
+  volatile png_bytep row = NULL;  // to call setjmp().
   png_bytep row_tmp = NULL;
 
   if (setjmp(png_jmpbuf(png_ptr)) != 0) {
@@ -43,7 +50,7 @@ int main(int argc, char* argv[]) {
   }
 
   row = (png_bytep)png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
-  row_tmp = row;  // To reduce the load of nonvolatile access.
+  row_tmp = row;  // To reduce the load of access to nonvolatile variable.
 
   png_uint_32 width = 0;
   png_uint_32 height = 0;
@@ -59,8 +66,18 @@ int main(int argc, char* argv[]) {
     ClosePNG(fp, png_ptr, info_ptr);
     return 1;
   }
-  int passes, pass;
+  fwprintf(stderr, L"width = %d\n", width);
+  fwprintf(stderr, L"height = %d\n", height);
+  fwprintf(stderr, L"bit_depth = %d\n", bit_depth);
+  fwprintf(stderr, L"color_type = %d\n", color_type);
+  fwprintf(stderr, L"interlace_method = %d\n", interlace_method);
+  fwprintf(stderr, L"compression_method = %d\n", compression_method);
+  fwprintf(stderr, L"filter_method = %d\n", filter_method);
+  fwprintf(stderr, L"\n");
 
+  ////////////////////////////////////////
+  // PNG file is closed.
+  ////////////////////////////////////////
   ClosePNG(fp, png_ptr, info_ptr);
 
   fwprintf(stderr, L"src_img.png => dst_img.png\n");
