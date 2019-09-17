@@ -56,7 +56,6 @@ int main(int argc, char* argv[]) {
     png_data.blue_buffer[i] /= 4;
     png_data.alpha_buffer[i] = 255;
   }
-  png_data.interlace_type = PNG_INTERLACE_NONE;
 
   // Write image data to PNG file.
   if (!WritePNGFile(L"dst_img.png", png_data)) {

@@ -80,7 +80,7 @@ bool ReadPNGFile(const wchar_t *file_name, PNGData *png_data) {
   png_data->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
   png_data->filter_type = png_get_filter_type(png_ptr, info_ptr);
   png_data->compression_type = png_get_compression_type(png_ptr, info_ptr);
-  png_data->interlace_type = png_get_color_type(png_ptr, info_ptr);
+  png_data->interlace_type = png_get_interlace_type(png_ptr, info_ptr);
   png_data->rowbytes = png_get_rowbytes(png_ptr, info_ptr);
   png_data->channels = png_get_channels(png_ptr, info_ptr);
 
