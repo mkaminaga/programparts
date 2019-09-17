@@ -31,17 +31,31 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   PrintPNGData(stderr, png_data);
+  fwprintf(stderr, L"\n");
+
+  // Show corner colors.
+  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", 0, 0, png_data.red_buffer[0],
+           png_data.green_buffer[0], png_data.blue_buffer[0]);
+  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", png_data.width-1, 0,
+           png_data.red_buffer[png_data.width-1],
+           png_data.green_buffer[png_data.width-1],
+           png_data.blue_buffer[png_data.width-1]);
+  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", 0, png_data.height-1,
+           png_data.red_buffer[png_data.width * (png_data.height - 1)],
+           png_data.green_buffer[png_data.width * (png_data.height - 1)],
+           png_data.blue_buffer[png_data.width * (png_data.height - 1)]);
+  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", png_data.width, png_data.height,
+           png_data.red_buffer[png_data.width * png_data.height - 1],
+           png_data.green_buffer[png_data.width * png_data.height - 1],
+           png_data.blue_buffer[png_data.width * png_data.height - 1]);
+  fwprintf(stderr, L"\n");
 
   // Modify image.
-  // for (int i = 0; i < static_cast<int>(png_data.width * png_data.height); ++i) {
-  //   png_data.red_buffer[i] = 0;
-  //   png_data.green_buffer[i] = static_cast<uint8_t>((png_data.red_buffer[i] +
-  //                                                    png_data.green_buffer[i] +
-  //                                                    png_data.blue_buffer[i]) /
-  //                                                   (255.0 * 3));
-  //   png_data.blue_buffer[i] = 0;
-  //   png_data.alpha_buffer[i] = 255;
-  // }
+  for (int i = 0; i < static_cast<int>(png_data.width * png_data.height); ++i) {
+    png_data.red_buffer[i] /= 4;
+    png_data.blue_buffer[i] /= 4;
+    png_data.alpha_buffer[i] = 255;
+  }
   png_data.interlace_type = PNG_INTERLACE_NONE;
 
   // Write image data to PNG file.
@@ -49,7 +63,6 @@ int main(int argc, char* argv[]) {
     fwprintf(stderr, L"WritePNGFile() failed.\n");
     return 1;
   }
-  fwprintf(stderr, L"\n");
 
   fwprintf(stderr, L"src_img.png => dst_img.png\n");
   return 0;
