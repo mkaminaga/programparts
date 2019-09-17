@@ -23,13 +23,16 @@ struct PNGData {
   int interlace_type;
   int rowbytes;
   int channels;
+  // Pixels are read from PNG data.
+  // This sample only supports RGBA format.
   std::vector<uint8_t> red_buffer;
   std::vector<uint8_t> green_buffer;
   std::vector<uint8_t> blue_buffer;
   std::vector<uint8_t> alpha_buffer;
 };
 
-bool ReadPNGData(const wchar_t *file_name, PNGData *png_data);
+bool ReadPNGFile(const wchar_t *file_name, PNGData *png_data);
+bool WritePNGFile(const wchar_t *file_name, const PNGData &png_data);
 void PrintPNGData(FILE *fp, const PNGData &png_data);
 
 #endif  // _UTIL_H_
