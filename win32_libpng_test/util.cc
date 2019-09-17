@@ -9,17 +9,11 @@
 #include <assert.h>
 #include <png.h>
 
-bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
-             png_infop* info_ptr_out) {
+bool ReadPNGData(const wchar_t *file_name, PNGData *png_data) {
   assert(file_name);
-  assert(fp_out);
-  assert(png_ptr_out);
-  assert(info_ptr_out);
-  (*fp_out) = NULL;
-  (*png_ptr_out) = NULL;
-  (*info_ptr_out) = NULL;
+  assert(png_data);
 
-  FILE* fp = NULL;
+  FILE *fp = NULL;
   _wfopen_s(&fp, file_name, L"rb");
   if (!fp) {
     return false;
@@ -56,34 +50,76 @@ bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
   }
 
   png_init_io(png_ptr, fp);
-  png_set_sig_bytes(png_ptr, sizeof(sig));  // Tell skipped bytes to libpng.
-  png_read_info(png_ptr, info_ptr);
+  png_set_sig_bytes(png_ptr, sizeof(sig));
 
-  (*fp_out) = fp;
-  (*png_ptr_out) = png_ptr;
-  (*info_ptr_out) = info_ptr;
+  if (setjmp(png_jmpbuf(png_ptr)) != 0) {
+#ifdef DEBUG
+    fwprintf(stderr, L"WARNING... longjmp() is called by libpng.\n");
+#endif
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    fclose(fp);
+    return false;
+  }
+
+  png_read_png(png_ptr, info_ptr,
+               PNG_TRANSFORM_PACKING | PNG_TRANSFORM_STRIP_16, NULL);
+  png_data->width = png_get_image_width(png_ptr, info_ptr);
+  png_data->height = png_get_image_height(png_ptr, info_ptr);
+  png_data->color_type = png_get_color_type(png_ptr, info_ptr);
+  png_data->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+  png_data->filter_type = png_get_filter_type(png_ptr, info_ptr);
+  png_data->compression_type = png_get_compression_type(png_ptr, info_ptr);
+  png_data->interlace_type = png_get_color_type(png_ptr, info_ptr);
+  png_data->rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+  png_data->channels = png_get_channels(png_ptr, info_ptr);
+
+  if (png_data->rowbytes == 0) {
+#ifdef DEBUG
+    fwprintf(stderr, L"ERROR... Invalid byte count.\n");
+#endif
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    fclose(fp);
+    return false;
+  }
+  fwprintf(stderr, L"\n");
+
+  // Pixels are read from PNG data.
+  // This sample only supports RGBA format.
+  if (png_data->color_type != PNG_COLOR_TYPE_RGB_ALPHA) {
+    fwprintf(stderr, L"color_type is not PNG_COLOR_TYPE_RGB_ALPHA, exit\n");
+    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    fclose(fp);
+    return false;
+  }
+
+  png_data->red_buffer.resize(png_data->height * png_data->width);
+  png_data->green_buffer.resize(png_data->height * png_data->width);
+  png_data->blue_buffer.resize(png_data->height * png_data->width);
+  png_data->alpha_buffer.resize(png_data->height * png_data->width);
+  png_bytepp rows = png_get_rows(png_ptr, info_ptr);
+  png_bytep row = rows[0];
+  for (int y = 0; y < static_cast<int>(png_data->height); y++) {
+    row = rows[y];
+    for (int x = 0; x < static_cast<int>(png_data->width); x++) {
+      png_data->red_buffer[y * 4 + x] = *(row++);
+      png_data->green_buffer[y * 4 + x] = *(row++);
+      png_data->blue_buffer[y * 4 + x] = *(row++);
+      png_data->alpha_buffer[y * 4 + x] = *(row++);
+    }
+  }
   return true;
 }
 
-void ClosePNG(FILE* fp, png_structpp png_ptrptr, png_infopp info_ptrptr) {
-  if (png_ptrptr != NULL) {
-    png_destroy_read_struct(png_ptrptr, info_ptrptr, NULL);
-  }
-  if (fp != NULL) {
-    fclose(fp);
-  }
-}
+void PrintPNGData(FILE *fp, const PNGData &png_data) {
+  assert(fp);
+  fwprintf(fp, L"png_data = %d\n", png_data.width);
+  fwprintf(fp, L"height = %d\n", png_data.height);
+  fwprintf(fp, L"bit_depth = %d\n", png_data.bit_depth);
+  fwprintf(fp, L"rowbytes = %d\n", png_data.rowbytes);
+  fwprintf(fp, L"channels = %d\n", png_data.channels);
 
-void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
-                  int bit_depth, int color_type, int interlace_method,
-                  int compression_method, int filter_method) {
-  fwprintf(fp, L"width = %d\n", width);
-  fwprintf(fp, L"height = %d\n", height);
-  fwprintf(fp, L"bit_depth = %d\n", bit_depth);
-  fwprintf(fp, L"color_type = %d\n", color_type);
-
-  fwprintf(fp, L"color_type = %d (", color_type);
-  switch (color_type) {
+  fwprintf(fp, L"color_type = %d (", png_data.color_type);
+  switch (png_data.color_type) {
     case PNG_COLOR_TYPE_GRAY:
       fwprintf(fp, L"PNG_COLOR_TYPE_GRAY");
       break;
@@ -105,8 +141,8 @@ void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
   }
   fwprintf(fp, L")\n");
 
-  fwprintf(fp, L"interlace_method = %d (", interlace_method);
-  switch (interlace_method) {
+  fwprintf(fp, L"interlace_type = %d (", png_data.interlace_type);
+  switch (png_data.interlace_type) {
     case PNG_INTERLACE_NONE:
       fwprintf(fp, L"PNG_INTERLACE_NONE");
       break;
@@ -122,8 +158,8 @@ void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
   }
   fwprintf(fp, L")\n");
 
-  fwprintf(fp, L"compression_method = %d (", compression_method);
-  switch (compression_method) {
+  fwprintf(fp, L"compression_type = %d (", png_data.compression_type);
+  switch (png_data.compression_type) {
     case PNG_COMPRESSION_TYPE_DEFAULT:
       fwprintf(fp, L"PNG_COMPRESSION_TYPE_DEFAULT");
       break;
@@ -133,8 +169,8 @@ void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
   }
   fwprintf(fp, L")\n");
 
-  fwprintf(fp, L"filter_method = %d (", filter_method);
-  switch (filter_method) {
+  fwprintf(fp, L"filter_type = %d (", png_data.filter_type);
+  switch (png_data.filter_type) {
     case PNG_INTRAPIXEL_DIFFERENCING:
       fwprintf(fp, L"PNG_INTRAPIXEL_DIFFERENCING");
       break;

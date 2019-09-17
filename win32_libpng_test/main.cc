@@ -6,9 +6,11 @@
 // Copyright 2019 Mamoru Kaminaga
 //
 #include <png.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
+#include <vector>
 #include "./util.h"
 
 namespace {
@@ -22,59 +24,22 @@ int main(int argc, char* argv[]) {
   fwprintf(stderr, L"libpng test program.\n");
   fwprintf(stderr, L"\n");
 
-  ////////////////////////////////////////
-  // PNG file is opened.
-  ////////////////////////////////////////
-  FILE* fp = NULL;
-  png_structp png_ptr = NULL;
-  png_infop info_ptr = NULL;
-  if (!OpenPNG(L"src_img.png", &fp, &png_ptr, &info_ptr)) {
+  PNGData png_data;
+  if (!ReadPNGData(L"src_img.png", &png_data)) {
     return 1;
   }
+  PrintPNGData(stderr, png_data);
 
-  ////////////////////////////////////////
-  // Information is read from data.
-  ////////////////////////////////////////
-  volatile png_bytep row = NULL;  // Volatile access for setjmp().
-  png_bytep row_tmp = NULL;
-
-  if (setjmp(png_jmpbuf(png_ptr)) != 0) {
-    fwprintf(stderr, L"WARNING... longjmp() is called for internal error.\n");
-    if (!row) {
-      row_tmp = row;
-      row = NULL;
-      png_free(png_ptr, row_tmp);
-    }
-    ClosePNG(fp, &png_ptr, &info_ptr);
-    return false;
+  // White to Green.
+  for (int i = 0; i < static_cast<int>(png_data.width * png_data.height);
+       ++i) {
+    png_data.green_buffer[i] = static_cast<uint8_t>((png_data.red_buffer[i] +
+                                                     png_data.green_buffer[i] +
+                                                     png_data.blue_buffer[i]) /
+                                                    (256.0 * 3));
   }
-
-  row = (png_bytep)png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
-  row_tmp = row;  // To reduce the load of access to nonvolatile variable.
-
-  png_uint_32 width = 0;
-  png_uint_32 height = 0;
-  int bit_depth = 0;
-  int color_type = 0;
-  int interlace_method = 0;
-  int compression_method = 0;
-  int filter_method = 0;
-
-  if (!png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-                    &interlace_method, &compression_method, &filter_method)) {
-    fwprintf(stderr, L"ERROR... Failed to get header information.\n");
-    ClosePNG(fp, &png_ptr, &info_ptr);
-    return 1;
-  }
-  PrintPNGInfo(stderr, width, height, bit_depth, color_type, interlace_method,
-               compression_method, filter_method);
-  fwprintf(stderr, L"\n");
-
-  ////////////////////////////////////////
-  // PNG file is closed.
-  ////////////////////////////////////////
-  ClosePNG(fp, &png_ptr, &info_ptr);
 
   fwprintf(stderr, L"src_img.png => dst_img.png\n");
   return 0;
 }
+

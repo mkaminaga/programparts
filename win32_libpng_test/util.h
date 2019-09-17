@@ -11,12 +11,25 @@
 #include <png.h>
 #include <wchar.h>
 #include <windows.h>
-bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
-             png_infop* info_ptr_out);
-void ClosePNG(FILE* fp, png_structpp png_ptrptr, png_infopp info_ptrptr);
+#include <vector>
 
-void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
-                  int bit_depth, int color_type, int interlace_method,
-                  int compression_method, int filter_method);
+struct PNGData {
+  png_uint_32 width;
+  png_uint_32 height;
+  int color_type;
+  int bit_depth;
+  int filter_type;
+  int compression_type;
+  int interlace_type;
+  int rowbytes;
+  int channels;
+  std::vector<uint8_t> red_buffer;
+  std::vector<uint8_t> green_buffer;
+  std::vector<uint8_t> blue_buffer;
+  std::vector<uint8_t> alpha_buffer;
+};
+
+bool ReadPNGData(const wchar_t *file_name, PNGData *png_data);
+void PrintPNGData(FILE *fp, const PNGData &png_data);
 
 #endif  // _UTIL_H_
