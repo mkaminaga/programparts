@@ -8,7 +8,10 @@
 #include "./util.h"
 #include <assert.h>
 #include <png.h>
+#include <setjmp.h>
+#include <stdint.h>
 #include <string.h>
+#include <vector>
 
 bool ReadPNGFile(const wchar_t *file_name, PNGData *png_data) {
   assert(file_name);

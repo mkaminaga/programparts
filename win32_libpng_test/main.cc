@@ -1,6 +1,6 @@
 //
 // @file main.cc
-// @brief Template project for Windows desktop application.
+// @brief Test project for libpng.
 // @author Mamoru Kaminaga
 // @date 2019-09-16 18:51:54
 // Copyright 2019 Mamoru Kaminaga
@@ -36,11 +36,11 @@ int main(int argc, char* argv[]) {
   // Show corner colors.
   fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", 0, 0, png_data.red_buffer[0],
            png_data.green_buffer[0], png_data.blue_buffer[0]);
-  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", png_data.width-1, 0,
-           png_data.red_buffer[png_data.width-1],
-           png_data.green_buffer[png_data.width-1],
-           png_data.blue_buffer[png_data.width-1]);
-  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", 0, png_data.height-1,
+  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", png_data.width - 1, 0,
+           png_data.red_buffer[png_data.width - 1],
+           png_data.green_buffer[png_data.width - 1],
+           png_data.blue_buffer[png_data.width - 1]);
+  fwprintf(stderr, L"(%d,%d), (%d,%d,%d)\n", 0, png_data.height - 1,
            png_data.red_buffer[png_data.width * (png_data.height - 1)],
            png_data.green_buffer[png_data.width * (png_data.height - 1)],
            png_data.blue_buffer[png_data.width * (png_data.height - 1)]);

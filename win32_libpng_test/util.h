@@ -1,6 +1,6 @@
 //
 // @file util.h
-// @brief Test for libpng.
+// @brief Test project for libpng.
 // @author Mamoru Kaminaga
 // @date 2019-09-16 18:54:54
 // Copyright 2019 Mamoru Kaminaga
@@ -9,6 +9,7 @@
 #define _UTIL_H_
 
 #include <png.h>
+#include <stdint.h>
 #include <wchar.h>
 #include <windows.h>
 #include <vector>
