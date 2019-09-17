@@ -13,7 +13,7 @@
 #include <windows.h>
 bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
              png_infop* info_ptr_out);
-void ClosePNG(FILE* fp, png_structp png_ptr);
+void ClosePNG(FILE* fp, png_structpp png_ptrptr, png_infopp info_ptrptr);
 
 void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
                   int bit_depth, int color_type, int interlace_method,

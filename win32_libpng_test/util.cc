@@ -65,9 +65,9 @@ bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
   return true;
 }
 
-void ClosePNG(FILE* fp, png_structp png_ptr) {
-  if (png_ptr != NULL) {
-    png_destroy_read_struct(&png_ptr, NULL, NULL);
+void ClosePNG(FILE* fp, png_structpp png_ptrptr, png_infopp info_ptrptr) {
+  if (png_ptrptr != NULL) {
+    png_destroy_read_struct(png_ptrptr, info_ptrptr, NULL);
   }
   if (fp != NULL) {
     fclose(fp);

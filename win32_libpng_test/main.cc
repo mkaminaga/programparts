@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
       row = NULL;
       png_free(png_ptr, row_tmp);
     }
-    ClosePNG(fp, png_ptr);
+    ClosePNG(fp, &png_ptr, &info_ptr);
     return false;
   }
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
   if (!png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
                     &interlace_method, &compression_method, &filter_method)) {
     fwprintf(stderr, L"ERROR... Failed to get header information.\n");
-    ClosePNG(fp, png_ptr);
+    ClosePNG(fp, &png_ptr, &info_ptr);
     return 1;
   }
   PrintPNGInfo(stderr, width, height, bit_depth, color_type, interlace_method,
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
   ////////////////////////////////////////
   // PNG file is closed.
   ////////////////////////////////////////
-  ClosePNG(fp, png_ptr);
+  ClosePNG(fp, &png_ptr, &info_ptr);
 
   fwprintf(stderr, L"src_img.png => dst_img.png\n");
   return 0;
