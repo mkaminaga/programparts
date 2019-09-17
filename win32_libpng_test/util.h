@@ -13,6 +13,10 @@
 #include <windows.h>
 bool OpenPNG(const wchar_t* file_name, FILE** fp_out, png_structp* png_ptr_out,
              png_infop* info_ptr_out);
-void ClosePNG(FILE* fp, png_structp png_ptr, png_infop info_ptr);
+void ClosePNG(FILE* fp, png_structp png_ptr);
+
+void PrintPNGInfo(FILE* fp, png_uint_32 width, png_uint_32 height,
+                  int bit_depth, int color_type, int interlace_method,
+                  int compression_method, int filter_method);
 
 #endif  // _UTIL_H_

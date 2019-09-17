@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   ////////////////////////////////////////
   // Information is read from data.
   ////////////////////////////////////////
-  volatile png_bytep row = NULL;  // to call setjmp().
+  volatile png_bytep row = NULL;  // Volatile access for setjmp().
   png_bytep row_tmp = NULL;
 
   if (setjmp(png_jmpbuf(png_ptr)) != 0) {
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
       row = NULL;
       png_free(png_ptr, row_tmp);
     }
-    ClosePNG(fp, png_ptr, info_ptr);
+    ClosePNG(fp, png_ptr);
     return false;
   }
 
@@ -63,22 +63,17 @@ int main(int argc, char* argv[]) {
   if (!png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
                     &interlace_method, &compression_method, &filter_method)) {
     fwprintf(stderr, L"ERROR... Failed to get header information.\n");
-    ClosePNG(fp, png_ptr, info_ptr);
+    ClosePNG(fp, png_ptr);
     return 1;
   }
-  fwprintf(stderr, L"width = %d\n", width);
-  fwprintf(stderr, L"height = %d\n", height);
-  fwprintf(stderr, L"bit_depth = %d\n", bit_depth);
-  fwprintf(stderr, L"color_type = %d\n", color_type);
-  fwprintf(stderr, L"interlace_method = %d\n", interlace_method);
-  fwprintf(stderr, L"compression_method = %d\n", compression_method);
-  fwprintf(stderr, L"filter_method = %d\n", filter_method);
+  PrintPNGInfo(stderr, width, height, bit_depth, color_type, interlace_method,
+               compression_method, filter_method);
   fwprintf(stderr, L"\n");
 
   ////////////////////////////////////////
   // PNG file is closed.
   ////////////////////////////////////////
-  ClosePNG(fp, png_ptr, info_ptr);
+  ClosePNG(fp, png_ptr);
 
   fwprintf(stderr, L"src_img.png => dst_img.png\n");
   return 0;
