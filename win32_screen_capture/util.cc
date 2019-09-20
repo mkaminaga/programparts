@@ -52,11 +52,11 @@ bool BITMAPtoPNG(const BITMAP &bm, PNGData *png_data) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       png_data->blue_buffer[y * width + x] =
-          *((LPBYTE)bm.bmBits + y * bm_width + x * 3);
+          *((LPBYTE)bm.bmBits + (height - 1 - y) * bm_width + x * 3);
       png_data->green_buffer[y * width + x] =
-          *((LPBYTE)bm.bmBits + y * bm_width + x * 3 + 1);
+          *((LPBYTE)bm.bmBits + (height - 1 - y) * bm_width + x * 3 + 1);
       png_data->red_buffer[y * width + x] =
-          *((LPBYTE)bm.bmBits + y * bm_width + x * 3 + 2);
+          *((LPBYTE)bm.bmBits + (height - 1 - y) * bm_width + x * 3 + 2);
       png_data->alpha_buffer[y * width + x] = 255;
     }
   }
