@@ -35,10 +35,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifdef DEBUG
   fwprintf(stdout, L"Hello world to stdout!\n");
   fwprintf(stderr, L"Hello world to stderr!\n");
+  fwprintf(stderr, L"\n");
 #endif
 
   PNGData png_data;
-#if 0
+
   // Test case 1 : Use of PaintDesktop().
   if (!ScreenToPNG(TESTCASE_PAINT_DESKTOP, &png_data)) {
     MessageBox(NULL, L"Case 1 failed.", L"Error", MB_OK);
@@ -46,7 +47,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     WritePNGFile(L"case_1.png", png_data);
   }
 
-#endif
   // Test case 2 : Use of PaintWindow().
   if (!ScreenToPNG(TESTCASE_PAINT_WINDOW, &png_data)) {
     MessageBox(NULL, L"Case 2 failed.", L"Error", MB_OK);
