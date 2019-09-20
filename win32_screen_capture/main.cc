@@ -46,13 +46,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     WritePNGFile(L"case_1.png", png_data);
   }
 
+#endif
   // Test case 2 : Use of PaintWindow().
   if (!ScreenToPNG(TESTCASE_PAINT_WINDOW, &png_data)) {
     MessageBox(NULL, L"Case 2 failed.", L"Error", MB_OK);
   } else {
     WritePNGFile(L"case_2.png", png_data);
   }
-#endif
 
   // Test case 3 : Use of BitBlt().
   if (!ScreenToPNG(TESTCASE_BITBLT, &png_data)) {

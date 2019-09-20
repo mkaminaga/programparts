@@ -14,10 +14,9 @@
 #include <vector>
 
 namespace {
-bool BITMAPtoPNG(const BITMAP &bm, PNGData *png_data) {
+bool DIBtoPNG(LPVOID memDIB, int width, int height, PNGData *png_data) {
+  assert(memDIB);
   assert(png_data);
-  const int width = bm.bmWidth;
-  const int height = bm.bmHeight;
 
   // BITMAP(24 bit) is converted to PNG.
   png_data->width = width;
@@ -47,16 +46,14 @@ bool BITMAPtoPNG(const BITMAP &bm, PNGData *png_data) {
   fwprintf(stderr, L"\n");
 #endif
 
-  int bx = 0;
-  int by = 0;
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       png_data->blue_buffer[y * width + x] =
-          *((LPBYTE)bm.bmBits + (height - 1 - y) * bm_width + x * 3);
+          *((LPBYTE)memDIB + (height - 1 - y) * bm_width + x * 3);
       png_data->green_buffer[y * width + x] =
-          *((LPBYTE)bm.bmBits + (height - 1 - y) * bm_width + x * 3 + 1);
+          *((LPBYTE)memDIB + (height - 1 - y) * bm_width + x * 3 + 1);
       png_data->red_buffer[y * width + x] =
-          *((LPBYTE)bm.bmBits + (height - 1 - y) * bm_width + x * 3 + 2);
+          *((LPBYTE)memDIB + (height - 1 - y) * bm_width + x * 3 + 2);
       png_data->alpha_buffer[y * width + x] = 255;
     }
   }
@@ -73,10 +70,6 @@ bool ScreenToPNG(TESTCASE test_case, PNGData *png_data) {
   const int width = rect.right;
   const int height = rect.bottom;
 
-  // Get BITMAP structure.
-  HWND hShellWnd = GetShellWindow();
-  BITMAP bm;
-
   switch (test_case) {
     case TESTCASE_PAINT_DESKTOP: {
       // Test case 1: Use of PaintDesktop function.
@@ -90,7 +83,11 @@ bool ScreenToPNG(TESTCASE test_case, PNGData *png_data) {
       HBITMAP memBM = CreateCompatibleBitmap(memDC, width, height);
 
       // DDB to BITMAP.
+      BITMAP bm;
       GetObject(memBM, sizeof(BITMAP), &bm);
+
+      // BITMAP(24 bit) is converted to PNG.
+      DIBtoPNG(bm.bmBits, width, height, png_data);
 
       // Restore and release.
       DeleteObject(memBM);
@@ -99,18 +96,42 @@ bool ScreenToPNG(TESTCASE test_case, PNGData *png_data) {
     case TESTCASE_PAINT_WINDOW: {
       // Test case 2: Use of PaintDesktop function.
       HDC memDC = CreateCompatibleDC(NULL);
-      if (PrintWindow(hShellWnd, memDC, 0) == 0) {
+      if (PrintWindow(GetShellWindow(), memDC, 0) == 0) {
         DeleteDC(memDC);
         return false;
       }
 
-      // DDB to BITMAP.
+      // Get DDB.
       HBITMAP memBM = CreateCompatibleBitmap(memDC, width, height);
+      HBITMAP prevBM = (HBITMAP)SelectObject(memDC, memBM);
 
-      // DDB to BITMAP.
-      GetObject(memBM, sizeof(BITMAP), &bm);
+      // DIB section is created.
+      BITMAPINFOHEADER bmiHeader;
+      ZeroMemory(&bmiHeader, sizeof(bmiHeader));
+      bmiHeader.biSize = sizeof(bmiHeader);
+      bmiHeader.biWidth = width;
+      bmiHeader.biHeight = height;
+      bmiHeader.biPlanes = 1;
+      bmiHeader.biBitCount = 24;  // 24 bit BITMAP.
+
+      BITMAPINFO bmi;
+      bmi.bmiHeader = bmiHeader;
+
+      // DDB is converted to DIB.
+      int bm_width = width * 3;
+      if ((width * 3) % 4) {
+        bm_width += (4 - (width * 3) % 4);  // Set padding.
+      }
+      LPBYTE memDIB = (LPBYTE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
+                                        bm_width * height);
+      GetDIBits(memDC, memBM, 0, height, memDIB, &bmi, DIB_RGB_COLORS);
+
+      // BITMAP(24 bit) is converted to PNG.
+      DIBtoPNG(memDIB, width, height, png_data);
 
       // Restore and release.
+      HeapFree(GetProcessHeap(), 0, memDIB);
+      SelectObject(memDC, prevBM);
       DeleteObject(memBM);
       DeleteDC(memDC);
     } break;
@@ -130,9 +151,9 @@ bool ScreenToPNG(TESTCASE test_case, PNGData *png_data) {
       BITMAPINFO bmi;
       bmi.bmiHeader = bmiHeader;
 
-      LPVOID lp = NULL;
+      LPVOID memDIB = NULL;
       HBITMAP memBM = CreateDIBSection(NULL, (LPBITMAPINFO)&bmi, DIB_RGB_COLORS,
-                                       &lp, NULL, 0);
+                                       &memDIB, NULL, 0);
 
       // DIB Section is set to memory DC.
       HBITMAP prevBM = (HBITMAP)SelectObject(memDC, memBM);
@@ -140,10 +161,11 @@ bool ScreenToPNG(TESTCASE test_case, PNGData *png_data) {
              SRCCOPY);
 
       // DIB is converted to BITMAP.
+      BITMAP bm;
       GetObject(memBM, sizeof(bm), &bm);
 
       // BITMAP(24 bit) is converted to PNG.
-      BITMAPtoPNG(bm, png_data);
+      DIBtoPNG(bm.bmBits, width, height, png_data);
 
       // Restore and release.
       SelectObject(memDC, prevBM);
