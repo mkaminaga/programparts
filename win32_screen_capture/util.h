@@ -40,6 +40,6 @@ enum TESTCASE {
   TESTCASE_BITBLT,
 };
 
-bool ScreenToPNG(TESTCASE test_case, PNGData *png_data);
+bool CaptureTest(TESTCASE test_case, PNGData *png_data);
 
 #endif  // _UTIL_H_

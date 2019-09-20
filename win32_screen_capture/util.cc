@@ -15,7 +15,7 @@
 
 namespace {}  // namespace
 
-bool ScreenToPNG(TESTCASE test_case, PNGData *png_data) {
+bool CaptureTest(TESTCASE test_case, PNGData *png_data) {
   assert(png_data);
 
   // The size of desktop window is acquired.
