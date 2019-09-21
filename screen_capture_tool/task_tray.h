@@ -19,7 +19,4 @@
 #define HANDLE_WM_TASKTRAY(hwnd, wParam, lParam, fn) \
   ((fn)((hwnd), (UINT)(wParam), (UINT)(lParam)), 0L)
 
-// Code of shutter key.
-#define VK_SHUTTER VK_SCROLL
-
 #endif  // _TASK_TRAY_H_

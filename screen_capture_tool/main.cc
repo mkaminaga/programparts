@@ -151,8 +151,12 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
   const UINT vk = (UINT)wParam;
   const BOOL fDown = ((lParam & 0x80000000) == 0) ? TRUE : FALSE;
 
+  if (fDown == TRUE) {
+    return;
+  }
+
   // Screen capture is executed.
-  if ((vk == VK_SHUTTER) && (fDown == TRUE)) {
+  if ((vk == VK_SCROLL) || (vk == VK_PAUSE)) {
     // File is named by time.
     wchar_t file_name[256] = {0};
     GetTimeFileName(file_name, ARRAYSIZE(file_name), L".png");
