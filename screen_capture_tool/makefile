@@ -3,12 +3,12 @@
 # Date 2019-09-21 18:22:39
 # Copyright 2019 Mamoru Kaminaga
 #
-TARGET = main.exe
-PDB = main.pdb
-MAP = main.map
+TARGET = ScreenCaptureTool.exe
+PDB = ScreenCaptureTool.pdb
+MAP = ScreenCaptureTool.map
 RES = resource.res
-SRC = main.cc key_hook.cc
-OBJ = $(OBJDIR)\main.obj
+SRC = main.cc folder_dialog.cc key_hook.cc
+OBJ = $(OBJDIR)\main.obj $(OBJDIR)\folder_dialog.obj
 DLL = key_hook.dll
 MYLIB = key_hook.lib
 OBJDIR = build

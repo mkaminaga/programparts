@@ -10,25 +10,42 @@
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
+#include "./folder_dialog.h"
 #include "./key_hook.h"
 #include "./resource.h"
 #include "./task_tray.h"
 
 namespace {
+constexpr wchar_t MODULE_FILE_NAME[] = L"ScreenCaptureTool.exe";
 constexpr wchar_t WINDOW_NAME[] = L"ScreenCaptureTool";
-constexpr wchar_t CLASS_NAME[] = L"ScreenCaptureToolClass";
+constexpr wchar_t CLASS_NAME[] = L"ScreenCaptureTool";
 constexpr int TASKTRAY_ICONID = 1;
+wchar_t output_dir[256] = {0};
 }  // namespace
 
 BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   (void)hwnd;
   (void)lpCreateStruct;
 
+  HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+
+  /////////////////////////////////////////////////////////////////////////////
+  //  Output path initialization
+  /////////////////////////////////////////////////////////////////////////////
+  if (GetModuleFileName(hInstance, output_dir, ARRAYSIZE(output_dir)) == 0) {
+    MessageBox(hwnd, L"Failed to get module file path", L"Error", MB_OK);
+    PostQuitMessage(0);
+    return FALSE;
+  }
+  output_dir[wcslen(output_dir) - wcslen(MODULE_FILE_NAME) - 1] =
+      L'\0';  // Module file path is converted to directory.
+#ifdef DEBUG
+  fwprintf(stderr, L"Module file name:%ls\n", output_dir);
+#endif
+
   /////////////////////////////////////////////////////////////////////////////
   //  Task tray initialization
   /////////////////////////////////////////////////////////////////////////////
-  HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
-
   // Add task tray icon.
   NOTIFYICONDATA nid;
   ZeroMemory(&nid, sizeof(nid));
@@ -44,6 +61,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 #ifdef DEBUG
     fwprintf(stderr, L"Failed to add an icon on task tray!\n");
 #endif
+    PostQuitMessage(0);
     return FALSE;
   }
 
@@ -98,15 +116,19 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)codeNotify;
 
   switch (id) {
-    case IDM_FOLDER:
+    case IDM_FOLDER: {
+      wchar_t buffer[256] = {0};
+      if (!GetDirectoryName(hwnd, L"Folder select", output_dir, buffer)) {
+        MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
+      } else {
+        wcscpy_s(output_dir, ARRAYSIZE(output_dir), buffer);
+      }
 #ifdef DEBUG
-      fwprintf(stderr, L"Folder is clicked\n");
+      fwprintf(stderr, L"%ls\n", output_dir);
 #endif
-      break;
+    } break;
     case IDM_QUIT:
-#ifdef DEBUG
-      fwprintf(stderr, L"Quit is clicked\n");
-#endif
+      DestroyWindow(hwnd);
       break;
     default:
       break;
