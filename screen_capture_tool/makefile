@@ -7,33 +7,47 @@ TARGET = ScreenCaptureTool.exe
 PDB = ScreenCaptureTool.pdb
 MAP = ScreenCaptureTool.map
 RES = resource.res
-SRC = main.cc folder_dialog.cc key_hook.cc
-OBJ = $(OBJDIR)\main.obj $(OBJDIR)\folder_dialog.obj
+TMPDIR = build
+SRC = main.cc folder_dialog.cc png_tool.cc util.cc capture.cc key_hook.cc
+OBJ = $(TMPDIR)\main.obj $(TMPDIR)\folder_dialog.obj $(TMPDIR)\png_tool.obj \
+			$(TMPDIR)\util.obj $(TMPDIR)\capture.obj
 DLL = key_hook.dll
 MYLIB = key_hook.lib
-OBJDIR = build
 
 CC = "$(VCINSTALLDIR)\cl.exe"
 LINK = "$(VCINSTALLDIR)\link.exe"
-CPPFLAGS = /nologo /W4 /Zi /O2 /MT /EHsc /Fd"$(TMPDIR)/" /DUNICODE /D_UNICODE \
-					 /DDEBUG
-LIB1 = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" \
-			 "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" \
-			 "odbc32.lib" "odbccp32.lib" "libcmt.lib"
-LFLAGS = $(LIB1) /NOLOGO /SUBSYSTEM:WINDOWS /DEBUG /PROFILE
+CPPFLAGS = /nologo /W4 /Zi /O2 /MTd /EHsc /Fd"$(TMPDIR)/"\
+					 /D"UNICODE" /D"_UNICODE" /EHsc /I"$(LIBRARIES)\libpng"\
+					 /D"DEBUG" /DEBUG
+LIBS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib"\
+			 "advapi32.lib" "shell32.lib" "ole32.lib"	"oleaut32.lib" "uuid.lib"\
+			 "odbc32.lib" "libcmtd.lib"
+LFLAGS = $(LIBS)\
+				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Debug\libpngd.lib" \
+				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Debug\ZLib\zlibd.lib"\
+				 /NOLOGO /SUBSYSTEM:WINDOWS /PROFILE /DEBUG /PDB:"$(PDB)" /MAP:"$(MAP)"
 
 ALL: $(TARGET)
 
 $(TARGET): $(OBJ) $(MYLIB) $(DLL) $(RES)
-	$(LINK) $(MYLIB) $(LFLAGS) /OUT:$(TARGET) /PDB:"$(PDB)" /MAP:"$(MAP)" \
-	$(OBJ) $(RES)
+	$(LINK) $(MYLIB) $(LIBS) $(LFLAGS) /OUT:$(TARGET) /PDB:$(PDB)\
+		/MAP:$(MAP) $(OBJ) $(RES)
 
-.cc{$(OBJDIR)}.obj:
-	@[ -d $(OBJDIR) ] || mkdir $(OBJDIR)
-	$(CC) $(CPPFLAGS) /Fo"$(OBJDIR)\\" /c $<
+.cc{$(TMPDIR)}.obj:
+	@[ -d $(TMPDIR) ] || mkdir $(TMPDIR)
+	$(CC) $(CPPFLAGS) /Fo"$(TMPDIR)\\" /c $<
 
 .cc.lib:
-	$(CC) $(CPPFLAGS) /LD $(LIB1) $<
+	$(CC) $(CPPFLAGS) /LD $(LIBS) $<
 
 clean:
-	rm $(OBJ) $(TARGET) *.map *.pdb *.ilk *.obj *.lib *.dll *.exp
+	rm $(OBJ)
+	rm $(TARGET)\*
+	rm *.dll
+	rm *.exe
+	rm *.exp
+	rm *.ilk
+	rm *.lib
+	rm *.map
+	rm *.obj
+	rm *.pdb

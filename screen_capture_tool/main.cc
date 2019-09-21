@@ -10,10 +10,13 @@
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
+#include "./capture.h"
 #include "./folder_dialog.h"
 #include "./key_hook.h"
+#include "./png_tool.h"
 #include "./resource.h"
 #include "./task_tray.h"
+#include "./util.h"
 
 namespace {
 constexpr wchar_t MODULE_FILE_NAME[] = L"ScreenCaptureTool.exe";
@@ -29,9 +32,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
   HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
 
-  /////////////////////////////////////////////////////////////////////////////
-  //  Output path initialization
-  /////////////////////////////////////////////////////////////////////////////
+  // Output path initialization
   if (GetModuleFileName(hInstance, output_dir, ARRAYSIZE(output_dir)) == 0) {
     MessageBox(hwnd, L"Failed to get module file path", L"Error", MB_OK);
     PostQuitMessage(0);
@@ -43,10 +44,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   fwprintf(stderr, L"Module file name:%ls\n", output_dir);
 #endif
 
-  /////////////////////////////////////////////////////////////////////////////
-  //  Task tray initialization
-  /////////////////////////////////////////////////////////////////////////////
-  // Add task tray icon.
+  // Task tray initialization
   NOTIFYICONDATA nid;
   ZeroMemory(&nid, sizeof(nid));
   nid.cbSize = sizeof(nid);
@@ -65,10 +63,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
     return FALSE;
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  //  Key hook initialization
-  /////////////////////////////////////////////////////////////////////////////
-  // Start the keyboard hook.
+  // Key hook initialization
   if (!SetKeyHook(hwnd)) {
 #ifdef DEBUG
     fwprintf(stderr, L"Failed to start hook\n");
@@ -81,10 +76,7 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
-  /////////////////////////////////////////////////////////////////////////////
-  //  Key hook finalization
-  /////////////////////////////////////////////////////////////////////////////
-  // Stop the keyboard hook.
+  // Key hook finalization
   if (!RemoveKeyHook()) {
 #ifdef DEBUG
     fwprintf(stderr, L"Failed to stop hook\n");
@@ -92,10 +84,7 @@ void Cls_OnDestroy(HWND hwnd) {
   }
   PostQuitMessage(0);
 
-  /////////////////////////////////////////////////////////////////////////////
-  //  Task tray finalization
-  /////////////////////////////////////////////////////////////////////////////
-  // Remove task tray icon.
+  // Task tray finalization
   NOTIFYICONDATA nid;
   ZeroMemory(&nid, sizeof(nid));
   nid.cbSize = sizeof(nid);
@@ -118,7 +107,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   switch (id) {
     case IDM_FOLDER: {
       wchar_t buffer[256] = {0};
-      if (!GetDirectoryName(hwnd, L"Folder select", output_dir, buffer)) {
+      if (!GetDirectoryName(hwnd, L"Folder select", NULL, buffer)) {
         MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
       } else {
         wcscpy_s(output_dir, ARRAYSIZE(output_dir), buffer);
@@ -161,10 +150,33 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
   (void)hwnd;
   const UINT vk = (UINT)wParam;
   const BOOL fDown = ((lParam & 0x80000000) == 0) ? TRUE : FALSE;
-  if (fDown == TRUE) {
-    fwprintf(stderr, L"key down, %2x:\n", vk);
-  } else {
-    fwprintf(stderr, L"key up, %2x:\n", vk);
+
+  // Screen capture is executed.
+  if ((vk == VK_SHUTTER) && (fDown == TRUE)) {
+    // File is named by time.
+    wchar_t file_name[256] = {0};
+    GetTimeFileName(file_name, ARRAYSIZE(file_name), L".png");
+
+    // File path is created.
+    wchar_t path[256] = {0};
+    wcscat_s(path, ARRAYSIZE(path), output_dir);
+    wcscat_s(path, ARRAYSIZE(path), L"\\");
+    wcscat_s(path, ARRAYSIZE(path), file_name);
+#ifdef DEBUG
+    fwprintf(stderr, L"PNG file name:%ls\n", path);
+#endif
+
+    // Screen is captured.
+    PNGData png_data;
+    if (!Capture(&png_data)) {
+      MessageBox(hwnd, L"Failed to capture screen.", L"Error", MB_OK);
+      return;
+    }
+    if (!WritePNGFile(path, png_data)) {
+      MessageBox(hwnd, L"Failed to write PNG file.", L"Error", MB_OK);
+      return;
+    }
+    return;
   }
 }
 
@@ -186,6 +198,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPTSTR lpsCmdLine, int nCmdShow) {
   (void)hPrevInstance;
   (void)lpsCmdLine;
+  (void)nCmdShow;
 
 #ifdef DEBUG
   FILE* fp = nullptr;
@@ -222,6 +235,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   if (hWnd == NULL) {
     return FALSE;
   }
+  ShowWindow(hWnd, SW_HIDE);
 
   MSG msg;
   while (GetMessage(&msg, NULL, 0, 0) > 0) {
