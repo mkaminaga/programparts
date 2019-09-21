@@ -91,10 +91,6 @@ bool CaptureTest(TESTCASE test_case, PNGData *png_data) {
   fwprintf(stderr, L"\n");
 #endif
 
-  // DIB is acquired.
-  BITMAP bm;
-  GetObject(memBM, sizeof(bm), &bm);
-
   // DIB is converted to PNG.
   png_data->width = width;
   png_data->height = height;
