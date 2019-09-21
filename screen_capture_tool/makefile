@@ -16,6 +16,20 @@ MYLIB = key_hook.lib
 
 CC = "$(VCINSTALLDIR)\cl.exe"
 LINK = "$(VCINSTALLDIR)\link.exe"
+
+!if 1
+# Release mode.
+CPPFLAGS = /nologo /W4 /Zi /O2 /MT /EHsc /Fd"$(TMPDIR)/"\
+					 /D"UNICODE" /D"_UNICODE" /EHsc /I"$(LIBRARIES)\libpng"
+LIBS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib"\
+			 "advapi32.lib" "shell32.lib" "ole32.lib"	"oleaut32.lib" "uuid.lib"\
+			 "odbc32.lib" "libcmt.lib"
+LFLAGS = $(LIBS)\
+				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Release\libpng.lib" \
+				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Release\ZLib\zlib.lib"\
+				 /NOLOGO /SUBSYSTEM:WINDOWS
+!else
+# Debug mode.
 CPPFLAGS = /nologo /W4 /Zi /O2 /MTd /EHsc /Fd"$(TMPDIR)/"\
 					 /D"UNICODE" /D"_UNICODE" /EHsc /I"$(LIBRARIES)\libpng"\
 					 /D"DEBUG" /DEBUG
@@ -26,6 +40,7 @@ LFLAGS = $(LIBS)\
 				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Debug\libpngd.lib" \
 				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Debug\ZLib\zlibd.lib"\
 				 /NOLOGO /SUBSYSTEM:WINDOWS /PROFILE /DEBUG /PDB:"$(PDB)" /MAP:"$(MAP)"
+!endif
 
 ALL: $(TARGET)
 

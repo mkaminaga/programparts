@@ -14,10 +14,10 @@
 static int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam,
                                        LPARAM lpData) {
   (void)hWnd;
+  (void)lParam;
   (void)lpData;
 
   wchar_t dir[MAX_PATH] = {0};
-  ITEMIDLIST *pidl = NULL;
 
   switch (uMsg) {
     case BFFM_INITIALIZED:
@@ -31,15 +31,15 @@ static int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam,
       // A nonexistent folder is considered an invalid name.
       MessageBox(hWnd, L"Invalid folder name!", L"Error", MB_OK);
       return 1;
-    case BFFM_SELCHANGED:
+    case BFFM_SELCHANGED: {
       // The selection has changed in the dialog box.
 #ifdef DEBUG
-      pidl = (ITEMIDLIST *)lParam;
+      ITEMIDLIST *pidl = (ITEMIDLIST *)lParam;
       SHGetPathFromIDList(pidl, dir);
       fwprintf(stderr, L"Select changed:%ls\n", dir);
       fwprintf(stderr, L"\n");
 #endif
-      break;
+    } break;
   }
   return 0;
 }
