@@ -41,7 +41,7 @@ bool WritePNGFile(const wchar_t *file_name, const PNGData &png_data) {
 #ifdef DEBUG
     fwprintf(stderr, L"ERROR... Failed to allocate info_ptr.\n");
 #endif
-    png_destroy_read_struct(&png_ptr, NULL, NULL);
+    png_destroy_write_struct(&png_ptr, NULL);
     fclose(fp);
     return false;
   }
