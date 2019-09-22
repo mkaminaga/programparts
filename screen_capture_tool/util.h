@@ -12,6 +12,6 @@
 #include <wchar.h>
 #include <windows.h>
 
-int GetTimeFileName(wchar_t* dst, int dst_size, const wchar_t* prefix);
+int GetTimeString(wchar_t* dst, int dst_size);
 
 #endif  // _UTIL_H_

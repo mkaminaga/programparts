@@ -46,6 +46,12 @@ bool InitializeCapture(CaptureData *capture) {
   // Set DDB to memory device context.
   capture->prevBM = (HBITMAP)SelectObject(capture->memDC, capture->memBM);
 
+  // Resize PNG data buffer.
+  capture->png_data.red_buffer.resize(capture->width * capture->height);
+  capture->png_data.green_buffer.resize(capture->width * capture->height);
+  capture->png_data.blue_buffer.resize(capture->width * capture->height);
+  capture->png_data.alpha_buffer.resize(capture->width * capture->height);
+
 #ifdef DEBUG
   fwprintf(stderr, L"width = %d\n", capture->width);
   fwprintf(stderr, L"height = %d\n", capture->height);
@@ -82,11 +88,6 @@ bool Capture(CaptureData *capture) {
   capture->png_data.interlace_type = PNG_INTERLACE_NONE;
   capture->png_data.compression_type = PNG_COMPRESSION_TYPE_DEFAULT;
   capture->png_data.filter_type = PNG_FILTER_TYPE_DEFAULT;
-
-  capture->png_data.red_buffer.resize(capture->width * capture->height);
-  capture->png_data.green_buffer.resize(capture->width * capture->height);
-  capture->png_data.blue_buffer.resize(capture->width * capture->height);
-  capture->png_data.alpha_buffer.resize(capture->width * capture->height);
 
   int bm_width = capture->width * 3;
   if ((capture->width * 3) % 4) {

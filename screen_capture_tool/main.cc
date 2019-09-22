@@ -6,7 +6,6 @@
 // Copyright 2019 Mamoru Kaminaga
 //
 #include <stdio.h>
-#include <strsafe.h>
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
@@ -22,8 +21,8 @@ namespace {
 constexpr wchar_t MODULE_FILE_NAME[] = L"ScreenCaptureTool.exe";
 constexpr wchar_t WINDOW_NAME[] = L"ScreenCaptureTool";
 constexpr wchar_t CLASS_NAME[] = L"ScreenCaptureTool";
-constexpr int TASKTRAY_ICONID = 1;
-wchar_t output_dir[256] = {0};
+constexpr int TRAY_ICON_ID = 1;
+wchar_t save_dir[256] = {0};
 CaptureData capture;
 }  // namespace
 
@@ -33,43 +32,36 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
   HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
 
-  // Output path initialization
-  if (GetModuleFileName(hInstance, output_dir, ARRAYSIZE(output_dir)) == 0) {
+  // Initialization of output path
+  if (GetModuleFileName(hInstance, save_dir, ARRAYSIZE(save_dir)) == 0) {
     MessageBox(hwnd, L"Failed to get module file name", L"Error", MB_OK);
     PostQuitMessage(0);
     return (-1);
   }
-  output_dir[wcslen(output_dir) - wcslen(MODULE_FILE_NAME) - 1] =
+  save_dir[wcslen(save_dir) - wcslen(MODULE_FILE_NAME) - 1] =
       L'\0';  // Module file path is converted to directory.
 #ifdef DEBUG
-  fwprintf(stderr, L"Module file dir:%ls\n", output_dir);
+  fwprintf(stderr, L"Module file dir:%ls\n", save_dir);
 #endif
 
-  // Task tray initialization
-  NOTIFYICONDATA nid;
-  ZeroMemory(&nid, sizeof(nid));
-  nid.cbSize = sizeof(nid);
-  nid.hWnd = hwnd;
-  nid.uID = TASKTRAY_ICONID;
-  nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-  nid.uCallbackMessage = WM_TASKTRAY;
-  nid.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-  StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Task tray test");
-
-  if (Shell_NotifyIcon(NIM_ADD, &nid) != TRUE) {
-    MessageBox(hwnd, L"Failed to add an icon on task tray.\n", L"Error", MB_OK);
+  // Initialization of task tray
+  if (!SetTaskTrayIcon(hwnd, TRAY_ICON_ID, IDI_ICON1)) {
+    MessageBox(hwnd, L"Failed to initialize task tray.\n", L"Error", MB_OK);
     return (-1);
   }
 
-  // Key hook initialization
+  // Initialization of key hook
   if (!SetKeyHook(hwnd)) {
     MessageBox(hwnd, L"Failed to set key hook.\n", L"Error", MB_OK);
+    RemoveTaskTrayIcon(hwnd, TRAY_ICON_ID);
     return (-1);
   }
 
-  // Capture data initialization
+  // Initialization of capture data
   if (!InitializeCapture(&capture)) {
     MessageBox(hwnd, L"Failed to initialize capture.\n", L"Error", MB_OK);
+    RemoveTaskTrayIcon(hwnd, TRAY_ICON_ID);
+    RemoveKeyHook();
     return (-1);
   }
   return TRUE;
@@ -78,21 +70,13 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
 
-  // Key hook finalization
-  if (!RemoveKeyHook()) {
-    MessageBox(hwnd, L"Failed to remove key hook.\n", L"Error", MB_OK);
-  }
+  // Finalization of key hook
+  RemoveKeyHook();
 
-  // Task tray finalization
-  NOTIFYICONDATA nid;
-  ZeroMemory(&nid, sizeof(nid));
-  nid.cbSize = sizeof(nid);
-  nid.hWnd = hwnd;
-  nid.uID = TASKTRAY_ICONID;
-  nid.uFlags = 0;
-  Shell_NotifyIcon(NIM_DELETE, &nid);
+  // Finalization of task tray
+  RemoveTaskTrayIcon(hwnd, TRAY_ICON_ID);
 
-  // Capture data finalization
+  // Finalization of capture data
   FinalizeCapture(&capture);
 
   PostQuitMessage(0);
@@ -108,14 +92,15 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
 
   switch (id) {
     case IDM_FOLDER: {
+      // Folder select dialog is called.
       wchar_t buffer[256] = {0};
       if (!GetDirectoryName(hwnd, L"Folder select", NULL, buffer)) {
         MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
       } else {
-        wcscpy_s(output_dir, ARRAYSIZE(output_dir), buffer);
+        wcscpy_s(save_dir, ARRAYSIZE(save_dir), buffer);
       }
 #ifdef DEBUG
-      fwprintf(stderr, L"%ls\n", output_dir);
+      fwprintf(stderr, L"%ls\n", save_dir);
 #endif
     } break;
     case IDM_QUIT:
@@ -129,7 +114,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
 void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
   (void)hwnd;
 
-  if (id != TASKTRAY_ICONID) {
+  if (id != TRAY_ICON_ID) {
     return;
   }
   switch (uMsg) {
@@ -143,6 +128,10 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
       TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
                      point.y, 0, hwnd, NULL);
     } break;
+    case WM_LBUTTONDOWN:
+      MessageBox(hwnd, L"Screen capture tool.\nCopyright 2019 Mamoru Kaminaga",
+                 MODULE_FILE_NAME, MB_OK);
+      break;
     default:
       break;
   }
@@ -157,17 +146,18 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     return;
   }
 
-  // Screen capture is executed.
+  // Any shutter button is pushed.
   if ((vk == VK_SCROLL) || (vk == VK_PAUSE)) {
     // File is named by time.
-    wchar_t file_name[256] = {0};
-    GetTimeFileName(file_name, ARRAYSIZE(file_name), L".png");
+    wchar_t file[256] = {0};
+    GetTimeString(file, ARRAYSIZE(file));
+    wcscat_s(file, ARRAYSIZE(file), L".png");
 
     // File path is created.
     wchar_t path[256] = {0};
-    wcscat_s(path, ARRAYSIZE(path), output_dir);
+    wcscat_s(path, ARRAYSIZE(path), save_dir);
     wcscat_s(path, ARRAYSIZE(path), L"\\");
-    wcscat_s(path, ARRAYSIZE(path), file_name);
+    wcscat_s(path, ARRAYSIZE(path), file);
 #ifdef DEBUG
     fwprintf(stderr, L"PNG file name:%ls\n", path);
 #endif
@@ -219,6 +209,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   fwprintf(stderr, L"\n");
 #endif
 
+  // Initialization of COM.
+  CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+
   WNDCLASS wc;
   wc.style = CS_HREDRAW | CS_VREDRAW;
   wc.lpfnWndProc = WndProc;
@@ -251,5 +244,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #ifdef DEBUG
   FreeConsole();
 #endif
+
+  // Finalization of COM.
+  CoUninitialize();
   return 0;
 }

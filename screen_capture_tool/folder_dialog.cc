@@ -29,7 +29,7 @@ static int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam,
     case BFFM_VALIDATEFAILED:
       // The user typed an invalid name into the dialog's edit box.
       // A nonexistent folder is considered an invalid name.
-      MessageBox(hWnd, L"Invalid folder name!", L"Error", MB_OK);
+      MessageBox(hWnd, L"Invalid folder name.", L"Error", MB_OK);
       return 1;
     case BFFM_SELCHANGED: {
       // The selection has changed in the dialog box.
@@ -58,7 +58,7 @@ bool GetDirectoryName(HWND hwnd, const wchar_t *title, const wchar_t *root_dir,
     HRESULT hr = SHParseDisplayName((PCWSTR)root_dir, NULL, &pidlRoot, 0, NULL);
     if ((hr != S_OK) || (pidlRoot == NULL)) {
 #ifdef DEBUG
-      fwprintf(stderr, L"Invalid root directory\n");
+      fwprintf(stderr, L"Invalid root directory.\n");
 #endif
       return false;
     }

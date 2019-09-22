@@ -24,8 +24,7 @@ struct PNGData {
   int interlace_type;
   int rowbytes;
   int channels;
-  // Pixels are read from PNG data.
-  // This version only supports RGBA format.
+  // Pixel buffer for RGBA format.
   std::vector<uint8_t> red_buffer;
   std::vector<uint8_t> green_buffer;
   std::vector<uint8_t> blue_buffer;

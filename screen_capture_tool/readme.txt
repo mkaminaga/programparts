@@ -1,0 +1,48 @@
+ï»¿ŠÈˆÕƒLƒƒƒvƒ`ƒƒƒ\ƒtƒg @ScreenCaptureTool.exe
+2019”N9ŒŽ22“ú@Mamoru Kaminaga
+====
+yŒ¾‚¢–óz
+‚±‚ê‚ÍŽ„‚ªWindowsƒvƒƒOƒ‰ƒ~ƒ“ƒO‚Ì•×‹­—p‚Éì¬‚µ‚½‚à‚Ì‚Å‚·B
+‚»‚Ì‚½‚ßA’Pƒ‚Å•seØ‚Å‚·B
+
+yŠT—vz
+EƒfƒXƒNƒgƒbƒv‘S‰æ–Ê‚ðƒLƒƒƒvƒ`ƒƒ‚µAPNGƒtƒ@ƒCƒ‹‚É•Û‘¶
+E•Û‘¶‚Ì‰ß’ö‚ÅƒNƒŠƒbƒvƒ{[ƒh‚ð‰î‚³‚È‚¢
+Eƒ^ƒXƒNƒgƒŒƒCí’“Œ^
+EPause‚âScrLkƒL[‚ð‰Ÿ‚·‚ÆƒLƒƒƒvƒ`ƒƒ‚ðŽÀs
+Eo—ÍæƒtƒHƒ‹ƒ_‚ÍƒfƒtƒHƒ‹ƒg‚Å‚ÍŽÀs‰Â”\ƒtƒ@ƒCƒ‹‚ª‚ ‚éƒtƒHƒ‹ƒ_A•ÏX‚ª‰Â”\
+Eƒtƒ@ƒCƒ‹–¼‚Í“úŽž‚©‚çŽ©“®“I‚ÅŒˆ’è
+
+y“®ìŠm”FÏ‚ÝŠÂ‹«z
+Windows 8.1
+ƒvƒƒZƒbƒT: Intel(R) Core(TM) i5-5200U CPU @2.20GHz
+ƒƒ‚ƒŠ: 8.00 GB
+OS: Windows 8.1 (64bit)
+
+yƒCƒ“ƒXƒg[ƒ‹EƒAƒ“ƒCƒ“ƒXƒg[ƒ‹z
+ƒƒCƒ“ƒXƒg[ƒ‹„
+1. libpng‚ðƒCƒ“ƒXƒg[ƒ‹‚·‚é(ƒCƒ“ƒXƒg[ƒ‹Ï‚Ý‚Å‚ ‚ê‚ÎƒXƒLƒbƒv‰Â)
+2. programparts/screen_capture_tool‚ðƒ[ƒJƒ‹‚ÉƒRƒs[
+3. makefile‚ðC³‚·‚éiŽå‚ÉˆÈ‰º‚Ì•Ï”‚ÌƒpƒX‚ÌC³j
+	CC
+	LINK
+	CPPFLAGS
+	LFLAGS
+4. ŠJ”­ŽÒƒRƒ}ƒ“ƒhƒvƒƒ“ƒg‚È‚Ç‚©‚çnmake‚·‚é
+
+ƒƒAƒ“ƒCƒ“ƒXƒg[ƒ‹„
+ƒtƒHƒ‹ƒ_‚²‚Æíœ‚µ‚Ä‚­‚¾‚³‚¢B
+
+y’ˆÓ“_z
+EƒOƒ[ƒoƒ‹ƒtƒbƒN‚ÌŽg—p‚É‚Â‚¢‚Ä
+ƒVƒƒƒbƒ^[ƒL[‚ª‰Ÿ‚³‚ê‚½‚±‚Æ‚ð’m‚é‚½‚ß‚ÉAƒOƒ[ƒoƒ‹ƒtƒbƒN‚ðŽg—p‚µ‚Ä‚¢‚Ü‚·B
+ƒOƒ[ƒoƒ‹ƒtƒbƒN‚ÍƒL[ƒƒK[‚ÉŽg‚¤‚±‚Æ‚Ì‚Å‚«‚Ä‚µ‚Ü‚¤‹Zp‚Å‚·B
+‚±‚Ìƒ\ƒtƒg‚Éˆ«ˆÓ‚Í‚ ‚è‚Ü‚¹‚ñ‚ªA”O‚Ì‚½‚ßŒ¾‹y‚µ‚Ä‚¨‚«‚Ü‚·B
+
+yŠù’m‚Ì•s‹ï‡z
+EDPI‚ÌŠÖŒW‚ÅƒXƒP[ƒŠƒ“ƒO‚ª‚¨‚©‚µ‚­‚È‚é‚±‚Æ‚ª‚ ‚è‚Ü‚·
+‚»‚Ìê‡AScreenCaptureTool.exe‚ð‰EƒNƒŠƒbƒNAƒvƒƒpƒeƒB‚ð‘I‘ðAŒÝŠ·«‚Ìƒ^ƒu‚ðŠJ‚«Au‚DPIÝ’è‚Å‚Í‰æ–Ê‚ÌƒXƒP[ƒŠƒ“ƒO‚ð–³Œø‚É‚·‚év‚Éƒ`ƒFƒbƒN‚ð“ü‚ê‚Ä‚Ý‚Ä‚­‚¾‚³‚¢B
+
+EƒVƒƒƒbƒ^[ƒL[‚ðŽó‚¯•t‚¯‚È‚­‚È‚é
+Œ´ˆö‚Í•s–¾‚Å‚·B
+ScreenCaptureTool.exe‚ðÄ‹N“®‚µ‚Ä‚­‚¾‚³‚¢B

@@ -19,4 +19,7 @@
 #define HANDLE_WM_TASKTRAY(hwnd, wParam, lParam, fn) \
   ((fn)((hwnd), (UINT)(wParam), (UINT)(lParam)), 0L)
 
+bool SetTaskTrayIcon(HWND hwnd, int tray_icon_id, int icon_id);
+void RemoveTaskTrayIcon(HWND hwnd, int tray_icon_id);
+
 #endif  // _TASK_TRAY_H_

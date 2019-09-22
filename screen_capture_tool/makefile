@@ -8,9 +8,10 @@ PDB = ScreenCaptureTool.pdb
 MAP = ScreenCaptureTool.map
 RES = resource.res
 TMPDIR = build
-SRC = main.cc folder_dialog.cc png_tool.cc util.cc capture.cc key_hook.cc
+SRC = main.cc folder_dialog.cc png_tool.cc util.cc capture.cc  task_tray.cc\
+			key_hook.cc
 OBJ = $(TMPDIR)\main.obj $(TMPDIR)\folder_dialog.obj $(TMPDIR)\png_tool.obj \
-			$(TMPDIR)\util.obj $(TMPDIR)\capture.obj
+			$(TMPDIR)\util.obj $(TMPDIR)\capture.obj $(TMPDIR)\task_tray.obj
 DLL = key_hook.dll
 MYLIB = key_hook.lib
 

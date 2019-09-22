@@ -12,7 +12,7 @@
 #include <wchar.h>
 #include <windows.h>
 
-int GetTimeFileName(wchar_t* dst, int dst_size, const wchar_t* prefix) {
+int GetTimeString(wchar_t* dst, int dst_size) {
   assert(dst);
 
   // Local time is acquired.
@@ -21,8 +21,8 @@ int GetTimeFileName(wchar_t* dst, int dst_size, const wchar_t* prefix) {
   localtime_s(&tim, &t);
 
   // File name is created using local time.
-  int str_len = swprintf_s(dst, dst_size, L"%04d%02d%02d-%02d%02d%02d%ls",
-                           tim.tm_year + 1900, tim.tm_mon, tim.tm_mday,
-                           tim.tm_hour, tim.tm_min, tim.tm_sec, prefix);
+  const int str_len = swprintf_s(dst, dst_size, L"%04d%02d%02d-%02d%02d%02d",
+                                 tim.tm_year + 1900, tim.tm_mon, tim.tm_mday,
+                                 tim.tm_hour, tim.tm_min, tim.tm_sec);
   return str_len;
 }
