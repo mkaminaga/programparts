@@ -1,48 +1,48 @@
-﻿�ȈՃL���v�`���\�t�g �@ScreenCaptureTool.exe
-2019�N9��22���@Mamoru Kaminaga
+簡易キャプチャソフト 　ScreenCaptureTool.exe
+2019年9月22日　Mamoru Kaminaga
 ====
-�y������z
-����͎���Windows�v���O���~���O�̕׋��p�ɍ쐬�������̂ł��B
-���̂��߁A�P���ŕs�e�؂ł��B
+【言い訳】
+これは私がWindowsプログラミングの勉強用に作成したものです。
+そのため、単純で不親切です。
 
-�y�T�v�z
-�E�f�X�N�g�b�v�S��ʂ��L���v�`�����APNG�t�@�C���ɕۑ�
-�E�ۑ��̉ߒ��ŃN���b�v�{�[�h����Ȃ�
-�E�^�X�N�g���C�풓�^
-�EPause��ScrLk�L�[�������ƃL���v�`�������s
-�E�o�͐�t�H���_�̓f�t�H���g�ł͎��s�\�t�@�C��������t�H���_�A�ύX���\
-�E�t�@�C�����͓������玩���I�Ō���
+【概要】
+・デスクトップ全画面をキャプチャし、PNGファイルに保存
+・保存の過程でクリップボードを介さない
+・タスクトレイ常駐型
+・PauseやScrLkキーを押すとキャプチャを実行
+・出力先フォルダはデフォルトでは実行可能ファイルがあるフォルダ、変更が可能
+・ファイル名は日時から自動的で決定
 
-�y����m�F�ς݊��z
+【動作確認済み環境】
 Windows 8.1
-�v���Z�b�T: Intel(R) Core(TM) i5-5200U CPU @2.20GHz
-������: 8.00 GB
+プロセッサ: Intel(R) Core(TM) i5-5200U CPU @2.20GHz
+メモリ: 8.00 GB
 OS: Windows 8.1 (64bit)
 
-�y�C���X�g�[���E�A���C���X�g�[���z
-���C���X�g�[����
-1. libpng���C���X�g�[������(�C���X�g�[���ς݂ł���΃X�L�b�v��)
-2. programparts/screen_capture_tool�����[�J���ɃR�s�[
-3. makefile���C������i��Ɉȉ��̕ϐ��̃p�X�̏C���j
+【インストール・アンインストール】
+＜インストール＞
+1. libpngをインストールする(インストール済みであればスキップ可)
+2. programparts/screen_capture_toolをローカルにコピー
+3. makefileを修正する（主に以下の変数のパスの修正）
 	CC
 	LINK
 	CPPFLAGS
 	LFLAGS
-4. �J���҃R�}���h�v�����g�Ȃǂ���nmake����
+4. 開発者コマンドプロントなどからnmakeする
 
-���A���C���X�g�[����
-�t�H���_���ƍ폜���Ă��������B
+＜アンインストール＞
+フォルダごと削除してください。
 
-�y���ӓ_�z
-�E�O���[�o���t�b�N�̎g�p�ɂ���
-�V���b�^�[�L�[�������ꂽ���Ƃ�m�邽�߂ɁA�O���[�o���t�b�N���g�p���Ă��܂��B
-�O���[�o���t�b�N�̓L�[���K�[�Ɏg�����Ƃ̂ł��Ă��܂��Z�p�ł��B
-���̃\�t�g�Ɉ��ӂ͂���܂��񂪁A�O�̂��ߌ��y���Ă����܂��B
+【注意点】
+・グローバルフックの使用について
+シャッターキーが押されたことを知るために、グローバルフックを使用しています。
+グローバルフックはキーロガーに使うことのできてしまう技術です。
+このソフトに悪意はありませんが、念のため言及しておきます。
 
-�y���m�̕s��z
-�EDPI�̊֌W�ŃX�P�[�����O�����������Ȃ邱�Ƃ�����܂�
-���̏ꍇ�AScreenCaptureTool.exe���E�N���b�N�A�v���p�e�B��I���A�݊����̃^�u���J���A�u��DPI�ݒ�ł͉�ʂ̃X�P�[�����O�𖳌��ɂ���v�Ƀ`�F�b�N�����Ă݂Ă��������B
+【既知の不具合】
+・DPIの関係でスケーリングがおかしくなることがあります
+その場合、ScreenCaptureTool.exeを右クリック、プロパティを選択、互換性のタブを開き、「高DPI設定では画面のスケーリングを無効にする」にチェックを入れてみてください。
 
-�E�V���b�^�[�L�[���󂯕t���Ȃ��Ȃ�
-�����͕s���ł��B
-ScreenCaptureTool.exe���ċN�����Ă��������B
+・シャッターキーを受け付けなくなる
+原因は不明です。
+ScreenCaptureTool.exeを再起動してください。
