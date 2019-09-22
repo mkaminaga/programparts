@@ -24,6 +24,7 @@ constexpr wchar_t WINDOW_NAME[] = L"ScreenCaptureTool";
 constexpr wchar_t CLASS_NAME[] = L"ScreenCaptureTool";
 constexpr int TASKTRAY_ICONID = 1;
 wchar_t output_dir[256] = {0};
+CaptureData capture;
 }  // namespace
 
 BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
@@ -34,14 +35,14 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
   // Output path initialization
   if (GetModuleFileName(hInstance, output_dir, ARRAYSIZE(output_dir)) == 0) {
-    MessageBox(hwnd, L"Failed to get module file path", L"Error", MB_OK);
+    MessageBox(hwnd, L"Failed to get module file name", L"Error", MB_OK);
     PostQuitMessage(0);
-    return FALSE;
+    return (-1);
   }
   output_dir[wcslen(output_dir) - wcslen(MODULE_FILE_NAME) - 1] =
       L'\0';  // Module file path is converted to directory.
 #ifdef DEBUG
-  fwprintf(stderr, L"Module file name:%ls\n", output_dir);
+  fwprintf(stderr, L"Module file dir:%ls\n", output_dir);
 #endif
 
   // Task tray initialization
@@ -56,33 +57,31 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   StringCchCopy(nid.szTip, ARRAYSIZE(nid.szTip), L"Task tray test");
 
   if (Shell_NotifyIcon(NIM_ADD, &nid) != TRUE) {
-#ifdef DEBUG
-    fwprintf(stderr, L"Failed to add an icon on task tray!\n");
-#endif
-    PostQuitMessage(0);
-    return FALSE;
+    MessageBox(hwnd, L"Failed to add an icon on task tray.\n", L"Error", MB_OK);
+    return (-1);
   }
 
   // Key hook initialization
   if (!SetKeyHook(hwnd)) {
-#ifdef DEBUG
-    fwprintf(stderr, L"Failed to start hook\n");
-#endif
-    FreeConsole();
-    return 0;
+    MessageBox(hwnd, L"Failed to set key hook.\n", L"Error", MB_OK);
+    return (-1);
+  }
+
+  // Capture data initialization
+  if (!InitializeCapture(&capture)) {
+    MessageBox(hwnd, L"Failed to initialize capture.\n", L"Error", MB_OK);
+    return (-1);
   }
   return TRUE;
 }
 
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
+
   // Key hook finalization
   if (!RemoveKeyHook()) {
-#ifdef DEBUG
-    fwprintf(stderr, L"Failed to stop hook\n");
-#endif
+    MessageBox(hwnd, L"Failed to remove key hook.\n", L"Error", MB_OK);
   }
-  PostQuitMessage(0);
 
   // Task tray finalization
   NOTIFYICONDATA nid;
@@ -92,6 +91,9 @@ void Cls_OnDestroy(HWND hwnd) {
   nid.uID = TASKTRAY_ICONID;
   nid.uFlags = 0;
   Shell_NotifyIcon(NIM_DELETE, &nid);
+
+  // Capture data finalization
+  FinalizeCapture(&capture);
 
   PostQuitMessage(0);
 }
@@ -171,12 +173,11 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 #endif
 
     // Screen is captured.
-    PNGData png_data;
-    if (!Capture(&png_data)) {
+    if (!Capture(&capture)) {
       MessageBox(hwnd, L"Failed to capture screen.", L"Error", MB_OK);
       return;
     }
-    if (!WritePNGFile(path, png_data)) {
+    if (!WritePNGFile(path, capture.png_data)) {
       MessageBox(hwnd, L"Failed to write PNG file.", L"Error", MB_OK);
       return;
     }
