@@ -171,6 +171,8 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
       MessageBox(hwnd, L"Failed to write PNG file.", L"Error", MB_OK);
       return;
     }
+
+    MessageBox(hwnd, file, MODULE_FILE_NAME, MB_OK);
     return;
   }
 }
