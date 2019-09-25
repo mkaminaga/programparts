@@ -30,4 +30,4 @@ IDR_MENU1 MENU
 // Icon resources
 //
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-IDI_ICON1          ICON           ".\\icon.ico"
+IDI_ICON1          ICON           ".\\data\\icon.ico"

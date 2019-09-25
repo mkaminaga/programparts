@@ -57,13 +57,15 @@ $(TARGET): $(OBJ) $(MYLIB) $(DLL) $(RES)
 	$(CC) $(CPPFLAGS) /LD $(LIBS) $<
 
 clean:
-	rm $(OBJ)
-	rm $(TARGET)
-	rm *.dll
-	rm *.exe
-	rm *.exp
-	rm *.ilk
-	rm *.lib
-	rm *.map
-	rm *.obj
-	rm *.pdb
+	rm -f $(OBJ)
+	rm -f $(TARGET)
+	rm -f $(TMPDIR)/*
+	rm -f *.dll
+	rm -f *.exe
+	rm -f *.exp
+	rm -f *.ilk
+	rm -f *.lib
+	rm -f *.map
+	rm -f *.obj
+	rm -f *.pdb
+	rm -f *.png
