@@ -58,7 +58,7 @@ $(TARGET): $(OBJ) $(MYLIB) $(DLL) $(RES)
 
 clean:
 	rm $(OBJ)
-	rm $(TARGET)\*
+	rm $(TARGET)
 	rm *.dll
 	rm *.exe
 	rm *.exp
