@@ -8,7 +8,7 @@ TARGET = main.exe
 SRC = main.cc
 OBJ = main.obj
 
-CPPFLAGS = /nologo /EHsc /DUNICODE /D_UNICODE /MT
+CPPFLAGS = /nologo /EHsc /DUNICODE /D_UNICODE
 LFLAGS = /NOLOGO /SUBSYSTEM:WINDOWS /MAP
 
 all: $(TARGET)
