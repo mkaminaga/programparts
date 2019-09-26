@@ -5,23 +5,14 @@ Mamoru Kaminaga
 コンパイルオプションの実験です。
 
 【フォルダ】
-Z7_multi_files
+Z7_files
 複数ファイルからビルド、Z7オプションを使用した場合。
 
-Z7_one_file
-単一ファイルからビルド、Z7オプションを使用した場合。
-
-Zi_multi_file
+Zi_file
 複数ファイルからビルド、Ziオプションを使用した場合。
 
-Zi_one_file
-単一ファイルからビルド、Ziオプションを使用した場合。
-
-release_multi_file
-複数ファイルからビルド、デバッグを無効化した場合。
-
-release_one_file
-単一ファイルからビルド、デバッグを無効化した場合。
+release_file
+複数ファイルからビルド、/Zi オプションと /O1 オプションを使用した場合。
 
 【参考】
 /Z7, /Zi, /ZI (Debug Information Format)
