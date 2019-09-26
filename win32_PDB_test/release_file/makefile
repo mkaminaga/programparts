@@ -7,9 +7,11 @@ LINK = "$(VCINSTALLDIR)\link.exe"
 TARGET = main.exe
 SRC = main.cc sub.cc
 OBJ = main.obj sub.obj
+MAP = main.map
+PDB = main.pdb
 
-CPPFLAGS = /nologo /EHsc /DUNICODE /D_UNICODE
-LFLAGS = /NOLOGO /SUBSYSTEM:WINDOWS /MAP
+CPPFLAGS = /nologo /W4 /EHsc /DUNICODE /D_UNICODE /Zi /O1
+LFLAGS = /NOLOGO /SUBSYSTEM:WINDOWS /DEBUG /MAP:$(MAP) /PDB:$(PDB)
 
 all: $(TARGET)
 
