@@ -20,23 +20,19 @@ LINK = "$(VCINSTALLDIR)\link.exe"
 
 !if 1
 # Release mode.
-CPPFLAGS = /nologo /W4 /Zi /O2 /MT /EHsc /Fd"$(TMPDIR)/"\
+CPPFLAGS = /nologo /W4 /Zi /O1 /MT /EHsc /Fd"$(TMPDIR)/"\
 					 /D"UNICODE" /D"_UNICODE" /EHsc /I"$(LIBRARIES)\libpng"
-LIBS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib"\
-			 "advapi32.lib" "shell32.lib" "ole32.lib"	"oleaut32.lib" "uuid.lib"\
-			 "odbc32.lib" "libcmt.lib"
+LIBS = "kernel32.lib" "user32.lib" "gdi32.lib" "shell32.lib" "ole32.lib"
 LFLAGS = $(LIBS)\
 				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Release\libpng.lib" \
 				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Release\ZLib\zlib.lib"\
 				 /NOLOGO /SUBSYSTEM:WINDOWS
 !else
 # Debug mode.
-CPPFLAGS = /nologo /W4 /Zi /O2 /MTd /EHsc /Fd"$(TMPDIR)/"\
+CPPFLAGS = /nologo /W4 /Zi /MTd /EHsc /Fd"$(TMPDIR)/"\
 					 /D"UNICODE" /D"_UNICODE" /EHsc /I"$(LIBRARIES)\libpng"\
-					 /D"DEBUG" /DEBUG
-LIBS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib"\
-			 "advapi32.lib" "shell32.lib" "ole32.lib"	"oleaut32.lib" "uuid.lib"\
-			 "odbc32.lib" "libcmtd.lib"
+					 /D"DEBUG"
+LIBS = "kernel32.lib" "user32.lib" "gdi32.lib" "shell32.lib" "ole32.lib"
 LFLAGS = $(LIBS)\
 				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Debug\libpngd.lib" \
 				 "$(LIBRARIES)\libpng\projects\visualc71\Win32_LIB_Debug\ZLib\zlibd.lib"\

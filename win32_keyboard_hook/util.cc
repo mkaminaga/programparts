@@ -63,8 +63,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
   switch (fdwReason) {
     case DLL_PROCESS_ATTACH:
       hInstance = hinstDLL;
-      hHook = NULL;
-      hWndDest = NULL;
+      MessageBox(NULL, L"DLL_THREAD_ATTACH", L"key_hook.dll", MB_OK);
       break;
     case DLL_THREAD_ATTACH:
       break;
