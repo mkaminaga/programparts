@@ -201,6 +201,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   (void)lpsCmdLine;
   (void)nCmdShow;
 
+  // Multi instance check.
+  HANDLE hMutex = CreateMutex(NULL, TRUE, L"screen_capture_tool");
+  if (GetLastError() == ERROR_ALREADY_EXISTS) {
+    MessageBox(NULL, L"The process is already run", MODULE_FILE_NAME, MB_OK);
+    ReleaseMutex(hMutex);
+    CloseHandle(hMutex);
+    return 1;
+  }
+
 #ifdef DEBUG
   FILE* fp = nullptr;
   AllocConsole();
@@ -230,14 +239,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   wc.lpszMenuName = NULL;
   wc.lpszClassName = CLASS_NAME;
   if (!RegisterClass(&wc)) {
-    return FALSE;
+    // Release mutex for multi instance check.
+    ReleaseMutex(hMutex);
+    CloseHandle(hMutex);
+    return 1;
   }
 
   HWND hWnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_DISABLED, CW_USEDEFAULT,
                            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL,
                            NULL, hInstance, NULL);
   if (hWnd == NULL) {
-    return FALSE;
+    // Release mutex for multi instance check.
+    ReleaseMutex(hMutex);
+    CloseHandle(hMutex);
+    return 1;
   }
   ShowWindow(hWnd, SW_HIDE);
 
@@ -253,5 +268,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   // Finalization of COM.
   CoUninitialize();
+
+  // Release mutex for multi instance check.
+  ReleaseMutex(hMutex);
+  CloseHandle(hMutex);
   return 0;
 }
