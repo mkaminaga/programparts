@@ -101,6 +101,7 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
       TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
                      point.y, 0, hwnd, NULL);
       DestroyMenu(hMenu);
+      PostMessage(hwnd, WM_NULL, 0, 0);
     } break;
     default:
       break;
