@@ -70,14 +70,10 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
 
   switch (id) {
     case IDM_FOLDER:
-#ifdef DEBUG
-      fwprintf(stderr, L"Folder is clicked\n");
-#endif
+      MessageBox(hwnd, L"Folder is clicked", WINDOW_NAME, MB_OK);
       break;
     case IDM_QUIT:
-#ifdef DEBUG
-      fwprintf(stderr, L"Quit is clicked\n");
-#endif
+      DestroyWindow(hwnd);
       break;
     default:
       break;
@@ -91,6 +87,9 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
     return;
   }
   switch (uMsg) {
+    case WM_LBUTTONDOWN:
+      MessageBox(hwnd, L"main.exe", WINDOW_NAME, MB_OK);
+      break;
     case WM_RBUTTONDOWN: {
       // Display menu when right button is clicked on task tray icon.
       POINT point;
@@ -98,8 +97,10 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
       HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
       HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
       HMENU hSubMenu = GetSubMenu(hMenu, 0);
+      SetForegroundWindow(hwnd);
       TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
                      point.y, 0, hwnd, NULL);
+      DestroyMenu(hMenu);
     } break;
     default:
       break;
@@ -123,6 +124,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPTSTR lpsCmdLine, int nCmdShow) {
   (void)hPrevInstance;
   (void)lpsCmdLine;
+  (void)nCmdShow;
 
 #ifdef DEBUG
   FILE* fp = nullptr;
