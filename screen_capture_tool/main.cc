@@ -125,8 +125,11 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
       HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
       HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
       HMENU hSubMenu = GetSubMenu(hMenu, 0);
+      SetForegroundWindow(hwnd);
       TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
                      point.y, 0, hwnd, NULL);
+      DestroyMenu(hMenu);
+      PostMessage(hwnd, WM_NULL, 0, 0);
     } break;
     case WM_LBUTTONDOWN:
       MessageBox(hwnd, L"Screen capture tool.\nCopyright 2019 Mamoru Kaminaga",
