@@ -175,7 +175,8 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
       return;
     }
 
-    MessageBox(hwnd, file, MODULE_FILE_NAME, MB_OK);
+    SetForegroundWindow(hwnd);
+    MessageBox(hwnd, file, MODULE_FILE_NAME, MB_OK | MB_TOPMOST);
     return;
   }
 }
