@@ -17,6 +17,8 @@ namespace {
 constexpr wchar_t WINDOW_NAME[] = L"Template window";
 constexpr wchar_t CLASS_NAME[] = L"Template class";
 constexpr int TASKTRAY_ICONID = 1;
+HMENU hMenu = NULL;
+HMENU hSubMenu = NULL;
 }  // namespace
 
 BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
@@ -42,11 +44,18 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 #endif
     return FALSE;
   }
+
+  // Initialization of menu.
+  hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
+  hSubMenu = GetSubMenu(hMenu, 0);
   return TRUE;
 }
 
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
+
+  // Finalization of menu.
+  DestroyMenu(hMenu);
 
   // Remove task tray icon.
   NOTIFYICONDATA nid;
@@ -94,13 +103,9 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
       // Display menu when right button is clicked on task tray icon.
       POINT point;
       GetCursorPos(&point);
-      HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
-      HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
-      HMENU hSubMenu = GetSubMenu(hMenu, 0);
       SetForegroundWindow(hwnd);
       TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
                      point.y, 0, hwnd, NULL);
-      DestroyMenu(hMenu);
       PostMessage(hwnd, WM_NULL, 0, 0);
     } break;
     default:
