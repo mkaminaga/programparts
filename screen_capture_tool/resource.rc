@@ -15,12 +15,17 @@
 // Menu resources
 //
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-IDR_MENU1 MENU
+IDR_MENU1 MENUEX
 {
-    POPUP "PopupMenu"
+    POPUP "PopupMenu", 0, 0, 0
     {
-        MENUITEM "Folder", IDM_FOLDER
-        MENUITEM "Quit", IDM_QUIT
+        POPUP "Mode", 0, 0, 0
+        {
+            MENUITEM "Screen", IDM_SCREEN, 0, MFS_CHECKED
+            MENUITEM "Window", IDM_WINDOW, 0, MFS_CHECKED
+        }
+        MENUITEM "Folder", IDM_FOLDER, 0, 0
+        MENUITEM "Quit", IDM_QUIT, 0, 0
     }
 }
 

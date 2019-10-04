@@ -24,7 +24,26 @@ constexpr wchar_t CLASS_NAME[] = L"ScreenCaptureTool";
 constexpr int TRAY_ICON_ID = 1;
 wchar_t save_dir[256] = {0};
 CaptureData capture;
+HMENU hMenu = NULL;
+HMENU hSubMenu = NULL;
+CAPTUREMODE capture_mode = CAPTUREMODE_SCREEN;
 }  // namespace
+
+void ChangeCaptureMode(CAPTUREMODE mode) {
+  capture_mode = mode;
+  CheckMenuItem(hSubMenu, IDM_SCREEN, MF_UNCHECKED);
+  CheckMenuItem(hSubMenu, IDM_WINDOW, MF_UNCHECKED);
+  switch (mode) {
+    case CAPTUREMODE_SCREEN:
+      CheckMenuItem(hSubMenu, IDM_SCREEN, MF_CHECKED);
+      break;
+    case CAPTUREMODE_WINDOW:
+      CheckMenuItem(hSubMenu, IDM_WINDOW, MF_CHECKED);
+      break;
+    default:
+      break;
+  }
+}
 
 BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
   (void)hwnd;
@@ -57,6 +76,11 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
     return (-1);
   }
 
+  // Initialization of menu.
+  hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
+  hSubMenu = GetSubMenu(hMenu, 0);
+  ChangeCaptureMode(CAPTUREMODE_SCREEN);
+
   // Initialization of capture data
   if (!InitializeCapture(&capture)) {
     MessageBox(hwnd, L"Failed to initialize capture.\n", L"Error", MB_OK);
@@ -70,14 +94,17 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
 
+  // Finalization of capture data
+  FinalizeCapture(&capture);
+
+  // Finalization of menu.
+  DestroyMenu(hMenu);
+
   // Finalization of key hook
   RemoveKeyHook();
 
   // Finalization of task tray
   RemoveTaskTrayIcon(hwnd, TRAY_ICON_ID);
-
-  // Finalization of capture data
-  FinalizeCapture(&capture);
 
   PostQuitMessage(0);
 }
@@ -95,7 +122,9 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       // Folder select dialog is called.
       wchar_t buffer[256] = {0};
       if (!GetDirectoryName(hwnd, L"Folder select", NULL, buffer)) {
-        MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
+        if (buffer != NULL) {
+          MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
+        }
       } else {
         wcscpy_s(save_dir, ARRAYSIZE(save_dir), buffer);
       }
@@ -103,6 +132,18 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       fwprintf(stderr, L"%ls\n", save_dir);
 #endif
     } break;
+    case IDM_SCREEN:
+      ChangeCaptureMode(CAPTUREMODE_SCREEN);
+#ifdef DEBUG
+      fwprintf(stderr, L"CAPTUREMODE_SCREEN\n");
+#endif
+      break;
+    case IDM_WINDOW:
+#ifdef DEBUG
+      fwprintf(stderr, L"CAPTUREMODE_WINDOW\n");
+#endif
+      ChangeCaptureMode(CAPTUREMODE_WINDOW);
+      break;
     case IDM_QUIT:
       DestroyWindow(hwnd);
       break;
@@ -122,13 +163,9 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
       // Display menu when right button is clicked on task tray icon.
       POINT point;
       GetCursorPos(&point);
-      HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
-      HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENU1));
-      HMENU hSubMenu = GetSubMenu(hMenu, 0);
       SetForegroundWindow(hwnd);
       TrackPopupMenu(hSubMenu, TPM_LEFTALIGN | TPM_BOTTOMALIGN, point.x,
                      point.y, 0, hwnd, NULL);
-      DestroyMenu(hMenu);
       PostMessage(hwnd, WM_NULL, 0, 0);
     } break;
     case WM_LBUTTONDOWN:
@@ -151,6 +188,11 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
   // Any shutter button is pushed.
   if ((vk == VK_SCROLL) || (vk == VK_PAUSE)) {
+    // Screen is captured.
+    if (!Capture(capture_mode, &capture)) {
+      return;
+    }
+
     // File is named by time.
     wchar_t file[256] = {0};
     GetTimeString(file, ARRAYSIZE(file));
@@ -165,11 +207,7 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     fwprintf(stderr, L"PNG file name:%ls\n", path);
 #endif
 
-    // Screen is captured.
-    if (!Capture(&capture)) {
-      MessageBox(hwnd, L"Failed to capture screen.", L"Error", MB_OK);
-      return;
-    }
+    // PNG file is exported.
     if (!WritePNGFile(path, capture.png_data)) {
       MessageBox(hwnd, L"Failed to write PNG file.", L"Error", MB_OK);
       return;

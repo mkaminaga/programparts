@@ -6,3 +6,5 @@
 #define IDR_MENU1                               104
 #define IDM_FOLDER                              40000
 #define IDM_QUIT                                40001
+#define IDM_SCREEN                              40002
+#define IDM_WINDOW                              40003

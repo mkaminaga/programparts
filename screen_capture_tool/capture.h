@@ -12,8 +12,9 @@
 #include "./png_tool.h"
 
 struct CaptureData {
-  int width;
-  int height;
+  int width_screen;   // Width of screen.
+  int height_screen;  // Height of screen.
+  RECT rect_target;   // RECT of target (screen or window).
   HDC memDC;
   LPVOID memDIB;
   HBITMAP memBM;
@@ -21,8 +22,13 @@ struct CaptureData {
   PNGData png_data;
 };
 
+enum CAPTUREMODE {
+  CAPTUREMODE_SCREEN,
+  CAPTUREMODE_WINDOW,
+};
+
 bool InitializeCapture(CaptureData *capture);
 void FinalizeCapture(CaptureData *capture);
-bool Capture(CaptureData *capture);
+bool Capture(CAPTUREMODE capture_mode, CaptureData *capture);
 
 #endif  // _CAPTURE_H_
