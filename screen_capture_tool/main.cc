@@ -122,7 +122,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       // Folder select dialog is called.
       wchar_t buffer[256] = {0};
       if (!GetDirectoryName(hwnd, L"Folder select", NULL, buffer)) {
-        if (buffer != NULL) {
+        if (buffer[0] != NULL) {
           MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
         }
       } else {
@@ -214,7 +214,7 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
     }
 
     SetForegroundWindow(hwnd);
-    MessageBox(hwnd, file, MODULE_FILE_NAME, MB_OK | MB_TOPMOST);
+    MessageBox(hwnd, path, MODULE_FILE_NAME, MB_OK | MB_TOPMOST);
     return;
   }
 }
