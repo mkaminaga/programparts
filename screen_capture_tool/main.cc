@@ -5,6 +5,10 @@
 // @date 2019-09-21 18:22:39
 // Copyright 2019 Mamoru Kaminaga
 //
+// @author Mamoru Kaminaga
+// @date 2019-09-21 18:22:39
+// Copyright 2019 Mamoru Kaminaga
+//
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
@@ -53,7 +57,8 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
   // Initialization of output path
   if (GetModuleFileName(hInstance, save_dir, ARRAYSIZE(save_dir)) == 0) {
-    MessageBox(hwnd, L"Failed to get module file name", L"Error", MB_OK);
+    MessageBox(hwnd, L"Failed to get module file name", L"Error",
+               MB_OK | MB_SETFOREGROUND);
     PostQuitMessage(0);
     return (-1);
   }
@@ -65,13 +70,15 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
   // Initialization of task tray
   if (!SetTaskTrayIcon(hwnd, TRAY_ICON_ID, IDI_ICON1)) {
-    MessageBox(hwnd, L"Failed to initialize task tray.\n", L"Error", MB_OK);
+    MessageBox(hwnd, L"Failed to initialize task tray.\n", L"Error",
+               MB_OK | MB_SETFOREGROUND);
     return (-1);
   }
 
   // Initialization of key hook
   if (!SetKeyHook(hwnd)) {
-    MessageBox(hwnd, L"Failed to set key hook.\n", L"Error", MB_OK);
+    MessageBox(hwnd, L"Failed to set key hook.\n", L"Error",
+               MB_OK | MB_SETFOREGROUND);
     RemoveTaskTrayIcon(hwnd, TRAY_ICON_ID);
     return (-1);
   }
@@ -83,7 +90,8 @@ BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
 
   // Initialization of capture data
   if (!InitializeCapture(&capture)) {
-    MessageBox(hwnd, L"Failed to initialize capture.\n", L"Error", MB_OK);
+    MessageBox(hwnd, L"Failed to initialize capture.\n", L"Error",
+               MB_OK | MB_SETFOREGROUND);
     RemoveTaskTrayIcon(hwnd, TRAY_ICON_ID);
     RemoveKeyHook();
     return (-1);
@@ -123,7 +131,8 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       wchar_t buffer[256] = {0};
       if (!GetDirectoryName(hwnd, L"Folder select", NULL, buffer)) {
         if (buffer[0] != NULL) {
-          MessageBox(hwnd, L"Invalid directory", L"Error", MB_OK);
+          MessageBox(hwnd, L"Invalid directory", L"Error",
+                     MB_OK | MB_SETFOREGROUND);
         }
       } else {
         wcscpy_s(save_dir, ARRAYSIZE(save_dir), buffer);
@@ -170,7 +179,7 @@ void Cls_OnTaskTray(HWND hwnd, UINT id, UINT uMsg) {
     } break;
     case WM_LBUTTONDOWN:
       MessageBox(hwnd, L"Screen capture tool.\nCopyright 2019 Mamoru Kaminaga",
-                 MODULE_FILE_NAME, MB_OK);
+                 MODULE_FILE_NAME, MB_OK | MB_SETFOREGROUND);
       break;
     default:
       break;
@@ -190,6 +199,8 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
   if ((vk == VK_SCROLL) || (vk == VK_PAUSE)) {
     // Screen is captured.
     if (!Capture(capture_mode, &capture)) {
+      MessageBox(hwnd, L"Whole window is not in screen.", L"Error",
+                 MB_OK | MB_SETFOREGROUND);
       return;
     }
 
@@ -209,12 +220,12 @@ void Cls_OnKeyHook(HWND hwnd, WPARAM wParam, LPARAM lParam) {
 
     // PNG file is exported.
     if (!WritePNGFile(path, capture.png_data)) {
-      MessageBox(hwnd, L"Failed to write PNG file.", L"Error", MB_OK);
+      MessageBox(hwnd, L"Failed to write PNG file.", L"Error",
+                 MB_OK | MB_SETFOREGROUND);
       return;
     }
 
-    SetForegroundWindow(hwnd);
-    MessageBox(hwnd, path, MODULE_FILE_NAME, MB_OK | MB_TOPMOST);
+    MessageBox(hwnd, path, MODULE_FILE_NAME, MB_OK | MB_SETFOREGROUND);
     return;
   }
 }
@@ -242,7 +253,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   // Multi instance check.
   HANDLE hMutex = CreateMutex(NULL, TRUE, L"screen_capture_tool");
   if (GetLastError() == ERROR_ALREADY_EXISTS) {
-    MessageBox(NULL, L"The process is already run", MODULE_FILE_NAME, MB_OK);
+    MessageBox(NULL, L"The process is already run", MODULE_FILE_NAME,
+               MB_OK | MB_SETFOREGROUND);
     ReleaseMutex(hMutex);
     CloseHandle(hMutex);
     return 1;

@@ -87,6 +87,14 @@ bool Capture(CAPTUREMODE capture_mode, CaptureData *capture) {
     default:
       break;
   }
+
+  // The window must be inside screen to access DIB region.
+  if (!((capture->rect_target.left >= 0) && (capture->rect_target.top >= 0) &&
+        (capture->rect_target.right <= capture->width_screen) &&
+        (capture->rect_target.bottom <= capture->height_screen))) {
+    return false;
+  }
+
   const int width_target =
       capture->rect_target.right - capture->rect_target.left;
   const int height_target =
