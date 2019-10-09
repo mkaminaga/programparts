@@ -14,7 +14,7 @@ OBJ = $(TMPDIR)\main.obj
 CC = "$(VCINSTALLDIR)\cl.exe"
 LINK = "$(VCINSTALLDIR)\link.exe"
 
-!if 0
+!if 1
 # Release mode.
 LIBS = "kernel32.lib" "user32.lib" "gdi32.lib"
 CPPFLAGS = /nologo /W4 /Zi /EHsc /MT /O1 /Fd"$(TMPDIR)/"\

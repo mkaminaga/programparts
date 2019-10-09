@@ -25,19 +25,15 @@ WORD ramp[3 * 256] = {0};
 }  // namespace
 
 bool PrintToEdit(HWND hEdit, const wchar_t* format, ...) {
-  wchar_t buffer[64] = {0};
+  wchar_t buffer[256] = {0};
   va_list args;
   va_start(args, format);
   vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
-  Edit_SetText(hEdit, buffer);
 
   int index = GetWindowTextLength(hEdit);
   SetFocus(hEdit);
   SendMessage(hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
   SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)buffer);
-#if 1
-  fwprintf(stderr, L"%d, %ls", index, buffer);
-#endif
   return true;
 }
 
@@ -76,7 +72,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
         break;
       }
       for (int i = 0; i < 256; i++) {
-        PrintToEdit(hEdit1, L"%d, %d, %d, %d\n", i, static_cast<int>(ramp[i]),
+        PrintToEdit(hEdit1, L"%d\t%d\t%d\t%d\n", i, static_cast<int>(ramp[i]),
                     static_cast<int>(ramp[256 + i]),
                     static_cast<int>(ramp[512 + i]));
       }
