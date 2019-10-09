@@ -5,47 +5,27 @@
 // @date 2019-10-08 20:28:30
 // Copyright 2019 Mamoru Kaminaga
 //
-#include <stdarg.h>
-#include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
 #include "./resource.h"
-
-// Message cracker wrapper for DialogProc.
-#define HANDLE_DLG_MSG(hwndDlg, msg, fn)     \
-  case (msg):                                \
-    return SetDlgMsgResult((hwndDlg), (msg), \
-                           HANDLE_##msg((hwndDlg), (wParam), (lParam), (fn)));
+#include "./util.h"
 
 namespace {
-HWND hEdit1 = NULL;
+HWND hEdit = NULL;
 HDC hDisplay = NULL;
 WORD ramp[3 * 256] = {0};
 }  // namespace
-
-bool PrintToEdit(HWND hEdit, const wchar_t* format, ...) {
-  wchar_t buffer[256] = {0};
-  va_list args;
-  va_start(args, format);
-  vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
-
-  int index = GetWindowTextLength(hEdit);
-  SetFocus(hEdit);
-  SendMessage(hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
-  SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)buffer);
-  return true;
-}
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   (void)hwnd_forcus;
   (void)lp;
 
   // Get handles for desktop.
-  hDisplay = GetDC(hEdit1);
+  hDisplay = GetDC(hEdit);
 
   // Get edit handle.
-  hEdit1 = GetDlgItem(hwnd, IDC_EDIT1);
+  hEdit = GetDlgItem(hwnd, IDC_EDIT1);
 
   return TRUE;
 }
@@ -72,12 +52,10 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
         break;
       }
       for (int i = 0; i < 256; i++) {
-        PrintToEdit(hEdit1, L"%d\t%d\t%d\t%d\n", i, static_cast<int>(ramp[i]),
+        PrintToEdit(hEdit, L"%d\t%d\t%d\t%d\n", i, static_cast<int>(ramp[i]),
                     static_cast<int>(ramp[256 + i]),
                     static_cast<int>(ramp[512 + i]));
       }
-      break;
-    case IDSET:
       break;
     default:
       // No implementation.

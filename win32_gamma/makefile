@@ -8,8 +8,8 @@ PDB = main.pdb
 MAP = main.map
 RES = resource.res
 TMPDIR = build
-SRC = main.cc
-OBJ = $(TMPDIR)\main.obj
+SRC = main.cc util.cc
+OBJ = $(TMPDIR)\main.obj $(TMPDIR)\util.obj
 
 CC = "$(VCINSTALLDIR)\cl.exe"
 LINK = "$(VCINSTALLDIR)\link.exe"
