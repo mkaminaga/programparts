@@ -14,7 +14,7 @@ class PerformaceMonitor {
  public:
   virtual ~PerformaceMonitor() {}
   virtual bool Sample() = 0;
-  virtual double GetCPUPercentage() = 0;
+  virtual double GetCPU() = 0;
   virtual ULARGE_INTEGER GetUserTime() = 0;
   virtual ULARGE_INTEGER GetKernelTime() = 0;
 };

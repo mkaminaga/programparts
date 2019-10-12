@@ -17,7 +17,7 @@ class SystemPerformaceMonitor : public PerformaceMonitor {
   SystemPerformaceMonitor();
   ~SystemPerformaceMonitor();
   bool Sample();
-  double GetCPUPercentage();
+  double GetCPU();
   ULARGE_INTEGER GetUserTime();
   ULARGE_INTEGER GetKernelTime();
 

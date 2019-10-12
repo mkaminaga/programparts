@@ -39,6 +39,10 @@ bool ClearEdit(HWND hEdit) {
 
 bool CopyEdit(HWND hEdit) {
   const int length = GetWindowTextLength(hEdit);
+  if (length == 0) {
+    return true;
+  }
+
   wchar_t* buffer = (wchar_t*)malloc(length * sizeof(wchar_t));
   GetWindowText(hEdit, buffer, length);
   if (!CopyTextToClipBoard(buffer, length)) {

@@ -18,7 +18,7 @@ constexpr int TIMER_ID = 0;
 constexpr int SAMPLING_TIME = 500;  // [ms].
 
 // Performance monitor classes.
-SystemPerformaceMonitor system_performance_monitor;
+SystemPerformaceMonitor sys_monitor;
 
 // Edit control.
 HWND hEdit = NULL;
@@ -64,12 +64,12 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
 void Cls_OnTimer(HWND hwnd, UINT id) {
   (void)hwnd;
   (void)id;
-
-  // system_performance_monitor.Sample();
-
-#if 1
-  PrintEdit(hEdit, L"Test!\n");
-#endif
+  // Show system performance.
+  sys_monitor.Sample();
+  PrintEdit(hEdit, L"%f\t%lld\t%lld\t%lld\n", sys_monitor.GetCPU(),
+            sys_monitor.GetIdleTime().QuadPart,
+            sys_monitor.GetUserTime().QuadPart,
+            sys_monitor.GetKernelTime().QuadPart);
 }
 
 INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
