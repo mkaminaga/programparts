@@ -21,3 +21,7 @@
 #define IDCOPYALL                               40014
 #define IDCLEARALL                              40015
 #define IDGETALL                                40016
+#define IDFOCUS                                 40017
+#define IDC_EDIT3                               40018
+#define IDTAIL                                  40019
+#define IDCBCLEAR                               40020

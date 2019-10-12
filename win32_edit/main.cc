@@ -16,6 +16,7 @@
 namespace {
 std::unique_ptr<EditControl> edit_user;
 std::unique_ptr<EditControl> edit_app;
+std::unique_ptr<EditControl> edit_paste;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -30,6 +31,7 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   // Edit control classes are created .
   edit_user.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT1)));
   edit_app.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT2)));
+  edit_paste.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT3)));
   return TRUE;
 }
 
@@ -43,6 +45,11 @@ void Cls_OnClose(HWND hwnd) {
   return;
 }
 
+void ResetEditApps() {
+  edit_app->ClearAll();
+  edit_paste->ClearAll();
+}
+
 void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)hwnd;
   (void)hWndCtl;
@@ -51,97 +58,148 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   wchar_t buffer[256] = {0};
   switch (id) {
     case IDENABLE:
-      edit_user->Enable();
+      ResetEditApps();
+      edit_user->EnableInput();
 
       // Response.
-      edit_app->Set(L"Edit control is enabled.\n");
+      edit_paste->Paste();
+      edit_app->Set(L"Input is enabled.\n");
       break;
     case IDDISABLE:
-      edit_user->Disable();
+      ResetEditApps();
+      edit_user->DisableInput();
 
       // Response.
-      edit_app->Set(L"Edit control is disabled.\n");
+      edit_paste->Paste();
+      edit_app->Set(L"Input is disables (Read only).\n");
       break;
     case IDSHOW:
+      ResetEditApps();
       edit_user->Show();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Edit control is shown.\n");
       break;
     case IDHIDE:
+      ResetEditApps();
       edit_user->Hide();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Edit control is hidden.\n");
       break;
     case IDCLEAR:
+      ResetEditApps();
       edit_user->Clear();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Text is cleared.\n");
       break;
     case IDCLEARALL:
+      ResetEditApps();
       edit_user->ClearAll();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"All text is cleared.\n");
       break;
     case IDCOPY:
+      ResetEditApps();
       edit_user->Copy();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Text is copied.\n");
       break;
     case IDCOPYALL:
+      ResetEditApps();
       edit_user->CopyAll();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"All text is copied.\n");
       break;
     case IDCUT:
+      ResetEditApps();
       edit_user->Cut();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Text is cut.\n");
       break;
     case IDCUTALL:
+      ResetEditApps();
       edit_user->CutAll();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"All text is cut.\n");
       break;
     case IDGET:
+      ResetEditApps();
       edit_user->Get(buffer, ARRAYSIZE(buffer));
 
       // Response.
-      edit_app->Set(L"Text is get from edit control.\n");
-      edit_app->Add(L"%s", buffer);
+      edit_paste->Paste();
+      edit_app->Set(L"Text is get from edit control\n%s\n", buffer);
       break;
     case IDGETALL:
+      ResetEditApps();
       edit_user->GetAll(buffer, ARRAYSIZE(buffer));
 
       // Response.
-      edit_app->Set(L"All text is get from edit control.\n");
-      edit_app->Add(L"%s", buffer);
+      edit_paste->Paste();
+      edit_app->Set(L"All text is get from edit control\n%s\n", buffer);
       break;
     case IDPASTE:
+      ResetEditApps();
       edit_user->Paste();
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Pasted text.\n");
       break;
     case IDSET:
+      ResetEditApps();
       edit_user->Set(L"Set text.\n");
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Text is set to edit control.\n");
       break;
     case IDADD:
+      ResetEditApps();
       edit_user->Add(L"Added text.\n");
 
       // Response.
+      edit_paste->Paste();
       edit_app->Set(L"Text is added to edit control.\n");
       break;
+    case IDFOCUS:
+      edit_paste->Paste();
+      edit_app->Set(L"Set focus.\n");
+
+      ResetEditApps();
+      edit_user->Focus();
+      break;
+    case IDTAIL:
+      edit_paste->Paste();
+      edit_app->Set(L"Set focus to tail.\n");
+
+      ResetEditApps();
+      edit_user->Tail();
+      break;
+    case IDCBCLEAR:
+      if (OpenClipboard(hwnd)) {
+        EmptyClipboard();
+        CloseClipboard();
+        edit_app->Set(L"Clipboard is cleared.\n");
+        edit_paste->ClearAll();
+      } else {
+        edit_app->Set(L"Error... Failed to clear clipboard.\n");
+      }
     default:
       // No implementation.
       break;

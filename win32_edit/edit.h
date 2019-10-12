@@ -19,8 +19,8 @@ class EditControl {
   virtual ~EditControl();
 
   // Status.
-  void Enable();
-  void Disable();
+  void EnableInput();
+  void DisableInput();
   void Show();
   void Hide();
 
@@ -40,7 +40,7 @@ class EditControl {
   void Add(const wchar_t* format, ...);
 
   // Misc.
-  void Forcus();
+  void Focus();
   void Tail();
 
  private:

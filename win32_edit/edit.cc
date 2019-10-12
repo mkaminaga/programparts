@@ -21,13 +21,13 @@ EditControl::EditControl(HWND hEdit) : hEdit(hEdit) { return; }
 
 EditControl::~EditControl() { return; }
 
-void EditControl::Enable() {
-  Edit_Enable(hEdit, TRUE);
+void EditControl::EnableInput() {
+  SendMessage(hEdit, EM_SETREADONLY, FALSE, 0);
   return;
 }
 
-void EditControl::Disable() {
-  Edit_Enable(hEdit, FALSE);
+void EditControl::DisableInput() {
+  SendMessage(hEdit, EM_SETREADONLY, TRUE, 0);
   return;
 }
 
@@ -117,7 +117,6 @@ void EditControl::GetAll(wchar_t* dst, size_t dst_size) {
 }
 
 void EditControl::Paste() {
-  SetFocus(hEdit);
   SendMessage(hEdit, WM_PASTE, 0, 0);
   return;
 }
@@ -129,6 +128,7 @@ void EditControl::Set(const wchar_t* format, ...) {
   vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
 
   // Set buffered text.
+  SetFocus(hEdit);
   SendMessage(hEdit, WM_SETTEXT, (WPARAM)0, (LPARAM)buffer);
   return;
 }
@@ -147,7 +147,7 @@ void EditControl::Add(const wchar_t* format, ...) {
   return;
 }
 
-void EditControl::Forcus() {
+void EditControl::Focus() {
   SetFocus(hEdit);
 }
 
