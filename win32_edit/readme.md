@@ -1,3 +1,4 @@
-﻿programparts/win32\_edit
-====
-This is a test for wdit control.<br>
+﻿作成日 2019年10月12日
+作成者 Mamoru Kaminaga
+
+エディットコントロールのテストです。

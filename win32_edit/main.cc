@@ -1,98 +1,174 @@
-  // @file main.cc
-  // @brief Entry point.
-  // @author Mamoru Kaminaga
-  // @date 2017-12-07
-  // Copyright 2017 Mamoru Kaminaga
+//
+// @file main.cc
+// @brief Entry point.
+// @author Mamoru Kaminaga
+// @date 2017-12-07
+// Copyright 2017 Mamoru Kaminaga
+//
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
-
+#include <memory>
+#include "./edit.h"
 #include "./resource.h"
+#include "./util.h"
 
-  // Message cracker wrapper for DialogProc.
-#define HANDLE_DLG_MSG(hwnd, msg, fn)\
-  case (msg): return SetDlgMsgResult((hwnd), (msg), \
-      HANDLE_##msg((hwnd), (wp), (lp), (fn)));
+namespace {
+std::unique_ptr<EditControl> edit_user;
+std::unique_ptr<EditControl> edit_app;
+}  // namespace
 
-BOOL OnCreate(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
+BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
+  (void)hwnd_forcus;
+  (void)lp;
+
   // The icon is loaded.
-  HINSTANCE hinstance = (HINSTANCE) GetWindowLong(hwnd, GWL_HINSTANCE);
-  SendMessage(
-      hwnd,
-      WM_SETICON,
-      ICON_BIG,
-      (LPARAM) LoadIcon(hinstance, MAKEINTRESOURCE(IDI_ICON1)));
+  HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+  SendMessage(hwnd, WM_SETICON, ICON_BIG,
+              (LPARAM)LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)));
 
-  // Warnings are prevented for non-used parameters.
-  UNREFERENCED_PARAMETER(hwnd_forcus);
-  UNREFERENCED_PARAMETER(lp);
+  // Edit control classes are created .
+  edit_user.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT1)));
+  edit_app.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT2)));
   return TRUE;
 }
-void OnDestroy(HWND hwnd) {
-  // Warnings are prevented for non-used parameters.
-  UNREFERENCED_PARAMETER(hwnd);
+
+void Cls_OnDestroy(HWND hwnd) {
+  (void)hwnd;
+  return;
 }
-void OnClose(HWND hwnd) {
-  // The modal dialog is ended.
+
+void Cls_OnClose(HWND hwnd) {
   EndDialog(hwnd, TRUE);
+  return;
 }
-void OnCommand(HWND hwnd, int id, HWND hwnd_ctrl, UINT code_notify) {
-  HWND hwnd_edit = GetDlgItem(hwnd, IDC_ED);
+
+void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
+  (void)hwnd;
+  (void)hWndCtl;
+  (void)codeNotify;
+
+  wchar_t buffer[256] = {0};
   switch (id) {
-    case IDC_ENABLE:
-      Edit_Enable(hwnd_edit, TRUE);
-      Edit_SetText(hwnd_edit, L"Enabled");
+    case IDENABLE:
+      edit_user->Enable();
+
+      // Response.
+      edit_app->Set(L"Edit control is enabled.\n");
       break;
-    case IDC_DISABLE:
-      Edit_Enable(hwnd_edit, FALSE);
-      Edit_SetText(hwnd_edit, L"Disabled");
+    case IDDISABLE:
+      edit_user->Disable();
+
+      // Response.
+      edit_app->Set(L"Edit control is disabled.\n");
+      break;
+    case IDSHOW:
+      edit_user->Show();
+
+      // Response.
+      edit_app->Set(L"Edit control is shown.\n");
+      break;
+    case IDHIDE:
+      edit_user->Hide();
+
+      // Response.
+      edit_app->Set(L"Edit control is hidden.\n");
+      break;
+    case IDCLEAR:
+      edit_user->Clear();
+
+      // Response.
+      edit_app->Set(L"Text is cleared.\n");
+      break;
+    case IDCLEARALL:
+      edit_user->ClearAll();
+
+      // Response.
+      edit_app->Set(L"All text is cleared.\n");
+      break;
+    case IDCOPY:
+      edit_user->Copy();
+
+      // Response.
+      edit_app->Set(L"Text is copied.\n");
+      break;
+    case IDCOPYALL:
+      edit_user->CopyAll();
+
+      // Response.
+      edit_app->Set(L"All text is copied.\n");
+      break;
+    case IDCUT:
+      edit_user->Cut();
+
+      // Response.
+      edit_app->Set(L"Text is cut.\n");
+      break;
+    case IDCUTALL:
+      edit_user->CutAll();
+
+      // Response.
+      edit_app->Set(L"All text is cut.\n");
+      break;
+    case IDGET:
+      edit_user->Get(buffer, ARRAYSIZE(buffer));
+
+      // Response.
+      edit_app->Set(L"Text is get from edit control.\n");
+      edit_app->Add(L"%s", buffer);
+      break;
+    case IDGETALL:
+      edit_user->GetAll(buffer, ARRAYSIZE(buffer));
+
+      // Response.
+      edit_app->Set(L"All text is get from edit control.\n");
+      edit_app->Add(L"%s", buffer);
+      break;
+    case IDPASTE:
+      edit_user->Paste();
+
+      // Response.
+      edit_app->Set(L"Pasted text.\n");
+      break;
+    case IDSET:
+      edit_user->Set(L"Set text.\n");
+
+      // Response.
+      edit_app->Set(L"Text is set to edit control.\n");
+      break;
+    case IDADD:
+      edit_user->Add(L"Added text.\n");
+
+      // Response.
+      edit_app->Set(L"Text is added to edit control.\n");
       break;
     default:
       // No implementation.
       break;
   }
-  // Warnings are prevented for non-used parameters.
-  UNREFERENCED_PARAMETER(id);
-  UNREFERENCED_PARAMETER(hwnd_ctrl);
-  UNREFERENCED_PARAMETER(code_notify);
+  return;
 }
-INT_PTR CALLBACK DialogProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
-  switch (msg) {
-    HANDLE_DLG_MSG(hwnd, WM_INITDIALOG, OnCreate);
-    HANDLE_DLG_MSG(hwnd, WM_DESTROY, OnDestroy);
-    HANDLE_DLG_MSG(hwnd, WM_COMMAND, OnCommand);
-    HANDLE_DLG_MSG(hwnd, WM_CLOSE, OnClose);
+
+INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
+                            LPARAM lParam) {
+  switch (uMsg) {
+    HANDLE_DLG_MSG(hwndDlg, WM_INITDIALOG, Cls_OnInitDialog);
+    HANDLE_DLG_MSG(hwndDlg, WM_DESTROY, Cls_OnDestroy);
+    HANDLE_DLG_MSG(hwndDlg, WM_COMMAND, Cls_OnCommand);
+    HANDLE_DLG_MSG(hwndDlg, WM_CLOSE, Cls_OnClose);
     default:
       return FALSE;
   }
+  return FALSE;
 }
 
-int WINAPI wWinMain(
-    HINSTANCE hinstance,
-    HINSTANCE not_used,
-    LPTSTR cmdline,
-    int cmdshow) {
-  // An console is allocated for stdio.
-  FILE* fp = nullptr;
-  AllocConsole();
-  _wfreopen_s(&fp, L"CONOUT$", L"w", stdout);
-  _wfreopen_s(&fp, L"CONOUT$", L"w", stderr);
-  _wfreopen_s(&fp, L"CONIN$", L"r", stdin);
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                    LPTSTR lpsCmdLine, int nCmdShow) {
+  (void)hPrevInstance;
+  (void)lpsCmdLine;
+  (void)nCmdShow;
 
-  // The dialog is opened.
-  DialogBoxParam(
-      hinstance,
-      MAKEINTRESOURCE(IDD_DIALOG1),
-      nullptr,
-      &DialogProc,
-      NULL);
-
-  // The console is released.
-  FreeConsole();
-
-  // Warnings are prevented for non-used parameters.
-  UNREFERENCED_PARAMETER(not_used);
-  UNREFERENCED_PARAMETER(cmdline);
-  UNREFERENCED_PARAMETER(cmdshow);
+  DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), nullptr, &DialogProc,
+                 NULL);
   return 0;
 }
