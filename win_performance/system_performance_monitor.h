@@ -15,7 +15,6 @@
 class SystemPerformaceMonitor : public PerformaceMonitor {
  public:
   SystemPerformaceMonitor();
-  SystemPerformaceMonitor(int cpu_history_size);
   ~SystemPerformaceMonitor();
   bool Sample();
   double GetCPUPercentage();

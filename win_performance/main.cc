@@ -8,18 +8,32 @@
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
+#include "./resource.h"
 #include "./system_performance_monitor.h"
 #include "./util.h"
-#include "./resource.h"
 
 namespace {
-constexpr wchar_t WINDOW_NAME[] = L"Template";
-constexpr wchar_t CLASS_NAME[] = L"Template";
+// Timer.
+constexpr int TIMER_ID = 0;
+constexpr int SAMPLING_TIME = 500;  // [ms].
+
+// Performance monitor classes.
+SystemPerformaceMonitor system_performance_monitor;
+
+// Edit control.
+HWND hEdit = NULL;
+
 }  // namespace
 
-BOOL Cls_OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct) {
+BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
+  (void)hwnd_forcus;
+  (void)lp;
   (void)hwnd;
-  (void)lpCreateStruct;
+
+  SetTimer(hwnd, TIMER_ID, SAMPLING_TIME, NULL);
+
+  // Get edit control handle.
+  hEdit = GetDlgItem(hwnd, IDC_EDIT1);
   return TRUE;
 }
 
@@ -30,15 +44,46 @@ void Cls_OnDestroy(HWND hwnd) {
 
 void Cls_OnClose(HWND hwnd) { DestroyWindow(hwnd); }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam,
-                         LPARAM lParam) {
-  switch (message) {
-    HANDLE_MSG(hwnd, WM_CREATE, Cls_OnCreate);
-    HANDLE_MSG(hwnd, WM_DESTROY, Cls_OnDestroy);
-    HANDLE_MSG(hwnd, WM_CLOSE, Cls_OnClose);
+void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
+  (void)hwnd;
+  (void)hWndCtl;
+  (void)codeNotify;
+  switch (id) {
+    case IDCLEAR:
+      ClearEdit(hEdit);
+      break;
+    case IDCOPY:
+      CopyEdit(hEdit);
+      break;
     default:
-      return DefWindowProc(hwnd, message, wParam, lParam);
+      // No implementation.
+      break;
   }
+}
+
+void Cls_OnTimer(HWND hwnd, UINT id) {
+  (void)hwnd;
+  (void)id;
+
+  // system_performance_monitor.Sample();
+
+#if 1
+  PrintEdit(hEdit, L"Test!\n");
+#endif
+}
+
+INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
+                            LPARAM lParam) {
+  switch (uMsg) {
+    HANDLE_DLG_MSG(hwndDlg, WM_INITDIALOG, Cls_OnInitDialog);
+    HANDLE_DLG_MSG(hwndDlg, WM_DESTROY, Cls_OnDestroy);
+    HANDLE_DLG_MSG(hwndDlg, WM_CLOSE, Cls_OnClose);
+    HANDLE_DLG_MSG(hwndDlg, WM_COMMAND, Cls_OnCommand);
+    HANDLE_DLG_MSG(hwndDlg, WM_TIMER, Cls_OnTimer);
+    default:
+      return FALSE;
+  }
+  return FALSE;
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -47,51 +92,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   (void)lpsCmdLine;
   (void)nCmdShow;
 
-#ifdef DEBUG
-  FILE* fp = nullptr;
-  AllocConsole();
-  _wfreopen_s(&fp, L"CONOUT$", L"w", stdout);
-  _wfreopen_s(&fp, L"CONOUT$", L"w", stderr);
-  _wfreopen_s(&fp, L"CONIN$", L"r", stdin);
-#endif
-
-#ifdef DEBUG
-  fwprintf(stdout, L"Hello world to stdout!\n");
-  fwprintf(stderr, L"Hello world to stderr!\n");
-  fwprintf(stderr, L"\n");
-#endif
-
-  WNDCLASS wc;
-  wc.style = CS_HREDRAW | CS_VREDRAW;
-  wc.lpfnWndProc = WndProc;
-  wc.cbClsExtra = 0;
-  wc.cbWndExtra = 0;
-  wc.hInstance = hInstance;
-  wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-  wc.lpszMenuName = NULL;
-  wc.lpszClassName = CLASS_NAME;
-  if (!RegisterClass(&wc)) {
-    return 1;
-  }
-
-  HWND hWnd = CreateWindow(CLASS_NAME, WINDOW_NAME, WS_DISABLED, CW_USEDEFAULT,
-                           CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL,
-                           NULL, hInstance, NULL);
-  if (hWnd == NULL) {
-    return 1;
-  }
-
-  MSG msg;
-  while (GetMessage(&msg, NULL, 0, 0) > 0) {
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
-  }
-
-#ifdef DEBUG
-  FreeConsole();
-#endif
-
+  DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), nullptr, &DialogProc,
+                 NULL);
   return 0;
 }

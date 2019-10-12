@@ -13,10 +13,6 @@
 
 SystemPerformaceMonitor::SystemPerformaceMonitor() { cpu_history.resize(3); }
 
-SystemPerformaceMonitor::SystemPerformaceMonitor(int cpu_history_size) {
-  cpu_history.resize(cpu_history_size);
-}
-
 SystemPerformaceMonitor::~SystemPerformaceMonitor() {}
 
 bool SystemPerformaceMonitor::Sample() {
@@ -30,13 +26,11 @@ bool SystemPerformaceMonitor::Sample() {
   if (GetSystemTimes(&ft_idle, &ft_kernel, &ft_user) == 0) {
     return false;
   }
-
-  // Convert file time to long integer.
   idle_time = FILETIME_to_ULARGE_INTEGER(ft_idle);
   kernel_time = FILETIME_to_ULARGE_INTEGER(ft_kernel);
   user_time = FILETIME_to_ULARGE_INTEGER(ft_user);
 
-  // Get intervals since last sampling.
+  // Get interval times since last sampling.
   LONGLONG idle = idle_time.QuadPart - last_idle_time.QuadPart;
   LONGLONG kernel = kernel_time.QuadPart - last_kernel_time.QuadPart;
   LONGLONG user = user_time.QuadPart - last_user_time.QuadPart;
