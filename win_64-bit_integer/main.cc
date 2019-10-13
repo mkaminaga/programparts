@@ -11,7 +11,7 @@
 #define show(EXPRESSION) (_show(#EXPRESSION, (EXPRESSION)))
 void _show(const char* text, unsigned __int64 p) {
   printf("%s\n", text);
-  printf("  %I64d (0x%I64x)\n", p, p);
+  printf("  0x%I64x\n", p);
   printf("\n");
 }
 
@@ -63,10 +63,10 @@ int main(int argc, char* argv[]) {
   printf("s = %d\n", s);
   printf("\n");
 
-  show(p * r);
-  show((unsigned __int64)p * r);
-  show((unsigned __int64)(p * r));
-  show((unsigned __int64)p * (unsigned __int64)r);
+  show(r * s);
+  show((unsigned __int64)r * s);
+  show((unsigned __int64)(r * s));
+  show((unsigned __int64)r * (unsigned __int64)s);
 
   return 0;
 }
