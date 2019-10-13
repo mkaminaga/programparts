@@ -1,9 +1,9 @@
 //
 // @file main.cc
-// @brief
-// @author
+// @brief Test for unsigned __int64 type.
+// @author Mamoru Kaminaga
 // @date 2019-10-13 17:41:15
-// Copyright 2019
+// Copyright 2019 Mamoru Kaminaga
 //
 #include <stdio.h>
 #include <windows.h>
