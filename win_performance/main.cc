@@ -8,6 +8,8 @@
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <memory>
+#include "../win32_edit_mini/edit.h"
 #include "./resource.h"
 #include "./system_performance_monitor.h"
 #include "./util.h"
@@ -22,7 +24,10 @@ SystemPerformaceMonitor sys_monitor;
 
 // Edit control.
 HWND hEdit = NULL;
-
+std::unique_ptr<EditControl> edit_cpu;
+std::unique_ptr<EditControl> edit_idle;
+std::unique_ptr<EditControl> edit_user;
+std::unique_ptr<EditControl> edit_kernel;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -30,46 +35,52 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   (void)lp;
   (void)hwnd;
 
+  // Set refresh rate.
   SetTimer(hwnd, TIMER_ID, SAMPLING_TIME, NULL);
 
   // Get edit control handle.
-  hEdit = GetDlgItem(hwnd, IDC_EDIT1);
+  edit_cpu.reset(new EditControl(GetDlgItem(hwnd, IDC_CPU)));
+  edit_idle.reset(new EditControl(GetDlgItem(hwnd, IDC_IDLE)));
+  edit_user.reset(new EditControl(GetDlgItem(hwnd, IDC_USER)));
+  edit_kernel.reset(new EditControl(GetDlgItem(hwnd, IDC_KERNEL)));
   return TRUE;
 }
 
 void Cls_OnDestroy(HWND hwnd) {
   (void)hwnd;
   PostQuitMessage(0);
+  return;
 }
 
-void Cls_OnClose(HWND hwnd) { DestroyWindow(hwnd); }
+void Cls_OnClose(HWND hwnd) {
+  DestroyWindow(hwnd);
+  return;
+}
 
 void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)hwnd;
   (void)hWndCtl;
   (void)codeNotify;
   switch (id) {
-    case IDCLEAR:
-      ClearEdit(hEdit);
-      break;
-    case IDCOPY:
-      CopyEdit(hEdit);
-      break;
     default:
-      // No implementation.
       break;
   }
+  return;
 }
 
 void Cls_OnTimer(HWND hwnd, UINT id) {
   (void)hwnd;
   (void)id;
-  // Show system performance.
+
+  // Sample performances.
   sys_monitor.Sample();
-  PrintEdit(hEdit, L"%f\t%lld\t%lld\t%lld\n", sys_monitor.GetCPU(),
-            sys_monitor.GetIdleTime().QuadPart,
-            sys_monitor.GetUserTime().QuadPart,
-            sys_monitor.GetKernelTime().QuadPart);
+
+  // Show system performance.
+  edit_cpu->Set(L"%f", sys_monitor.GetCPU());
+  edit_idle->Set(L"%lld", sys_monitor.GetIdleTime().QuadPart);
+  edit_user->Set(L"%lld", sys_monitor.GetUserTime().QuadPart);
+  edit_kernel->Set(L"%lld", sys_monitor.GetKernelTime().QuadPart);
+  return;
 }
 
 INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,

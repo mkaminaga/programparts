@@ -9,16 +9,15 @@ TARGET = main.exe
 PDB = main.pdb
 MAP = main.map
 RES = resource.res
-SRC = main.cc util.cc \
+SRC = main.cc util.cc ../win32_edit_mini/edit.cc \
+			performance_monitor.cc \
 			system_performance_monitor.cc
-OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj \
+OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/edit.obj \
+			$(OBJDIR)/performance_monitor.obj \
 			$(OBJDIR)/system_performance_monitor.obj
 
-CPPFLAGS = /nologo /W4 /Zi /O2 /MTd /D"UNICODE" /D"_UNICODE" /D"DEBUG" /DEBUG \
-					 /EHsc /Fd"$(OBJDIR)/" /I"$(LIBRARIES)\libpng"
-LFLAGS = "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" \
-				 "advapi32.lib" "shell32.lib" "ole32.lib"	"oleaut32.lib" "uuid.lib" \
-				 "odbc32.lib" "odbccp32.lib" "libcmtd.lib" \
+CPPFLAGS = /nologo /W4 /Zi /O2 /D"UNICODE" /D"_UNICODE" /EHsc /Fd"$(OBJDIR)/"
+LFLAGS = "kernel32.lib" "user32.lib" \
 				 /NOLOGO /SUBSYSTEM:WINDOWS /DEBUG /PDB:"$(PDB)" /MAP:"$(MAP)"
 
 ALL: $(TARGET)
@@ -26,6 +25,10 @@ ALL: $(TARGET)
 $(TARGET): $(OBJ) $(RES)
 	$(LINK) $(LFLAGS) /OUT:$(TARGET) $(OBJ) $(RES)
 	nmake -f load.mk
+
+{../win32_edit_mini}.cc{$(OBJDIR)}.obj:
+	@[ -d $(OBJDIR) ] || mkdir $(OBJDIR)
+	$(CC) $(CPPFLAGS) /Fo"$(OBJDIR)\\" /c $<
 
 .cc{$(OBJDIR)}.obj:
 	@[ -d $(OBJDIR) ] || mkdir $(OBJDIR)

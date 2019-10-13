@@ -20,11 +20,6 @@
     return SetDlgMsgResult((hwndDlg), (msg), \
                            HANDLE_##msg((hwndDlg), (wParam), (lParam), (fn)));
 
-ULARGE_INTEGER FILETIME_to_ULARGE_INTEGER(const FILETIME& file_time);
-
-bool PrintEdit(HWND hEdit, const wchar_t* format, ...);
-bool ClearEdit(HWND hEdit);
-bool CopyEdit(HWND hEdit);
 bool CopyTextToClipBoard(const wchar_t* text, size_t length);
 
 #endif  // _UTIL_H_

@@ -17,15 +17,9 @@ SystemPerformaceMonitor::~SystemPerformaceMonitor() {}
 
 bool SystemPerformaceMonitor::Sample() {
   // Save last sampling result.
-#if 0
-  memcpy(&last_idle_time, &idle_time, sizeof(idle_time));
-  memcpy(&last_kernel_time, &kernel_time, sizeof(kernel_time));
-  memcpy(&last_user_time, &user_time, sizeof(user_time));
-#else
   last_idle_time.QuadPart = idle_time.QuadPart;
   last_kernel_time.QuadPart = kernel_time.QuadPart;
   last_user_time.QuadPart = user_time.QuadPart;
-#endif
 
   // Get system times.
   FILETIME ft_idle, ft_kernel, ft_user;

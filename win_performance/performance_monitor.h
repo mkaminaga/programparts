@@ -19,4 +19,6 @@ class PerformaceMonitor {
   virtual ULARGE_INTEGER GetKernelTime() = 0;
 };
 
+ULARGE_INTEGER FILETIME_to_ULARGE_INTEGER(const FILETIME& file_time);
+
 #endif  // PERFORMANCE_MONITOR_H_

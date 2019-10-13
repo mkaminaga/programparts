@@ -20,6 +20,4 @@
     return SetDlgMsgResult((hwndDlg), (msg), \
                            HANDLE_##msg((hwndDlg), (wParam), (lParam), (fn)));
 
-bool PrintToEdit(HWND hEdit, const wchar_t* format, ...);
-
 #endif  // UTIL_H_

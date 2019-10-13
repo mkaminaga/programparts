@@ -80,7 +80,6 @@ void EditControl::Set(const wchar_t* format, ...) {
   vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
 
   // Set buffered text.
-  SetFocus(hEdit);
   SendMessage(hEdit, WM_SETTEXT, (WPARAM)0, (LPARAM)buffer);
   return;
 }
