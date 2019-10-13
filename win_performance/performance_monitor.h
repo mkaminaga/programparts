@@ -14,9 +14,9 @@ class PerformaceMonitor {
  public:
   virtual ~PerformaceMonitor() {}
   virtual bool Sample() = 0;
-  virtual double GetCPU() = 0;
-  virtual ULARGE_INTEGER GetUserTime() = 0;
-  virtual ULARGE_INTEGER GetKernelTime() = 0;
+  virtual double GetTotalCPU() const = 0;
+  virtual double GetUserCPU() const = 0;
+  virtual double GetKernelCPU() const = 0;
 };
 
 ULARGE_INTEGER FILETIME_to_ULARGE_INTEGER(const FILETIME& file_time);

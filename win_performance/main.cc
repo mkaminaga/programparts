@@ -20,11 +20,13 @@ constexpr int TIMER_ID = 0;
 constexpr int SAMPLING_TIME = 500;  // [ms].
 
 // Performance monitor classes.
-SystemPerformaceMonitor sys_monitor;
+std::unique_ptr<SystemPerformaceMonitor> system_performance_monitor;
 
 // Edit control.
 HWND hEdit = NULL;
-std::unique_ptr<EditControl> edit_cpu;
+std::unique_ptr<EditControl> edit_total_cpu;
+std::unique_ptr<EditControl> edit_user_cpu;
+std::unique_ptr<EditControl> edit_kernel_cpu;
 std::unique_ptr<EditControl> edit_idle;
 std::unique_ptr<EditControl> edit_user;
 std::unique_ptr<EditControl> edit_kernel;
@@ -38,8 +40,13 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   // Set refresh rate.
   SetTimer(hwnd, TIMER_ID, SAMPLING_TIME, NULL);
 
+  // Initialize system performance monitors.
+  system_performance_monitor.reset(new SystemPerformaceMonitor());
+
   // Get edit control handle.
-  edit_cpu.reset(new EditControl(GetDlgItem(hwnd, IDC_CPU)));
+  edit_total_cpu.reset(new EditControl(GetDlgItem(hwnd, IDC_TOTAL_CPU)));
+  edit_user_cpu.reset(new EditControl(GetDlgItem(hwnd, IDC_USER_CPU)));
+  edit_kernel_cpu.reset(new EditControl(GetDlgItem(hwnd, IDC_KERNEL_CPU)));
   edit_idle.reset(new EditControl(GetDlgItem(hwnd, IDC_IDLE)));
   edit_user.reset(new EditControl(GetDlgItem(hwnd, IDC_USER)));
   edit_kernel.reset(new EditControl(GetDlgItem(hwnd, IDC_KERNEL)));
@@ -73,13 +80,19 @@ void Cls_OnTimer(HWND hwnd, UINT id) {
   (void)id;
 
   // Sample performances.
-  sys_monitor.Sample();
+  system_performance_monitor->Sample();
 
   // Show system performance.
-  edit_cpu->Set(L"%f", sys_monitor.GetCPU());
-  edit_idle->Set(L"%lld", sys_monitor.GetIdleTime().QuadPart);
-  edit_user->Set(L"%lld", sys_monitor.GetUserTime().QuadPart);
-  edit_kernel->Set(L"%lld", sys_monitor.GetKernelTime().QuadPart);
+  edit_total_cpu->Set(L"%f", system_performance_monitor->GetTotalCPU());
+  edit_user_cpu->Set(L"%f", system_performance_monitor->GetUserCPU());
+  edit_kernel_cpu->Set(L"%f", system_performance_monitor->GetKernelCPU());
+
+  ULARGE_INTEGER system_idle_time, system_user_time, system_kernel_time;
+  system_performance_monitor->GetCPUTime(&system_idle_time, &system_user_time,
+                                         &system_kernel_time);
+  edit_idle->Set(L"%lld", system_idle_time);
+  edit_user->Set(L"%lld", system_user_time);
+  edit_kernel->Set(L"%lld", system_kernel_time);
   return;
 }
 
@@ -94,7 +107,6 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
     default:
       return FALSE;
   }
-  return FALSE;
 }
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,

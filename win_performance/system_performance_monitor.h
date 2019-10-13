@@ -17,11 +17,11 @@ class SystemPerformaceMonitor : public PerformaceMonitor {
   SystemPerformaceMonitor();
   ~SystemPerformaceMonitor();
   bool Sample();
-  double GetCPU();
-  ULARGE_INTEGER GetUserTime();
-  ULARGE_INTEGER GetKernelTime();
-
-  ULARGE_INTEGER GetIdleTime();
+  double GetTotalCPU() const;
+  double GetUserCPU() const;
+  double GetKernelCPU() const;
+  void GetCPUTime(ULARGE_INTEGER* idle, ULARGE_INTEGER* user,
+                  ULARGE_INTEGER* kernel) const;
 
  private:
   // This sampling.
@@ -33,10 +33,6 @@ class SystemPerformaceMonitor : public PerformaceMonitor {
   ULARGE_INTEGER last_idle_time;
   ULARGE_INTEGER last_kernel_time;
   ULARGE_INTEGER last_user_time;
-
-  // Misc.
-  double cpu_percentage;
-  std::vector<double> cpu_history;
 };
 
 #endif  // SYSTEM_PERFORMANCE_MONITOR_H_
