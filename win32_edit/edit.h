@@ -17,6 +17,8 @@ class EditControl {
  public:
   EditControl(HWND hEdit);
   virtual ~EditControl();
+  HWND EditControl::GetHandle();
+
 
   // Status.
   void EnableInput();

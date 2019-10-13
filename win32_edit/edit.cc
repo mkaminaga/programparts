@@ -21,6 +21,8 @@ EditControl::EditControl(HWND hEdit) : hEdit(hEdit) { return; }
 
 EditControl::~EditControl() { return; }
 
+HWND EditControl::GetHandle() { return hEdit; }
+
 void EditControl::EnableInput() {
   SendMessage(hEdit, EM_SETREADONLY, FALSE, 0);
   return;
@@ -147,9 +149,7 @@ void EditControl::Add(const wchar_t* format, ...) {
   return;
 }
 
-void EditControl::Focus() {
-  SetFocus(hEdit);
-}
+void EditControl::Focus() { SetFocus(hEdit); }
 
 void EditControl::Tail() {
   int index = GetWindowTextLength(hEdit);
