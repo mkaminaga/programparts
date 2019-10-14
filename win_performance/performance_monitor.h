@@ -17,8 +17,8 @@ class PerformaceMonitor {
   virtual double GetTotalCPU() const = 0;
   virtual double GetUserCPU() const = 0;
   virtual double GetKernelCPU() const = 0;
+  virtual void GetCPUTime(ULONGLONG* user, ULONGLONG* kernel) const = 0;
+  virtual void GetCPUDeltaTime(ULONGLONG* user, ULONGLONG* kernel) const = 0;
 };
-
-ULARGE_INTEGER FILETIME_to_ULARGE_INTEGER(const FILETIME& file_time);
 
 #endif  // PERFORMANCE_MONITOR_H_

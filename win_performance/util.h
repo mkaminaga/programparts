@@ -20,6 +20,9 @@
     return SetDlgMsgResult((hwndDlg), (msg), \
                            HANDLE_##msg((hwndDlg), (wParam), (lParam), (fn)));
 
+#define FILETIME_TO_ULONGLONG(ft) \
+  (((ULONGLONG)ft.dwHighDateTime << 32) | ft.dwLowDateTime);
+
 bool CopyTextToClipBoard(const wchar_t* text, size_t length);
 
 #endif  // _UTIL_H_

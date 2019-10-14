@@ -10,11 +10,11 @@ PDB = main.pdb
 MAP = main.map
 RES = resource.res
 SRC = main.cc util.cc ../win32_edit_mini/edit.cc \
-			performance_monitor.cc \
-			system_performance_monitor.cc
+			system_performance_monitor.cc \
+			process_performance_monitor.cc
 OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/edit.obj \
-			$(OBJDIR)/performance_monitor.obj \
-			$(OBJDIR)/system_performance_monitor.obj
+			$(OBJDIR)/system_performance_monitor.obj \
+			$(OBJDIR)/process_performance_monitor.obj
 
 CPPFLAGS = /nologo /W4 /Zi /O2 /D"UNICODE" /D"_UNICODE" /EHsc /Fd"$(OBJDIR)/"
 LFLAGS = "kernel32.lib" "user32.lib" \

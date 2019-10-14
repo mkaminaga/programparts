@@ -10,6 +10,7 @@
 #include <windowsx.h>
 #include <memory>
 #include "../win32_edit_mini/edit.h"
+#include "./process_performance_monitor.h"
 #include "./resource.h"
 #include "./system_performance_monitor.h"
 #include "./util.h"
@@ -21,6 +22,10 @@ constexpr int SAMPLING_TIME = 500;  // [ms].
 
 // Performance monitor classes.
 std::unique_ptr<SystemPerformaceMonitor> system_performance_monitor;
+std::unique_ptr<ProcessPerformaceMonitor> process_performance_monitor;
+
+// Handle for dummy load process.
+HANDLE hLoad = NULL;
 
 // Edit control.
 HWND hEdit = NULL;
@@ -30,6 +35,9 @@ std::unique_ptr<EditControl> edit_kernel_cpu;
 std::unique_ptr<EditControl> edit_idle;
 std::unique_ptr<EditControl> edit_user;
 std::unique_ptr<EditControl> edit_kernel;
+std::unique_ptr<EditControl> edit_idle_delta;
+std::unique_ptr<EditControl> edit_user_delta;
+std::unique_ptr<EditControl> edit_kernel_delta;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -37,11 +45,20 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   (void)lp;
   (void)hwnd;
 
+  // The icon is loaded.
+  HINSTANCE hInstance = (HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE);
+  SendMessage(hwnd, WM_SETICON, ICON_BIG,
+              (LPARAM)LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)));
+
   // Set refresh rate.
   SetTimer(hwnd, TIMER_ID, SAMPLING_TIME, NULL);
 
   // Initialize system performance monitors.
   system_performance_monitor.reset(new SystemPerformaceMonitor());
+  process_performance_monitor.reset(
+      system_performance_monitor->CreateProcessPerformanceMonitor());
+
+  // TODO(Mamoru):Start dummy load process.
 
   // Get edit control handle.
   edit_total_cpu.reset(new EditControl(GetDlgItem(hwnd, IDC_TOTAL_CPU)));
@@ -50,6 +67,9 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   edit_idle.reset(new EditControl(GetDlgItem(hwnd, IDC_IDLE)));
   edit_user.reset(new EditControl(GetDlgItem(hwnd, IDC_USER)));
   edit_kernel.reset(new EditControl(GetDlgItem(hwnd, IDC_KERNEL)));
+  edit_idle_delta.reset(new EditControl(GetDlgItem(hwnd, IDC_IDLE_DELTA)));
+  edit_user_delta.reset(new EditControl(GetDlgItem(hwnd, IDC_USER_DELTA)));
+  edit_kernel_delta.reset(new EditControl(GetDlgItem(hwnd, IDC_KERNEL_DELTA)));
   return TRUE;
 }
 
@@ -60,6 +80,8 @@ void Cls_OnDestroy(HWND hwnd) {
 }
 
 void Cls_OnClose(HWND hwnd) {
+  // TODO(Mamoru):Close dummy load process.
+
   DestroyWindow(hwnd);
   return;
 }
@@ -82,17 +104,27 @@ void Cls_OnTimer(HWND hwnd, UINT id) {
   // Sample performances.
   system_performance_monitor->Sample();
 
-  // Show system performance.
+  // Show system performance (%).
   edit_total_cpu->Set(L"%f", system_performance_monitor->GetTotalCPU());
   edit_user_cpu->Set(L"%f", system_performance_monitor->GetUserCPU());
   edit_kernel_cpu->Set(L"%f", system_performance_monitor->GetKernelCPU());
 
-  ULARGE_INTEGER system_idle_time, system_user_time, system_kernel_time;
-  system_performance_monitor->GetCPUTime(&system_idle_time, &system_user_time,
-                                         &system_kernel_time);
-  edit_idle->Set(L"%lld", system_idle_time);
-  edit_user->Set(L"%lld", system_user_time);
-  edit_kernel->Set(L"%lld", system_kernel_time);
+  // Show system time (absolute)
+  ULONGLONG system_idle, system_user, system_kernel;
+  system_performance_monitor->GetCPUTime(&system_user, &system_kernel);
+  system_performance_monitor->GetCPUIdleTime(&system_idle);
+  edit_idle->Set(L"%I64d", system_idle);
+  edit_user->Set(L"%I64d", system_user);
+  edit_kernel->Set(L"%I64d", system_kernel);
+
+  // Show system time (delta)
+  system_performance_monitor->GetCPUTime(&system_user, &system_kernel);
+  system_performance_monitor->GetCPUIdleDeltaTime(&system_idle);
+  edit_idle_delta->Set(L"%I64d", system_idle);
+  edit_user_delta->Set(L"%I64d", system_user);
+  edit_kernel_delta->Set(L"%I64d", system_kernel);
+
+  // TODO(Mamoru): Add process performance monitor code here!
   return;
 }
 

@@ -10,3 +10,6 @@
 #define IDC_KERNEL                              40003
 #define IDC_TOTAL_CPU                           40004
 #define IDC_USER_CPU                            40005
+#define IDC_IDLE_DELTA                          40007
+#define IDC_KERNEL_DELTA                        40008
+#define IDC_USER_DELTA                          40009

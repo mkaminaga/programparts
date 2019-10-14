@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <vector>
 #include "./performance_monitor.h"
+#include "./process_performance_monitor.h"
 
 class SystemPerformaceMonitor : public PerformaceMonitor {
  public:
@@ -20,19 +21,20 @@ class SystemPerformaceMonitor : public PerformaceMonitor {
   double GetTotalCPU() const;
   double GetUserCPU() const;
   double GetKernelCPU() const;
-  void GetCPUTime(ULARGE_INTEGER* idle, ULARGE_INTEGER* user,
-                  ULARGE_INTEGER* kernel) const;
+  void GetCPUTime(ULONGLONG* user, ULONGLONG* kernel) const;
+  void GetCPUDeltaTime(ULONGLONG* user, ULONGLONG* kernel) const;
+
+  void GetCPUIdleTime(ULONGLONG* idle) const;
+  void GetCPUIdleDeltaTime(ULONGLONG* idle_delta) const;
+  ProcessPerformaceMonitor* CreateProcessPerformanceMonitor();
 
  private:
-  // This sampling.
-  ULARGE_INTEGER idle_time;
-  ULARGE_INTEGER kernel_time;
-  ULARGE_INTEGER user_time;
-
-  // Last sampling.
-  ULARGE_INTEGER last_idle_time;
-  ULARGE_INTEGER last_kernel_time;
-  ULARGE_INTEGER last_user_time;
+  ULONGLONG idle_time;
+  ULONGLONG kernel_time;
+  ULONGLONG user_time;
+  ULONGLONG last_idle_time;
+  ULONGLONG last_kernel_time;
+  ULONGLONG last_user_time;
 };
 
 #endif  // SYSTEM_PERFORMANCE_MONITOR_H_
