@@ -50,6 +50,7 @@ void Cls_OnDestroy(HWND hwnd) {
 
 void Cls_OnClose(HWND hwnd) {
   (void)hwnd;
+  EndDialog(hwnd, TRUE);
   return;
 }
 
