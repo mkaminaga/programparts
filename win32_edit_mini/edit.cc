@@ -84,6 +84,20 @@ void EditControl::Set(const wchar_t* format, ...) {
   return;
 }
 
+void EditControl::Add(const wchar_t* format, ...) {
+  wchar_t buffer[EDIT_BUFFER_MAX] = {0};
+  va_list args;
+  va_start(args, format);
+  vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
+
+  // Add buffered text to tail.
+  int index = GetWindowTextLength(hEdit);
+  SetFocus(hEdit);
+  SendMessage(hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
+  SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)buffer);
+  return;
+}
+
 void EditControl::Focus() {
   int index = GetWindowTextLength(hEdit);
   SetFocus(hEdit);

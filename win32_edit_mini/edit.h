@@ -34,6 +34,7 @@ class EditControl {
   // Write.
   void Paste();
   void Set(const wchar_t* format, ...);
+  void Add(const wchar_t* format, ...);
 
   // Misc.
   void Focus();
