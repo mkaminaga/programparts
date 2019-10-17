@@ -7,6 +7,7 @@
 #define IDC_EDIT_SETROW                         40000
 #define IDC_EDIT_OUTPUT                         40001
 #define IDLIST                                  40002
+#define IDSETWIDTH                              40003
 #define IDSMALLICON                             40004
 #define IDREPORT                                40005
 #define IDCLEAR                                 40006
@@ -21,3 +22,4 @@
 #define IDGETALL                                40015
 #define IDC_EDIT_SET                            40016
 #define IDC_EDIT_SETCOL                         40017
+#define IDC_EDIT_SETWIDTH                       40018

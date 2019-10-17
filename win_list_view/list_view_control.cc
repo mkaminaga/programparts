@@ -133,7 +133,7 @@ void ListViewControl::ResizeColumn(int old_column_max, int new_column_max) {
     LVCOLUMN lvc;
     ZeroMemory(&lvc, sizeof(lvc));
     lvc.mask = LVCF_TEXT | LVCF_WIDTH;
-    lvc.cx = 40;
+    lvc.cx = LISTVIEW_DEFAULT_COLUMN_WIDTH;
     lvc.pszText = L"";
     for (int i = 0; i < (new_column_max - old_column_max); i++) {
       ListView_InsertColumn(_hListView, old_column_max + i, &lvc);

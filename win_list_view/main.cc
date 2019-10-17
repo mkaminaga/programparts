@@ -24,6 +24,7 @@ std::unique_ptr<ListViewControl> list_view;
 std::unique_ptr<EditControl> out_edit;
 std::unique_ptr<EditControl> row_edit;
 std::unique_ptr<EditControl> col_edit;
+std::unique_ptr<EditControl> width_edit;
 
 int row_max = 3;
 int col_max = 4;
@@ -61,9 +62,11 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   out_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
   row_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
   col_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
+  width_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETWIDTH)));
   out_edit->Set(L"List view test utility\n");
   row_edit->Set(L"%d", row_max);
   col_edit->Set(L"%d", col_max);
+  width_edit->Set(L"%d", LISTVIEW_DEFAULT_COLUMN_WIDTH);
   return TRUE;
 }
 
@@ -118,9 +121,21 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       col_max = std::stoi(buffer);
       out_edit->Add(L"IDSETSIZE\n");
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
-      // Resize list vies.
+      out_edit->Add(L"\n");
+      // Resize list view.
       list_view->Resize(ListViewControl::MODE::REPORT, row_max, col_max);
     } break;
+    case IDSETWIDTH: {
+      wchar_t buffer[256] = {0};
+      width_edit->Get(buffer, ARRAYSIZE(buffer));
+      int width = std::stoi(buffer);
+      out_edit->Add(L"IDSETWIDTH\n");
+      out_edit->Add(L"width = %d\n", width);
+      out_edit->Add(L"\n");
+      // Set column width.
+      list_view->SetColumnWidth(0, width);
+      break;
+    }
     default:
       // none.
       break;

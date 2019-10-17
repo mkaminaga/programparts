@@ -14,6 +14,8 @@
 
 #include <commctrl.h>  // Included at last.
 
+#define LISTVIEW_DEFAULT_COLUMN_WIDTH       (40)
+
 class ListViewControl {
  public:
   enum MODE {
