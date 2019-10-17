@@ -13,11 +13,13 @@
 #include <wchar.h>
 #include <windows.h>
 
-class EditControl {
+namespace mk {
+
+class Edit {
  public:
-  EditControl(HWND hEdit);
-  virtual ~EditControl();
-  HWND EditControl::GetHandle();
+  Edit(HWND hEdit);
+  virtual ~Edit();
+  HWND Edit::GetHandle();
 
   // Status.
   void EnableInput();
@@ -42,5 +44,7 @@ class EditControl {
  private:
   HWND hEdit;
 };
+
+}  // namespace mk
 
 #endif  // _EDIT_H_

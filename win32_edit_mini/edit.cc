@@ -14,66 +14,70 @@
 #include <windowsx.h>
 
 namespace {
+
 constexpr int EDIT_BUFFER_MAX = 512;
+
 }  // namespace
 
-EditControl::EditControl(HWND hEdit) : hEdit(hEdit) { return; }
+namespace mk {
 
-EditControl::~EditControl() { return; }
+Edit::Edit(HWND hEdit) : hEdit(hEdit) { return; }
 
-HWND EditControl::GetHandle() { return hEdit; }
+Edit::~Edit() { return; }
 
-void EditControl::EnableInput() {
+HWND Edit::GetHandle() { return hEdit; }
+
+void Edit::EnableInput() {
   SendMessage(hEdit, EM_SETREADONLY, FALSE, 0);
   return;
 }
 
-void EditControl::DisableInput() {
+void Edit::DisableInput() {
   SendMessage(hEdit, EM_SETREADONLY, TRUE, 0);
   return;
 }
 
-void EditControl::Show() {
+void Edit::Show() {
   ShowWindow(hEdit, SW_SHOW);
   return;
 }
 
-void EditControl::Hide() {
+void Edit::Hide() {
   ShowWindow(hEdit, SW_HIDE);
   return;
 }
 
-void EditControl::Clear() {
+void Edit::Clear() {
   SendMessage(hEdit, EM_SETSEL, 0, -1);
   SendMessage(hEdit, WM_CLEAR, 0, 0);
   return;
 }
 
-void EditControl::Copy() {
+void Edit::Copy() {
   SendMessage(hEdit, EM_SETSEL, 0, -1);
   SendMessage(hEdit, WM_COPY, 0, 0);
   return;
 }
 
-void EditControl::Cut() {
+void Edit::Cut() {
   SendMessage(hEdit, EM_SETSEL, 0, -1);
   SendMessage(hEdit, WM_CUT, 0, 0);
   return;
 }
 
-void EditControl::Get(wchar_t* dst, size_t dst_size) {
+void Edit::Get(wchar_t* dst, size_t dst_size) {
   assert(dst);
   SendMessage(hEdit, EM_SETSEL, 0, -1);
   SendMessage(hEdit, WM_GETTEXT, (WPARAM)dst_size, (LPARAM)dst);
   return;
 }
 
-void EditControl::Paste() {
+void Edit::Paste() {
   SendMessage(hEdit, WM_PASTE, 0, 0);
   return;
 }
 
-void EditControl::Set(const wchar_t* format, ...) {
+void Edit::Set(const wchar_t* format, ...) {
   wchar_t buffer[EDIT_BUFFER_MAX] = {0};
   va_list args;
   va_start(args, format);
@@ -84,7 +88,7 @@ void EditControl::Set(const wchar_t* format, ...) {
   return;
 }
 
-void EditControl::Add(const wchar_t* format, ...) {
+void Edit::Add(const wchar_t* format, ...) {
   wchar_t buffer[EDIT_BUFFER_MAX] = {0};
   va_list args;
   va_start(args, format);
@@ -98,8 +102,10 @@ void EditControl::Add(const wchar_t* format, ...) {
   return;
 }
 
-void EditControl::Focus() {
+void Edit::Focus() {
   int index = GetWindowTextLength(hEdit);
   SetFocus(hEdit);
   SendMessage(hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
 }
+
+}  // namespace mk

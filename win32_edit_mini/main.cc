@@ -14,9 +14,9 @@
 #include "./util.h"
 
 namespace {
-std::unique_ptr<EditControl> edit_user;
-std::unique_ptr<EditControl> edit_app;
-std::unique_ptr<EditControl> edit_paste;
+std::unique_ptr<mk::Edit> edit_user;
+std::unique_ptr<mk::Edit> edit_app;
+std::unique_ptr<mk::Edit> edit_paste;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -29,9 +29,9 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
               (LPARAM)LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)));
 
   // Edit control classes are created .
-  edit_user.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT1)));
-  edit_app.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT2)));
-  edit_paste.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT3)));
+  edit_user.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT1)));
+  edit_app.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT2)));
+  edit_paste.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT3)));
   return TRUE;
 }
 
