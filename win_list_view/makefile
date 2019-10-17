@@ -10,7 +10,7 @@ PDB = main.pdb
 MAP = main.map
 RES = resource.res
 SRC = main.cc util.cc ../list_view_control.cc \
-			../win32_edit/edit.cc
+			../win32_edit_mini/edit.cc
 OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/list_view_control.obj \
 			$(OBJDIR)/edit.obj
 
@@ -23,7 +23,7 @@ ALL: $(TARGET)
 $(TARGET): $(OBJ) $(RES)
 	$(LINK) $(LFLAGS) /OUT:$(TARGET) $(OBJ) $(RES)
 
-{../win32_edit}.cc{$(OBJDIR)}.obj:
+{../win32_edit_mini}.cc{$(OBJDIR)}.obj:
 	@[ -d $(OBJDIR) ] || mkdir $(OBJDIR)
 	$(CC) $(CPPFLAGS) /Fo"$(OBJDIR)\\" /c $<
 

@@ -9,17 +9,20 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <memory>
-#include "../win32_edit/edit.h"
+#include "../win32_edit_mini/edit.h"
 #include "./list_view_control.h"
 #include "./resource.h"
 #include "./util.h"
 
-#include <commctrl.h>  // Last include.
+#include <commctrl.h>  // Included at last.
 
 namespace {
 // List view.
 std::unique_ptr<ListViewControl> list_view;
-std::unique_ptr<EditControl> edit;
+std::unique_ptr<EditControl> out_edit;
+
+int row_max = 3;
+int column_max = 4;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -34,11 +37,12 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
 
   // List view for test.
   ListViewControl::EnableListView();
-  list_view.reset(
-      new ListViewControl(GetDlgItem(hwnd, IDC_LISTVIEW1), LVS_LIST, 3));
+  list_view.reset(new ListViewControl(GetDlgItem(hwnd, IDC_LIST1),
+                                      ListViewControl::MODE::REPORT, row_max,
+                                      column_max));
 
-  // Edit control for debug.
-  edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT1)));
+  // Edit control for test interface.
+  out_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
   return TRUE;
 }
 
@@ -60,16 +64,16 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)codeNotify;
   switch (id) {
     case IDLIST:
-      edit->Add(L"IDLIST\n");
+      out_edit->Add(L"IDLIST\n");
       break;
     case IDDETAIL:
-      edit->Add(L"IDDETAIL\n");
+      out_edit->Add(L"IDDETAIL\n");
       break;
     case IDLICON:
-      edit->Add(L"IDLICON\n");
+      out_edit->Add(L"IDLICON\n");
       break;
     case IDSICON:
-      edit->Add(L"IDSICON\n");
+      out_edit->Add(L"IDSICON\n");
       break;
     default:
       // none.

@@ -10,18 +10,31 @@
 
 #include <windows.h>
 
-#include <commctrl.h>  // Last include.
+#include <commctrl.h>  // Included at last.
 
 class ListViewControl {
  public:
-  ListViewControl(HWND h, DWORD style_flag, int item_count);
+  enum MODE {
+    ICON,
+    SMALLICON,
+    LIST,
+    REPORT,
+  };
+  ListViewControl(HWND hListView, ListViewControl::MODE mode, int row_max,
+                  int column_max);
   virtual ~ListViewControl();
-  void ResetStyle(int item_count, DWORD style_flag);
+  void Reset(ListViewControl::MODE mode, int row_max, int column_max);
 
   static bool EnableListView();
 
  private:
-  HWND hListView;
+  void ResizeRow(int old_row_max, int new_row_max);
+  void ResizeColumn(int old_column_max, int new_column_max);
+
+ private:
+  HWND _hListView;
+  int _row_max;
+  int _column_max;
 };
 
 #endif  // LIST_VIEW_H_

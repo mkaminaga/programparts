@@ -8,7 +8,7 @@ ResEditでリストビューコントロールが含まれるファイルを読�
 以下のコントロールをリソースファイルに手動で追加。
 
 resource.rc
-CONTROL         "", IDC_LISTVIEW1, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_ICON, 5, 5, 180, 240, WS_EX_LEFT
+CONTROL         "", IDC_LIST1, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHOWSELALWAYS | LVS_REPORT, 5, 5, 180, 240, WS_EX_LEFT
 
 resource.h
-#define IDC_IDC_LISTVIEW1                       40116
+#define IDC_LIST1                               40100
