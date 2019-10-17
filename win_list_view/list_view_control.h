@@ -16,6 +16,8 @@
 
 #define LISTVIEW_DEFAULT_COLUMN_WIDTH (40)
 
+namespace mk {
+
 class ListView {
  public:
   enum MODE {
@@ -24,14 +26,15 @@ class ListView {
     LIST,
     REPORT,
   };
-  ListView(HWND hListView, ListView::MODE mode, int row_max, int column_max);
+  ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
+           int column_max);
   virtual ~ListView();
-  void Resize(ListView::MODE mode, int row_max, int column_max);
+  void Resize(mk::ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
   template <class T>
-  void SetColumn(int column, const wchar_t* format, std::vector<T> data);
+  void SetColumnData(int column, const wchar_t* format, std::vector<T> data);
   // template <class T>
-  // void SetColumn<std::wstring>(std::vector<T> data);
+  // void SetColumnData<std::wstring>(std::vector<T> data);
 
   static bool EnableListView();
 
@@ -44,5 +47,7 @@ class ListView {
   int _row_max;
   int _column_max;
 };
+
+}  // namespace mk
 
 #endif  // LIST_VIEW_H_

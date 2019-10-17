@@ -11,7 +11,9 @@
 
 #include <commctrl.h>  // Included at last.
 
-ListView::ListView(HWND hListView, ListView::MODE mode, int row_max,
+namespace mk {
+
+ListView::ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
                    int column_max)
     : _hListView(hListView), _row_max(0), _column_max(0) {
   Resize(mode, row_max, column_max);
@@ -20,7 +22,7 @@ ListView::ListView(HWND hListView, ListView::MODE mode, int row_max,
 
 ListView::~ListView() { return; }
 
-void ListView::Resize(ListView::MODE mode, int row_max, int column_max) {
+void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
   const int old_row_max = _row_max;
   const int old_column_max = _column_max;
   _row_max = row_max;
@@ -28,16 +30,16 @@ void ListView::Resize(ListView::MODE mode, int row_max, int column_max) {
   ListView_SetExtendedListViewStyleEx(
       _hListView, LVS_ICON | LVS_SMALLICON | LVS_LIST | LVS_REPORT, 0);
   switch (mode) {
-    case ListView::MODE::ICON:
+    case mk::ListView::MODE::ICON:
       // Reserved.
       break;
-    case ListView::MODE::SMALLICON:
+    case mk::ListView::MODE::SMALLICON:
       // Reserved.
       break;
-    case ListView::MODE::LIST:
+    case mk::ListView::MODE::LIST:
       // Reserved.
       break;
-    case ListView::MODE::REPORT: {
+    case mk::ListView::MODE::REPORT: {
       DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES;
       ListView_SetExtendedListViewStyleEx(_hListView, mask, mask);
       ResizeRow(old_row_max, _row_max);
@@ -53,17 +55,13 @@ void ListView::SetColumnWidth(int column, int width) {
   assert(column >= 0);
   assert(width >= 0);
 
-  LVCOLUMN lvc;
-  ZeroMemory(&lvc, sizeof(lvc));
-  lvc.mask = LVCF_WIDTH;
-  lvc.cx = width;
-  ListView_SetColumn(_hListView, column, &lvc);
+  ListView_SetColumnWidth(_hListView, column, width);
   return;
 }
 
 template <class T>
-void ListView::SetColumn(int column, const wchar_t* format,
-                         std::vector<T> data) {
+void ListView::SetColumnData(int column, const wchar_t* format,
+                             std::vector<T> data) {
   assert(column >= 0);
 
   wchar_t buffer[256] = {0};
@@ -92,7 +90,7 @@ void ListView::SetColumn(int column, const wchar_t* format,
   lvc.pszText = buffer;
   for (int i = 0; i < (new_column_max - old_column_max); i++) {
     lvc.iSubItem = i;
-    ListView_SetColumn(_hListView, &lvc);
+    ListView_SetColumn(_hListView, i, &lvc);
   }
   return;
 }
@@ -157,3 +155,5 @@ bool ListView::EnableListView() {
   }
   return true;
 }
+
+}  // namespace mk

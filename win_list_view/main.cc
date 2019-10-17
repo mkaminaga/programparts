@@ -4,6 +4,7 @@
 // @author Mamoru Kaminaga
 // @date 2019-10-12 15:43:10
 // Copyright 2019 Mamoru Kaminaga
+#include <assert.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
@@ -20,11 +21,11 @@
 
 namespace {
 // List view.
-std::unique_ptr<ListView> list_view;
-std::unique_ptr<EditControl> out_edit;
-std::unique_ptr<EditControl> row_edit;
-std::unique_ptr<EditControl> col_edit;
-std::unique_ptr<EditControl> width_edit;
+std::unique_ptr<mk::ListView> list_view;
+std::unique_ptr<mk::Edit> out_edit;
+std::unique_ptr<mk::Edit> row_edit;
+std::unique_ptr<mk::Edit> col_edit;
+std::unique_ptr<mk::Edit> width_edit;
 
 int row_max = 3;
 int col_max = 4;
@@ -44,9 +45,10 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
               (LPARAM)LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)));
 
   // List view for test.
-  ListView::EnableListView();
-  list_view.reset(new ListView(GetDlgItem(hwnd, IDC_LIST1),
-                               ListView::MODE::REPORT, row_max, col_max));
+  mk::ListView::EnableListView();
+  list_view.reset(new mk::ListView(GetDlgItem(hwnd, IDC_LIST1),
+                                   mk::ListView::MODE::REPORT, row_max,
+                                   col_max));
   // Test data.
   data_d.resize(row_max);
   data_f.resize(row_max);
@@ -58,10 +60,10 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   }
 
   // Edit control for test interface.
-  out_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
-  row_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
-  col_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
-  width_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETWIDTH)));
+  out_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
+  row_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
+  col_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
+  width_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETWIDTH)));
   out_edit->Set(L"List view test utility\n");
   row_edit->Set(L"%d", row_max);
   col_edit->Set(L"%d", col_max);
@@ -78,6 +80,22 @@ void Cls_OnDestroy(HWND hwnd) {
 void Cls_OnClose(HWND hwnd) {
   (void)hwnd;
   EndDialog(hwnd, TRUE);
+  return;
+}
+
+void handle_wm_notify(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+  assert(wParam);
+
+  LPNMHDR nmhdr = (LPNMHDR)wParam;
+  if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
+    switch (nmhdr->code) {
+      case LVN_COLUMNCLICK: {
+        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)lParam;
+      } break;
+      default:
+        break;
+    }
+  }
   return;
 }
 
@@ -122,7 +140,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
       out_edit->Add(L"\n");
       // Resize list view.
-      list_view->Resize(ListView::MODE::REPORT, row_max, col_max);
+      list_view->Resize(mk::ListView::MODE::REPORT, row_max, col_max);
     } break;
     case IDSETWIDTH: {
       wchar_t buffer[256] = {0};
@@ -149,6 +167,9 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
     HANDLE_DLG_MSG(hwndDlg, WM_DESTROY, Cls_OnDestroy);
     HANDLE_DLG_MSG(hwndDlg, WM_CLOSE, Cls_OnClose);
     HANDLE_DLG_MSG(hwndDlg, WM_COMMAND, Cls_OnCommand);
+    case WM_NOTIFY:
+      handle_wm_notify(hwndDlg, uMsg, wParam, lParam);
+      break;
     default:
       return FALSE;
   }
