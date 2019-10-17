@@ -14,9 +14,9 @@
 
 #include <commctrl.h>  // Included at last.
 
-#define LISTVIEW_DEFAULT_COLUMN_WIDTH       (40)
+#define LISTVIEW_DEFAULT_COLUMN_WIDTH (40)
 
-class ListViewControl {
+class ListView {
  public:
   enum MODE {
     ICON,
@@ -24,10 +24,9 @@ class ListViewControl {
     LIST,
     REPORT,
   };
-  ListViewControl(HWND hListView, ListViewControl::MODE mode, int row_max,
-                  int column_max);
-  virtual ~ListViewControl();
-  void Resize(ListViewControl::MODE mode, int row_max, int column_max);
+  ListView(HWND hListView, ListView::MODE mode, int row_max, int column_max);
+  virtual ~ListView();
+  void Resize(ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
   template <class T>
   void SetColumn(int column, const wchar_t* format, std::vector<T> data);

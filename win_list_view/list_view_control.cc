@@ -11,17 +11,16 @@
 
 #include <commctrl.h>  // Included at last.
 
-ListViewControl::ListViewControl(HWND hListView, ListViewControl::MODE mode,
-                                 int row_max, int column_max)
+ListView::ListView(HWND hListView, ListView::MODE mode, int row_max,
+                   int column_max)
     : _hListView(hListView), _row_max(0), _column_max(0) {
   Resize(mode, row_max, column_max);
   return;
 }
 
-ListViewControl::~ListViewControl() { return; }
+ListView::~ListView() { return; }
 
-void ListViewControl::Resize(ListViewControl::MODE mode, int row_max,
-                             int column_max) {
+void ListView::Resize(ListView::MODE mode, int row_max, int column_max) {
   const int old_row_max = _row_max;
   const int old_column_max = _column_max;
   _row_max = row_max;
@@ -29,16 +28,16 @@ void ListViewControl::Resize(ListViewControl::MODE mode, int row_max,
   ListView_SetExtendedListViewStyleEx(
       _hListView, LVS_ICON | LVS_SMALLICON | LVS_LIST | LVS_REPORT, 0);
   switch (mode) {
-    case ListViewControl::MODE::ICON:
+    case ListView::MODE::ICON:
       // Reserved.
       break;
-    case ListViewControl::MODE::SMALLICON:
+    case ListView::MODE::SMALLICON:
       // Reserved.
       break;
-    case ListViewControl::MODE::LIST:
+    case ListView::MODE::LIST:
       // Reserved.
       break;
-    case ListViewControl::MODE::REPORT: {
+    case ListView::MODE::REPORT: {
       DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES;
       ListView_SetExtendedListViewStyleEx(_hListView, mask, mask);
       ResizeRow(old_row_max, _row_max);
@@ -50,7 +49,7 @@ void ListViewControl::Resize(ListViewControl::MODE mode, int row_max,
   return;
 }
 
-void ListViewControl::SetColumnWidth(int column, int width) {
+void ListView::SetColumnWidth(int column, int width) {
   assert(column >= 0);
   assert(width >= 0);
 
@@ -58,14 +57,13 @@ void ListViewControl::SetColumnWidth(int column, int width) {
   ZeroMemory(&lvc, sizeof(lvc));
   lvc.mask = LVCF_WIDTH;
   lvc.cx = width;
-  // lvc.iSubItem = column;
   ListView_SetColumn(_hListView, column, &lvc);
   return;
 }
 
 template <class T>
-void ListViewControl::SetColumn(int column, const wchar_t* format,
-                                std::vector<T> data) {
+void ListView::SetColumn(int column, const wchar_t* format,
+                         std::vector<T> data) {
   assert(column >= 0);
 
   wchar_t buffer[256] = {0};
@@ -99,7 +97,7 @@ void ListViewControl::SetColumn(int column, const wchar_t* format,
   return;
 }
 
-void ListViewControl::ResizeRow(int old_row_max, int new_row_max) {
+void ListView::ResizeRow(int old_row_max, int new_row_max) {
   assert(old_row_max >= 0);
   assert(new_row_max >= 0);
 
@@ -124,7 +122,7 @@ void ListViewControl::ResizeRow(int old_row_max, int new_row_max) {
   return;
 }
 
-void ListViewControl::ResizeColumn(int old_column_max, int new_column_max) {
+void ListView::ResizeColumn(int old_column_max, int new_column_max) {
   assert(old_column_max >= 0);
   assert(new_column_max >= 0);
 
@@ -149,7 +147,7 @@ void ListViewControl::ResizeColumn(int old_column_max, int new_column_max) {
   return;
 }
 
-bool ListViewControl::EnableListView() {
+bool ListView::EnableListView() {
   // Bit flags for comctl32.dll.
   INITCOMMONCONTROLSEX ic;
   ic.dwSize = sizeof(ic);

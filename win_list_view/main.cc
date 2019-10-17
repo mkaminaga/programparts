@@ -20,7 +20,7 @@
 
 namespace {
 // List view.
-std::unique_ptr<ListViewControl> list_view;
+std::unique_ptr<ListView> list_view;
 std::unique_ptr<EditControl> out_edit;
 std::unique_ptr<EditControl> row_edit;
 std::unique_ptr<EditControl> col_edit;
@@ -44,10 +44,9 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
               (LPARAM)LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)));
 
   // List view for test.
-  ListViewControl::EnableListView();
-  list_view.reset(new ListViewControl(GetDlgItem(hwnd, IDC_LIST1),
-                                      ListViewControl::MODE::REPORT, row_max,
-                                      col_max));
+  ListView::EnableListView();
+  list_view.reset(new ListView(GetDlgItem(hwnd, IDC_LIST1),
+                               ListView::MODE::REPORT, row_max, col_max));
   // Test data.
   data_d.resize(row_max);
   data_f.resize(row_max);
@@ -123,7 +122,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
       out_edit->Add(L"\n");
       // Resize list view.
-      list_view->Resize(ListViewControl::MODE::REPORT, row_max, col_max);
+      list_view->Resize(ListView::MODE::REPORT, row_max, col_max);
     } break;
     case IDSETWIDTH: {
       wchar_t buffer[256] = {0};
