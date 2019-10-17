@@ -14,14 +14,14 @@
 ListViewControl::ListViewControl(HWND hListView, ListViewControl::MODE mode,
                                  int row_max, int column_max)
     : _hListView(hListView), _row_max(0), _column_max(0) {
-  Reset(mode, row_max, column_max);
+  Resize(mode, row_max, column_max);
   return;
 }
 
 ListViewControl::~ListViewControl() { return; }
 
-void ListViewControl::Reset(ListViewControl::MODE mode, int row_max,
-                            int column_max) {
+void ListViewControl::Resize(ListViewControl::MODE mode, int row_max,
+                             int column_max) {
   const int old_row_max = _row_max;
   const int old_column_max = _column_max;
   _row_max = row_max;
@@ -39,7 +39,7 @@ void ListViewControl::Reset(ListViewControl::MODE mode, int row_max,
       // Reserved.
       break;
     case ListViewControl::MODE::REPORT: {
-      DWORD mask = LVS_REPORT | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES;
+      DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES;
       ListView_SetExtendedListViewStyleEx(_hListView, mask, mask);
       ResizeRow(old_row_max, _row_max);
       ResizeColumn(old_column_max, _column_max);
@@ -47,6 +47,56 @@ void ListViewControl::Reset(ListViewControl::MODE mode, int row_max,
     default:
       break;
   }
+  return;
+}
+
+void ListViewControl::SetColumnWidth(int column, int width) {
+  assert(column >= 0);
+  assert(width >= 0);
+
+  LVCOLUMN lvc;
+  ZeroMemory(&lvc, sizeof(lvc));
+  lvc.mask = LVCF_WIDTH;
+  lvc.cx = width;
+  // lvc.iSubItem = column;
+  ListView_SetColumn(_hListView, column, &lvc);
+  return;
+}
+
+template <class T>
+void ListViewControl::SetColumn(int column, const wchar_t* format,
+                                std::vector<T> data) {
+  assert(column >= 0);
+
+  wchar_t buffer[256] = {0};
+#if 0
+  if (column == 0) {
+    // The first column is treated as "Item" in windows API.
+    LVITEM lvi;
+    ZeroMemory(&lvi, sizeof(lvi));
+    lvi.mask = LVIF_TEXT;
+    lvi.pszText = buffer;
+    for (int i = 0; i < static_cast<int>(data.size()); i++) {
+      if (static_cast<int>(i) >= data.size()) {
+        break;
+      }
+      lvi.iItem = i;
+      swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
+      ListView_SetItem(_hListView, &lvi);
+    }
+  } else {
+  }
+#endif
+  // Sub item is set.
+  LVCOLUMN lvc;
+  ZeroMemory(&lvc, sizeof(lvc));
+  lvc.mask = LVCF_TEXT;
+  lvc.pszText = buffer;
+  for (int i = 0; i < (new_column_max - old_column_max); i++) {
+    lvc.iSubItem = i;
+    ListView_SetColumn(_hListView, &lvc);
+  }
+  return;
 }
 
 void ListViewControl::ResizeRow(int old_row_max, int new_row_max) {
@@ -55,13 +105,13 @@ void ListViewControl::ResizeRow(int old_row_max, int new_row_max) {
 
   if (new_row_max > old_row_max) {
     // Push rows.
-    LVITEM item;
-    ZeroMemory(&item, sizeof(item));
-    item.mask = LVIF_TEXT;
-    item.pszText = L"";
+    LVITEM lvi;
+    ZeroMemory(&lvi, sizeof(lvi));
+    lvi.mask = LVIF_TEXT;
+    lvi.pszText = L"";
     for (int i = 0; i < (new_row_max - old_row_max); i++) {
-      item.iItem = old_row_max + i;
-      ListView_InsertItem(_hListView, &item);
+      lvi.iItem = old_row_max + i;
+      ListView_InsertItem(_hListView, &lvi);
     }
   } else if (new_row_max < old_row_max) {
     // Delete tail.
@@ -71,6 +121,7 @@ void ListViewControl::ResizeRow(int old_row_max, int new_row_max) {
   } else {
     // none.
   }
+  return;
 }
 
 void ListViewControl::ResizeColumn(int old_column_max, int new_column_max) {
@@ -79,13 +130,13 @@ void ListViewControl::ResizeColumn(int old_column_max, int new_column_max) {
 
   if (new_column_max > old_column_max) {
     // Push columns.
-    LVCOLUMN column;
-    ZeroMemory(&column, sizeof(column));
-    column.mask = LVCF_TEXT | LVCF_WIDTH;
-    column.cx = 40;
-    column.pszText = L"";
+    LVCOLUMN lvc;
+    ZeroMemory(&lvc, sizeof(lvc));
+    lvc.mask = LVCF_TEXT | LVCF_WIDTH;
+    lvc.cx = 40;
+    lvc.pszText = L"";
     for (int i = 0; i < (new_column_max - old_column_max); i++) {
-      ListView_InsertColumn(_hListView, old_column_max + i, &column);
+      ListView_InsertColumn(_hListView, old_column_max + i, &lvc);
     }
   } else if (new_column_max < old_column_max) {
     // Delete tail.
@@ -95,6 +146,7 @@ void ListViewControl::ResizeColumn(int old_column_max, int new_column_max) {
   } else {
     // none.
   }
+  return;
 }
 
 bool ListViewControl::EnableListView() {

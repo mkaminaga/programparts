@@ -9,6 +9,8 @@
 #define LIST_VIEW_H_
 
 #include <windows.h>
+#include <string>
+#include <vector>
 
 #include <commctrl.h>  // Included at last.
 
@@ -23,7 +25,12 @@ class ListViewControl {
   ListViewControl(HWND hListView, ListViewControl::MODE mode, int row_max,
                   int column_max);
   virtual ~ListViewControl();
-  void Reset(ListViewControl::MODE mode, int row_max, int column_max);
+  void Resize(ListViewControl::MODE mode, int row_max, int column_max);
+  void SetColumnWidth(int column, int width);
+  template <class T>
+  void SetColumn(int column, const wchar_t* format, std::vector<T> data);
+  // template <class T>
+  // void SetColumn<std::wstring>(std::vector<T> data);
 
   static bool EnableListView();
 

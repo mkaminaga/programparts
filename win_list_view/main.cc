@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <memory>
+#include <string>
+#include <vector>
 #include "../win32_edit_mini/edit.h"
 #include "./list_view_control.h"
 #include "./resource.h"
@@ -20,9 +22,14 @@ namespace {
 // List view.
 std::unique_ptr<ListViewControl> list_view;
 std::unique_ptr<EditControl> out_edit;
+std::unique_ptr<EditControl> row_edit;
+std::unique_ptr<EditControl> col_edit;
 
 int row_max = 3;
-int column_max = 4;
+int col_max = 4;
+std::vector<int> data_d;
+std::vector<double> data_f;
+std::vector<std::wstring> data_s;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -39,10 +46,24 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   ListViewControl::EnableListView();
   list_view.reset(new ListViewControl(GetDlgItem(hwnd, IDC_LIST1),
                                       ListViewControl::MODE::REPORT, row_max,
-                                      column_max));
+                                      col_max));
+  // Test data.
+  data_d.resize(row_max);
+  data_f.resize(row_max);
+  data_s.resize(row_max);
+  for (int i = 0; i < row_max; i++) {
+    data_d[i] = i;
+    data_f[i] = 2.0 * i;
+    data_s[i] = L"text";
+  }
 
   // Edit control for test interface.
   out_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
+  row_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
+  col_edit.reset(new EditControl(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
+  out_edit->Set(L"List view test utility\n");
+  row_edit->Set(L"%d", row_max);
+  col_edit->Set(L"%d", col_max);
   return TRUE;
 }
 
@@ -66,15 +87,40 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
     case IDLIST:
       out_edit->Add(L"IDLIST\n");
       break;
-    case IDDETAIL:
+    case IDREPORT:
       out_edit->Add(L"IDDETAIL\n");
       break;
-    case IDLICON:
+    case IDICON:
       out_edit->Add(L"IDLICON\n");
       break;
-    case IDSICON:
+    case IDSMALLICON:
       out_edit->Add(L"IDSICON\n");
       break;
+    case IDCLEAR:
+      break;
+    case IDCLEARALL:
+      break;
+    case IDDELETE:
+      break;
+    case IDDELETEALL:
+      break;
+    case IDGETALL:
+      break;
+    case IDGETITEM:
+      break;
+    case IDSETITEM:
+      break;
+    case IDSETSIZE: {
+      wchar_t buffer[256] = {0};
+      row_edit->Get(buffer, ARRAYSIZE(buffer));
+      row_max = std::stoi(buffer);
+      col_edit->Get(buffer, ARRAYSIZE(buffer));
+      col_max = std::stoi(buffer);
+      out_edit->Add(L"IDSETSIZE\n");
+      out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
+      // Resize list vies.
+      list_view->Resize(ListViewControl::MODE::REPORT, row_max, col_max);
+    } break;
     default:
       // none.
       break;
