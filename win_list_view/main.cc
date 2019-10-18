@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 #include "../win32_edit_mini/edit.h"
-#include "./list_view_control.h"
+#include "./list_view.h"
 #include "./resource.h"
 #include "./util.h"
 
@@ -58,6 +58,7 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
     data_f[i] = 2.0 * i;
     data_s[i] = L"text";
   }
+  list_view->SetColumnData(1, L"%d", data_d);
 
   // Edit control for test interface.
   out_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));

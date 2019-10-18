@@ -9,9 +9,9 @@ TARGET = main.exe
 PDB = main.pdb
 MAP = main.map
 RES = resource.res
-SRC = main.cc util.cc ../list_view_control.cc \
+SRC = main.cc util.cc ../list_view.cc \
 			../win32_edit_mini/edit.cc
-OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/list_view_control.obj \
+OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/list_view.obj \
 			$(OBJDIR)/edit.obj
 
 CPPFLAGS = /nologo /W4 /Zi /O2 /D"UNICODE" /D"_UNICODE" /EHsc /Fd"$(OBJDIR)/"

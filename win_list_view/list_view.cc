@@ -1,11 +1,11 @@
 //
-// @file list_view_control.cc
+// @file list_view.cc
 // @brief List view wrapper.
 // @author Mamoru Kaminaga.
 // @date 2019-10-16 09:03:55
 // Copyright 2019 Mamoru Kaminaga.
 //
-#include "./list_view_control.h"
+#include "./list_view.h"
 #include <assert.h>
 #include <windows.h>
 
@@ -59,38 +59,25 @@ void ListView::SetColumnWidth(int column, int width) {
   return;
 }
 
-template <class T>
 void ListView::SetColumnData(int column, const wchar_t* format,
-                             std::vector<T> data) {
+                             const std::vector<int>& data) {
   assert(column >= 0);
+  LVITEM lvi;
 
+  ZeroMemory(&lvi, sizeof(lvi));
   wchar_t buffer[256] = {0};
-#if 0
-  if (column == 0) {
-    // The first column is treated as "Item" in windows API.
-    LVITEM lvi;
-    ZeroMemory(&lvi, sizeof(lvi));
-    lvi.mask = LVIF_TEXT;
-    lvi.pszText = buffer;
-    for (int i = 0; i < static_cast<int>(data.size()); i++) {
-      if (static_cast<int>(i) >= data.size()) {
-        break;
-      }
-      lvi.iItem = i;
-      swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
-      ListView_SetItem(_hListView, &lvi);
-    }
-  } else {
+  lvi.mask = LVIF_TEXT;
+  lvi.pszText = buffer;
+
+  size_t i_max = _row_max;
+  if (_row_max > data.size()) {
+    i_max = data.size();
   }
-#endif
-  // Sub item is set.
-  LVCOLUMN lvc;
-  ZeroMemory(&lvc, sizeof(lvc));
-  lvc.mask = LVCF_TEXT;
-  lvc.pszText = buffer;
-  for (int i = 0; i < (new_column_max - old_column_max); i++) {
-    lvc.iSubItem = i;
-    ListView_SetColumn(_hListView, i, &lvc);
+  for (size_t i = 0; i < i_max; i++) {
+    lvi.iItem = i;
+    lvi.iSubItem = column;
+    swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
+    ListView_SetItem(_hListView, &lvi);
   }
   return;
 }

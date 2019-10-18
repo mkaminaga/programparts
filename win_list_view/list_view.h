@@ -1,5 +1,5 @@
 //
-// @file list_view_control.h
+// @file list_view.h
 // @brief List view wrapper.
 // @author Mamoru Kaminaga.
 // @date 2019-10-16 09:03:55
@@ -31,10 +31,8 @@ class ListView {
   virtual ~ListView();
   void Resize(mk::ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
-  template <class T>
-  void SetColumnData(int column, const wchar_t* format, std::vector<T> data);
-  // template <class T>
-  // void SetColumnData<std::wstring>(std::vector<T> data);
+  void SetColumnData(int column, const wchar_t* format,
+                     const std::vector<int>& data);
 
   static bool EnableListView();
 
