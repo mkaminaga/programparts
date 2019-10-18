@@ -54,23 +54,42 @@ void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
 void ListView::SetColumnWidth(int column, int width) {
   assert(column >= 0);
   assert(width >= 0);
-
   ListView_SetColumnWidth(_hListView, column, width);
   return;
 }
 
-void ListView::SetColumnData(int column, const wchar_t* format,
-                             const std::vector<int>& data) {
+void ListView::SetColumnText(int column,
+                             const std::vector<std::wstring>& data) {
   assert(column >= 0);
   LVITEM lvi;
+  ZeroMemory(&lvi, sizeof(lvi));
+  lvi.mask = LVIF_TEXT;
+  size_t i_max = _row_max;
+  if (i_max > data.size()) {
+    i_max = data.size();
+  }
+  for (size_t i = 0; i < i_max; i++) {
+    lvi.iItem = i;
+    lvi.iSubItem = column;
+    lvi.pszText = (LPWSTR)data[i].c_str();
+    lvi.cchTextMax = data[i].size();
+    ListView_SetItem(_hListView, &lvi);
+  }
+  return;
+}
 
+template <typename T>
+void ListView::SetColumnData(int column, const wchar_t* format,
+                             const std::vector<T>& data) {
+  assert(column >= 0);
+  LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
   wchar_t buffer[256] = {0};
   lvi.mask = LVIF_TEXT;
   lvi.pszText = buffer;
-
+  lvi.cchTextMax = ARRAYSIZE(buffer);
   size_t i_max = _row_max;
-  if (_row_max > data.size()) {
+  if (i_max > data.size()) {
     i_max = data.size();
   }
   for (size_t i = 0; i < i_max; i++) {
@@ -82,10 +101,14 @@ void ListView::SetColumnData(int column, const wchar_t* format,
   return;
 }
 
+template void ListView::SetColumnData<int>(int, const wchar_t*,
+                                           const std::vector<int>&);
+template void ListView::SetColumnData<double>(int, const wchar_t*,
+                                              const std::vector<double>&);
+
 void ListView::ResizeRow(int old_row_max, int new_row_max) {
   assert(old_row_max >= 0);
   assert(new_row_max >= 0);
-
   if (new_row_max > old_row_max) {
     // Push rows.
     LVITEM lvi;
@@ -110,7 +133,6 @@ void ListView::ResizeRow(int old_row_max, int new_row_max) {
 void ListView::ResizeColumn(int old_column_max, int new_column_max) {
   assert(old_column_max >= 0);
   assert(new_column_max >= 0);
-
   if (new_column_max > old_column_max) {
     // Push columns.
     LVCOLUMN lvc;

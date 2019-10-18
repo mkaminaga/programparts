@@ -56,9 +56,11 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   for (int i = 0; i < row_max; i++) {
     data_d[i] = i;
     data_f[i] = 2.0 * i;
-    data_s[i] = L"text";
+    data_s[i] = mk::SynthString(L"text %d", i);
   }
+  list_view->SetColumnText(0, data_s);
   list_view->SetColumnData(1, L"%d", data_d);
+  list_view->SetColumnData(2, L"%5.3f", data_f);
 
   // Edit control for test interface.
   out_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
@@ -86,7 +88,6 @@ void Cls_OnClose(HWND hwnd) {
 
 void handle_wm_notify(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   assert(wParam);
-
   LPNMHDR nmhdr = (LPNMHDR)wParam;
   if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
     switch (nmhdr->code) {
