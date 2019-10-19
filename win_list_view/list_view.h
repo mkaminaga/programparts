@@ -32,6 +32,7 @@ class ListView {
   void Resize(mk::ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
   void SetColumnText(int column, const wchar_t* text);
+  void SelectItem(int item);
   void SetFocus();
 
   // Methods for data input.

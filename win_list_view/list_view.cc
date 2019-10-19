@@ -80,13 +80,20 @@ void ListView::SetColumnWidth(int column, int width) {
 }
 
 void ListView::SetColumnText(int column, const wchar_t* text) {
-  assert(column >= 0);
+  assert((column >= 0) && (column <= _column_max));
   LVCOLUMNA lvc;
   ZeroMemory(&lvc, sizeof(lvc));
   lvc.mask = LVCF_TEXT;
   lvc.pszText = (LPSTR)text;
   lvc.cchTextMax = wcslen(text);
   ListView_SetColumn(_hListView, column, &lvc);
+}
+
+void ListView::SelectItem(int item) {
+  assert((item >= 0) && (item <= _row_max));
+  ListView_SetItemState(_hListView, -1, 0, LVIS_SELECTED);
+  SendMessage(_hListView, LVM_ENSUREVISIBLE, (WPARAM)item, FALSE);
+  ListView_SetItemState(_hListView, item, LVIS_SELECTED, LVIS_SELECTED);
 }
 
 UINT ListView::GetSelectedItem() {
@@ -107,7 +114,7 @@ template void ListView::SetData<double>(int, const wchar_t*,
 template <typename T>
 void ListView::SetData(int column, const wchar_t* format,
                        const std::vector<T>& data) {
-  assert(column >= 0);
+  assert((column >= 0) && (column <= _column_max));
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
   wchar_t buffer[256] = {0};

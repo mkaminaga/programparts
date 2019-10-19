@@ -27,10 +27,11 @@ std::unique_ptr<mk::Edit> out_edit;
 std::unique_ptr<mk::Edit> row_edit;
 std::unique_ptr<mk::Edit> col_edit;
 std::unique_ptr<mk::Edit> width_edit;
+std::unique_ptr<mk::Edit> select_edit;
 
 int row_max = 3;
 int col_max = 3;
-int selected_column = 0;
+int select_column = 0;
 std::vector<int> data_d;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
@@ -48,13 +49,19 @@ void ResetListViewForReportMode() {
 
   // Set default data.
   data_d = {
-    0, 1, 2,
+      0,
+      1,
+      2,
   };
   data_f = {
-    3.0, 4.0, 5.0,
+      3.0,
+      4.0,
+      5.0,
   };
   data_s = {
-    L"Apple", L"Banana", L"Grape",
+      L"Apple",
+      L"Banana",
+      L"Grape",
   };
   list_view->SetText(0, data_s);
   list_view->SetData(1, L"%d", data_d);
@@ -67,8 +74,9 @@ void ResetListViewForReportMode() {
   list_view->SetColumnWidth(0, 100);
   list_view->SetColumnWidth(1, 80);
   list_view->SetColumnWidth(2, 40);
-  selected_column = 0;
-  width_edit->Set(L"100\n");
+  select_column = 0;
+  width_edit->Set(L"100");
+  select_edit->Set(L"0");
 
   // Prepare user color.
   color_FG.resize(row_max);
@@ -97,6 +105,7 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   row_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
   col_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
   width_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETWIDTH)));
+  select_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETSELECT)));
 
   // List view for test.
   mk::ListView::EnableListView();
@@ -159,11 +168,14 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       out_edit->Add(L"Reserved\n");
       break;
     case IDSETSIZE: {
-      wchar_t buffer[256] = {0};
-      row_edit->Get(buffer, ARRAYSIZE(buffer));
-      row_max = std::stoi(buffer);
-      col_edit->Get(buffer, ARRAYSIZE(buffer));
-      col_max = std::stoi(buffer);
+      row_max = std::stoi(row_edit->Get());
+      col_max = std::stoi(col_edit->Get());
+      data_d.resize(row_max);
+      data_f.resize(row_max);
+      data_s.resize(row_max);
+      color_FG.resize(row_max);
+      color_BG.resize(row_max);
+      // Debug string output.
       out_edit->Add(L"IDSETSIZE\n");
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
       out_edit->Add(L"\n");
@@ -171,16 +183,25 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       list_view->Resize(mk::ListView::MODE::REPORT, row_max, col_max);
     } break;
     case IDSETWIDTH: {
-      wchar_t buffer[256] = {0};
-      width_edit->Get(buffer, ARRAYSIZE(buffer));
-      int width = std::stoi(buffer);
+      int width = std::stoi(width_edit->Get());
+      list_view->SetColumnWidth(0, width);
+      // Debug string output.
       out_edit->Add(L"IDSETWIDTH\n");
       out_edit->Add(L"width = %d\n", width);
       out_edit->Add(L"\n");
-      // Set column width.
-      list_view->SetColumnWidth(0, width);
       break;
     }
+    case IDSETSELECT: {
+      int item = std::stoi(select_edit->Get());
+      if ((item < 0) || (item > row_max)) {
+        out_edit->Add(L"Invalid range\n");
+      }
+      list_view->SelectItem(item);
+      // Debug string output.
+      out_edit->Add(L"IDSETSELECT\n");
+      out_edit->Add(L"item = %d\n", item);
+      out_edit->Add(L"\n");
+    } break;
     default:
       // none.
       break;
@@ -195,18 +216,23 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
     switch (nmhdr->code) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        // Debug string output.
         out_edit->Add(L"LVN_COLUMNCLICK\n");
         out_edit->Add(L"column = %d\n", lv->iSubItem);
         out_edit->Add(L"\n");
       } break;
       case NM_CLICK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        // Debug string output.
+        select_edit->Set(L"%d", lv->iItem);
         out_edit->Add(L"NM_CLICK\n");
         out_edit->Add(L"item = %d\n", lv->iItem);
         out_edit->Add(L"\n");
       } break;
       case NM_DBLCLK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        // Debug string output.
+        select_edit->Set(L"%d", lv->iItem);
         out_edit->Add(L"NM_DBLCLK\n");
         out_edit->Add(L"item = %d\n", lv->iItem);
         out_edit->Add(L"\n");
@@ -215,15 +241,19 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
         LPNMLVCUSTOMDRAW draw = (LPNMLVCUSTOMDRAW)nmhdr;
         switch (draw->nmcd.dwDrawStage) {
           case CDDS_PREPAINT:
+            // Debug string output.
             out_edit->Add(L"CDDS_PREPAINT\n");
+            // Use custom draw notification.
             SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NOTIFYITEMDRAW);
             break;
           case CDDS_ITEMPREPAINT:
-            out_edit->Add(L"CDDS_ITEMPREPAINT\n");
             assert(color_FG.size() >= draw->nmcd.dwItemSpec);
             assert(color_BG.size() >= draw->nmcd.dwItemSpec);
             draw->clrText = color_FG[draw->nmcd.dwItemSpec];
             draw->clrTextBk = color_BG[draw->nmcd.dwItemSpec];
+            // Debug string output.
+            out_edit->Add(L"CDDS_ITEMPREPAINT\n");
+            // Use custom draw notification.
             SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NEWFONT);
             break;
           default:

@@ -19,6 +19,8 @@
 #define IDC_EDIT_INPUT                          40012
 #define IDSETITEM                               40013
 #define IDDELETE                                40014
+#define IDSETSELECT                             40015
+#define IDC_EDIT_SETSELECT                      40016
 #define IDC_EDIT_SETCOL                         40017
 #define IDC_EDIT_SETWIDTH                       40018
 #define IDC_LIST1                               40100
