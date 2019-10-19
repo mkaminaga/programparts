@@ -51,9 +51,7 @@ void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
   return;
 }
 
-void ListView::SetFocus() {
-  ::SetFocus(_hListView);
-}
+void ListView::SetFocus() { ::SetFocus(_hListView); }
 
 void ListView::SetText(int column, const std::vector<std::wstring>& data) {
   assert(column >= 0);
@@ -79,6 +77,16 @@ void ListView::SetColumnWidth(int column, int width) {
   assert(width >= 0);
   ListView_SetColumnWidth(_hListView, column, width);
   return;
+}
+
+void ListView::SetColumnText(int column, const wchar_t* text) {
+  assert(column >= 0);
+  LVCOLUMNA lvc;
+  ZeroMemory(&lvc, sizeof(lvc));
+  lvc.mask = LVCF_TEXT;
+  lvc.pszText = (LPSTR)text;
+  lvc.cchTextMax = wcslen(text);
+  ListView_SetColumn(_hListView, column, &lvc);
 }
 
 UINT ListView::GetSelectedRow() {
@@ -153,7 +161,7 @@ void ListView::ResizeColumn(int old_column_max, int new_column_max) {
     LVCOLUMN lvc;
     ZeroMemory(&lvc, sizeof(lvc));
     lvc.mask = LVCF_TEXT | LVCF_WIDTH;
-    lvc.cx = LISTVIEW_DEFAULT_COLUMN_WIDTH;
+    lvc.cx = 40;  // default.
     lvc.pszText = L"";
     for (int i = 0; i < (new_column_max - old_column_max); i++) {
       ListView_InsertColumn(_hListView, old_column_max + i, &lvc);

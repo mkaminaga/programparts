@@ -14,8 +14,6 @@
 
 #include <commctrl.h>  // Included at last.
 
-#define LISTVIEW_DEFAULT_COLUMN_WIDTH (40)
-
 namespace mk {
 
 class ListView {
@@ -33,6 +31,7 @@ class ListView {
   // Methods to set properties.
   void Resize(mk::ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
+  void SetColumnText(int column, const wchar_t* text);
   void SetFocus();
 
   // Methods for data input.

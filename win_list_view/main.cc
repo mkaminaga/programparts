@@ -29,13 +29,59 @@ std::unique_ptr<mk::Edit> col_edit;
 std::unique_ptr<mk::Edit> width_edit;
 
 int row_max = 3;
-int col_max = 4;
+int col_max = 3;
 std::vector<int> data_d;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
 std::vector<COLORREF> color_FG;
 std::vector<COLORREF> color_BG;
 }  // namespace
+
+void ResetListViewForReportMode() {
+  row_max = 3;
+  col_max = 3;
+  list_view->Resize(mk::ListView::MODE::REPORT, row_max, col_max);
+
+  // Set default data.
+  data_d = {
+    0, 1, 2,
+  };
+  data_f = {
+    3.0, 4.0, 5.0,
+  };
+  data_s = {
+    L"Apple", L"Banana", L"Grape",
+  };
+  list_view->SetText(0, data_s);
+  list_view->SetData(1, L"%d", data_d);
+  list_view->SetData(2, L"%5.3f", data_f);
+
+  // Set column.
+  list_view->SetColumnText(0, L"col 0");
+  list_view->SetColumnText(1, L"col 1");
+  list_view->SetColumnText(2, L"col 2");
+  list_view->SetColumnWidth(0, 100);
+  list_view->SetColumnWidth(1, 80);
+  list_view->SetColumnWidth(2, 40);
+
+  // Prepare user color.
+  color_FG.resize(row_max);
+  color_BG.resize(row_max);
+  for (auto& c : color_FG) {
+    c = RGB(0, 255, 255);
+  }
+  for (auto& c : color_BG) {
+    c = RGB(128, 128, 0);
+  }
+
+  width_edit->Set(L"100\n");
+  out_edit->Add(L"Reset ListView in REPORT mode.\n");
+  out_edit->Add(L"\n");
+
+  out_edit->Set(L"List view test utility\n");
+  row_edit->Set(L"%d", row_max);
+  col_edit->Set(L"%d", col_max);
+}
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   (void)hwnd_forcus;
@@ -47,45 +93,20 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   SendMessage(hwnd, WM_SETICON, ICON_BIG,
               (LPARAM)LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)));
 
-  // List view for test.
-  mk::ListView::EnableListView();
-  list_view.reset(new mk::ListView(GetDlgItem(hwnd, IDC_LIST1),
-                                   mk::ListView::MODE::REPORT, row_max,
-                                   col_max));
-
-  // Test data.
-  data_d.resize(row_max);
-  data_f.resize(row_max);
-  data_s.resize(row_max);
-  for (int i = 0; i < row_max; i++) {
-    data_d[i] = i;
-    data_f[i] = 2.0 * i;
-    data_s[i] = mk::SynthString(L"text %d", i);
-  }
-  list_view->SetText(0, data_s);
-  list_view->SetData(1, L"%d", data_d);
-  list_view->SetData(2, L"%5.3f", data_f);
-
-  // Test color.
-  color_FG.resize(row_max);
-  color_BG.resize(row_max);
-  for (auto& c : color_FG) {
-    c = RGB(0, 255, 255);
-  }
-  for (auto& c : color_BG) {
-    c = RGB(128, 128, 0);
-  }
-
   // Edit control for test interface.
   out_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
   in_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_INPUT)));
   row_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
   col_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
   width_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETWIDTH)));
-  out_edit->Set(L"List view test utility\n");
-  row_edit->Set(L"%d", row_max);
-  col_edit->Set(L"%d", col_max);
-  width_edit->Set(L"%d", LISTVIEW_DEFAULT_COLUMN_WIDTH);
+
+  // List view for test.
+  mk::ListView::EnableListView();
+  list_view.reset(new mk::ListView(GetDlgItem(hwnd, IDC_LIST1),
+                                   mk::ListView::MODE::REPORT, row_max,
+                                   col_max));
+  ResetListViewForReportMode();
+
   return TRUE;
 }
 
