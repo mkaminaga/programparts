@@ -22,6 +22,7 @@
 namespace {
 // List view.
 std::unique_ptr<mk::ListView> list_view;
+std::unique_ptr<mk::Edit> in_edit;
 std::unique_ptr<mk::Edit> out_edit;
 std::unique_ptr<mk::Edit> row_edit;
 std::unique_ptr<mk::Edit> col_edit;
@@ -77,6 +78,7 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
 
   // Edit control for test interface.
   out_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
+  in_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_INPUT)));
   row_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETROW)));
   col_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETCOL)));
   width_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_SETWIDTH)));
@@ -124,8 +126,6 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       break;
     case IDDELETEALL:
       break;
-    case IDGETALL:
-      break;
     case IDGETITEM:
       break;
     case IDSETITEM:
@@ -162,58 +162,55 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
 
 LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
   assert(nmhdr);
-#if 0
-  if (nmhdr->hwndFrom == list_view->GetHandle()) {  // Access violation.
-#else
+  // if (nmhdr->hwndFrom == list_view->GetHandle()) {  // Access violation.
   if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
-#endif
-  switch (nmhdr->code) {
-    case LVN_COLUMNCLICK: {
-      LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
-      out_edit->Add(L"LVN_COLUMNCLICK\n");
-      out_edit->Add(L"column = %d\n", lv->iSubItem);
-      out_edit->Add(L"\n");
-    } break;
-    case NM_CLICK: {
-      LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
-      out_edit->Add(L"NM_CLICK\n");
-      out_edit->Add(L"item = %d\n", lv->iItem);
-      out_edit->Add(L"\n");
-    } break;
-    case NM_DBLCLK: {
-      LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
-      out_edit->Add(L"NM_DBLCLK\n");
-      out_edit->Add(L"item = %d\n", lv->iItem);
-      out_edit->Add(L"\n");
-    } break;
-    case NM_CUSTOMDRAW: {
-      LPNMLVCUSTOMDRAW draw = (LPNMLVCUSTOMDRAW)nmhdr;
-      out_edit->Add(L"NM_CUSTOMDRAW\n");
-      switch (draw->nmcd.dwDrawStage) {
-        case CDDS_PREPAINT:
-          out_edit->Add(L"CDDS_PREPAINT\n");
-          SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NOTIFYITEMDRAW);
-          break;
-        case CDDS_ITEMPREPAINT:
-          out_edit->Add(L"CDDS_ITEMPREPAINT\n");
-          assert(color_FG.size() >= draw->nmcd.dwItemSpec);
-          assert(color_BG.size() >= draw->nmcd.dwItemSpec);
-          // User specified color.
-          draw->clrText = color_FG[draw->nmcd.dwItemSpec];
-          draw->clrTextBk = color_BG[draw->nmcd.dwItemSpec];
-          SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NEWFONT);
-          break;
-        default:
-          // none.
-          break;
+    switch (nmhdr->code) {
+      case LVN_COLUMNCLICK: {
+        LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        out_edit->Add(L"LVN_COLUMNCLICK\n");
+        out_edit->Add(L"column = %d\n", lv->iSubItem);
+        out_edit->Add(L"\n");
+      } break;
+      case NM_CLICK: {
+        LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        out_edit->Add(L"NM_CLICK\n");
+        out_edit->Add(L"item = %d\n", lv->iItem);
+        out_edit->Add(L"\n");
+      } break;
+      case NM_DBLCLK: {
+        LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        out_edit->Add(L"NM_DBLCLK\n");
+        out_edit->Add(L"item = %d\n", lv->iItem);
+        out_edit->Add(L"\n");
+      } break;
+      case NM_CUSTOMDRAW: {
+        LPNMLVCUSTOMDRAW draw = (LPNMLVCUSTOMDRAW)nmhdr;
+        out_edit->Add(L"NM_CUSTOMDRAW\n");
+        switch (draw->nmcd.dwDrawStage) {
+          case CDDS_PREPAINT:
+            out_edit->Add(L"CDDS_PREPAINT\n");
+            SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NOTIFYITEMDRAW);
+            break;
+          case CDDS_ITEMPREPAINT:
+            out_edit->Add(L"CDDS_ITEMPREPAINT\n");
+            assert(color_FG.size() >= draw->nmcd.dwItemSpec);
+            assert(color_BG.size() >= draw->nmcd.dwItemSpec);
+            // User specified color.
+            draw->clrText = color_FG[draw->nmcd.dwItemSpec];
+            draw->clrTextBk = color_BG[draw->nmcd.dwItemSpec];
+            SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NEWFONT);
+            break;
+          default:
+            // none.
+            break;
+        }
       }
+      default:
+        // none.
+        break;
     }
-    default:
-      // none.
-      break;
   }
-}
-return TRUE;
+  return TRUE;
 }
 
 INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,

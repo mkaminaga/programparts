@@ -16,10 +16,9 @@
 #define IDDELETEALL                             40009
 #define IDICON                                  40010
 #define IDGETITEM                               40011
-#define IDC_LIST1                               40012
+#define IDC_EDIT_INPUT                          40012
 #define IDSETITEM                               40013
 #define IDDELETE                                40014
-#define IDGETALL                                40015
-#define IDC_EDIT_SET                            40016
 #define IDC_EDIT_SETCOL                         40017
 #define IDC_EDIT_SETWIDTH                       40018
+#define IDC_LIST1                               40100
