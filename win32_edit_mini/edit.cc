@@ -21,59 +21,63 @@ constexpr int EDIT_BUFFER_MAX = 512;
 
 namespace mk {
 
-Edit::Edit(HWND hEdit) : hEdit(hEdit) { return; }
+Edit::Edit(HWND hEdit) : _hEdit(hEdit) { return; }
 
 Edit::~Edit() { return; }
 
-HWND Edit::GetHandle() { return hEdit; }
+HWND Edit::GetHandle() { return _hEdit; }
 
 void Edit::EnableInput() {
-  SendMessage(hEdit, EM_SETREADONLY, FALSE, 0);
+  SendMessage(_hEdit, EM_SETREADONLY, FALSE, 0);
   return;
 }
 
 void Edit::DisableInput() {
-  SendMessage(hEdit, EM_SETREADONLY, TRUE, 0);
+  SendMessage(_hEdit, EM_SETREADONLY, TRUE, 0);
   return;
 }
 
 void Edit::Show() {
-  ShowWindow(hEdit, SW_SHOW);
+  ShowWindow(_hEdit, SW_SHOW);
   return;
 }
 
 void Edit::Hide() {
-  ShowWindow(hEdit, SW_HIDE);
+  ShowWindow(_hEdit, SW_HIDE);
   return;
 }
 
+void Edit::SetFocus() {
+  ::SetFocus(_hEdit);
+}
+
 void Edit::Clear() {
-  SendMessage(hEdit, EM_SETSEL, 0, -1);
-  SendMessage(hEdit, WM_CLEAR, 0, 0);
+  SendMessage(_hEdit, EM_SETSEL, 0, -1);
+  SendMessage(_hEdit, WM_CLEAR, 0, 0);
   return;
 }
 
 void Edit::Copy() {
-  SendMessage(hEdit, EM_SETSEL, 0, -1);
-  SendMessage(hEdit, WM_COPY, 0, 0);
+  SendMessage(_hEdit, EM_SETSEL, 0, -1);
+  SendMessage(_hEdit, WM_COPY, 0, 0);
   return;
 }
 
 void Edit::Cut() {
-  SendMessage(hEdit, EM_SETSEL, 0, -1);
-  SendMessage(hEdit, WM_CUT, 0, 0);
+  SendMessage(_hEdit, EM_SETSEL, 0, -1);
+  SendMessage(_hEdit, WM_CUT, 0, 0);
   return;
 }
 
 void Edit::Get(wchar_t* dst, size_t dst_size) {
   assert(dst);
-  SendMessage(hEdit, EM_SETSEL, 0, -1);
-  SendMessage(hEdit, WM_GETTEXT, (WPARAM)dst_size, (LPARAM)dst);
+  SendMessage(_hEdit, EM_SETSEL, 0, -1);
+  SendMessage(_hEdit, WM_GETTEXT, (WPARAM)dst_size, (LPARAM)dst);
   return;
 }
 
 void Edit::Paste() {
-  SendMessage(hEdit, WM_PASTE, 0, 0);
+  SendMessage(_hEdit, WM_PASTE, 0, 0);
   return;
 }
 
@@ -84,7 +88,7 @@ void Edit::Set(const wchar_t* format, ...) {
   vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
 
   // Set buffered text.
-  SendMessage(hEdit, WM_SETTEXT, (WPARAM)0, (LPARAM)buffer);
+  SendMessage(_hEdit, WM_SETTEXT, (WPARAM)0, (LPARAM)buffer);
   return;
 }
 
@@ -95,17 +99,10 @@ void Edit::Add(const wchar_t* format, ...) {
   vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
 
   // Add buffered text to tail.
-  int index = GetWindowTextLength(hEdit);
-  SetFocus(hEdit);
-  SendMessage(hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
-  SendMessage(hEdit, EM_REPLACESEL, 0, (LPARAM)buffer);
+  int index = GetWindowTextLength(_hEdit);
+  SendMessage(_hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
+  SendMessage(_hEdit, EM_REPLACESEL, 0, (LPARAM)buffer);
   return;
-}
-
-void Edit::Focus() {
-  int index = GetWindowTextLength(hEdit);
-  SetFocus(hEdit);
-  SendMessage(hEdit, EM_SETSEL, (WPARAM)index, (LPARAM)index);
 }
 
 }  // namespace mk

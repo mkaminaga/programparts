@@ -26,6 +26,7 @@ class Edit {
   void DisableInput();
   void Show();
   void Hide();
+  void SetFocus();
 
   // Read.
   void Clear();
@@ -38,11 +39,8 @@ class Edit {
   void Set(const wchar_t* format, ...);
   void Add(const wchar_t* format, ...);
 
-  // Misc.
-  void Focus();
-
  private:
-  HWND hEdit;
+  HWND _hEdit;
 };
 
 }  // namespace mk

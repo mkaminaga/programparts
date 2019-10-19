@@ -142,7 +142,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       edit_app->Set(L"Set focus.\n");
 
       ResetEditApps();
-      edit_user->Focus();
+      edit_user->SetFocus();
       break;
     case IDCBCLEAR:
       if (OpenClipboard(hwnd)) {

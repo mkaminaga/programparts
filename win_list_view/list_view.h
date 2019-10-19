@@ -29,15 +29,22 @@ class ListView {
   ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
            int column_max);
   virtual ~ListView();
-  HWND GetHandle();
+
+  // Methods to set properties.
   void Resize(mk::ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
-  void SetColumnText(int column, const std::vector<std::wstring>& data);
+  void SetFocus();
 
+  // Methods for data input.
+  void SetText(int column, const std::vector<std::wstring>& data);
   template <typename T>
-  void SetColumnData(int column, const wchar_t* format,
-                     const std::vector<T>& data);
+  void SetData(int column, const wchar_t* format, const std::vector<T>& data);
 
+  // Methods for data output.
+  HWND GetHandle();
+  UINT GetSelectedRow();
+
+  // Methods for global purpose.
   static bool EnableListView();
 
  private:

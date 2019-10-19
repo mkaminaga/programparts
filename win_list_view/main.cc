@@ -62,9 +62,9 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
     data_f[i] = 2.0 * i;
     data_s[i] = mk::SynthString(L"text %d", i);
   }
-  list_view->SetColumnText(0, data_s);
-  list_view->SetColumnData(1, L"%d", data_d);
-  list_view->SetColumnData(2, L"%5.3f", data_f);
+  list_view->SetText(0, data_s);
+  list_view->SetData(1, L"%d", data_d);
+  list_view->SetData(2, L"%5.3f", data_f);
 
   // Test color.
   color_FG.resize(row_max);
@@ -195,7 +195,6 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
             out_edit->Add(L"CDDS_ITEMPREPAINT\n");
             assert(color_FG.size() >= draw->nmcd.dwItemSpec);
             assert(color_BG.size() >= draw->nmcd.dwItemSpec);
-            // User specified color.
             draw->clrText = color_FG[draw->nmcd.dwItemSpec];
             draw->clrTextBk = color_BG[draw->nmcd.dwItemSpec];
             SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NEWFONT);

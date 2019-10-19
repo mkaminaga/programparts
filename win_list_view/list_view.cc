@@ -22,10 +22,6 @@ ListView::ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
 
 ListView::~ListView() { return; }
 
-HWND ListView::GetHandle() {
-  return _hListView;
-}
-
 void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
   const int old_row_max = _row_max;
   const int old_column_max = _column_max;
@@ -55,15 +51,11 @@ void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
   return;
 }
 
-void ListView::SetColumnWidth(int column, int width) {
-  assert(column >= 0);
-  assert(width >= 0);
-  ListView_SetColumnWidth(_hListView, column, width);
-  return;
+void ListView::SetFocus() {
+  ::SetFocus(_hListView);
 }
 
-void ListView::SetColumnText(int column,
-                             const std::vector<std::wstring>& data) {
+void ListView::SetText(int column, const std::vector<std::wstring>& data) {
   assert(column >= 0);
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
@@ -82,13 +74,31 @@ void ListView::SetColumnText(int column,
   return;
 }
 
-template void ListView::SetColumnData<int>(int, const wchar_t*,
-                                           const std::vector<int>&);
-template void ListView::SetColumnData<double>(int, const wchar_t*,
-                                              const std::vector<double>&);
+void ListView::SetColumnWidth(int column, int width) {
+  assert(column >= 0);
+  assert(width >= 0);
+  ListView_SetColumnWidth(_hListView, column, width);
+  return;
+}
+
+UINT ListView::GetSelectedRow() {
+  int result = -1;
+  for (int i = 0; i < _row_max; i++) {
+    if ((ListView_GetItemState(_hListView, i, LVIS_SELECTED) & LVIS_SELECTED)) {
+      result = i;
+      break;
+    }
+  }
+  return result;
+}
+
+template void ListView::SetData<int>(int, const wchar_t*,
+                                     const std::vector<int>&);
+template void ListView::SetData<double>(int, const wchar_t*,
+                                        const std::vector<double>&);
 template <typename T>
-void ListView::SetColumnData(int column, const wchar_t* format,
-                             const std::vector<T>& data) {
+void ListView::SetData(int column, const wchar_t* format,
+                       const std::vector<T>& data) {
   assert(column >= 0);
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
@@ -108,6 +118,8 @@ void ListView::SetColumnData(int column, const wchar_t* format,
   }
   return;
 }
+
+HWND ListView::GetHandle() { return _hListView; }
 
 void ListView::ResizeRow(int old_row_max, int new_row_max) {
   assert(old_row_max >= 0);
