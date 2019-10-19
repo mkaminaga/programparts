@@ -68,10 +68,10 @@ void ResetListViewForReportMode() {
   color_FG.resize(row_max);
   color_BG.resize(row_max);
   for (auto& c : color_FG) {
-    c = RGB(0, 255, 255);
+    c = RGB(0x56, 0x3E, 0xA3);
   }
   for (auto& c : color_BG) {
-    c = RGB(128, 128, 0);
+    c = RGB(0xFF, 0xDA, 0x90);
   }
 
   width_edit->Set(L"100\n");
@@ -128,16 +128,19 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)codeNotify;
   switch (id) {
     case IDLIST:
-      out_edit->Add(L"IDLIST\n");
+      ResetListViewForReportMode();
       break;
     case IDREPORT:
-      out_edit->Add(L"IDDETAIL\n");
+      // Reserved.
+      out_edit->Add(L"Reserved\n");
       break;
     case IDICON:
-      out_edit->Add(L"IDLICON\n");
+      // Reserved.
+      out_edit->Add(L"Reserved\n");
       break;
     case IDSMALLICON:
-      out_edit->Add(L"IDSICON\n");
+      // Reserved.
+      out_edit->Add(L"Reserved\n");
       break;
     case IDCLEAR:
       break;
