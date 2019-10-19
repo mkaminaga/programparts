@@ -195,6 +195,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       int item = std::stoi(select_edit->Get());
       if ((item < 0) || (item > row_max)) {
         out_edit->Add(L"Invalid range\n");
+        break;
       }
       list_view->SelectItem(item);
       // Debug string output.
