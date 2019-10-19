@@ -14,7 +14,7 @@ SRC = main.cc util.cc ../list_view.cc \
 OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/list_view.obj \
 			$(OBJDIR)/edit.obj
 
-CPPFLAGS = /nologo /W4 /Zi /O2 /D"UNICODE" /D"_UNICODE" /EHsc /Fd"$(OBJDIR)/"
+CPPFLAGS = /nologo /W4 /Zi /O2 /D"UNICODE" /D"_UNICODE" /D"DEBUG" /EHsc /Fd"$(OBJDIR)/"
 LFLAGS = "kernel32.lib" "user32.lib" "comctl32.lib"\
 				 /NOLOGO /SUBSYSTEM:WINDOWS /DEBUG /PDB:"$(PDB)" /MAP:"$(MAP)"
 

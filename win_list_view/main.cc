@@ -32,6 +32,8 @@ int col_max = 4;
 std::vector<int> data_d;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
+std::vector<COLORREF> color_FG;
+std::vector<COLORREF> color_BG;
 }  // namespace
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -61,6 +63,16 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   list_view->SetColumnText(0, data_s);
   list_view->SetColumnData(1, L"%d", data_d);
   list_view->SetColumnData(2, L"%5.3f", data_f);
+
+  // Test color.
+  color_FG.resize(row_max);
+  color_BG.resize(row_max);
+  for (auto& c : color_FG) {
+    c = RGB(0, 255, 255);
+  }
+  for (auto& c : color_BG) {
+    c = RGB(128, 128, 0);
+  }
 
   // Edit control for test interface.
   out_edit.reset(new mk::Edit(GetDlgItem(hwnd, IDC_EDIT_OUTPUT)));
@@ -147,33 +159,55 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   return;
 }
 
-void OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
+LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
   assert(nmhdr);
   if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
     switch (nmhdr->code) {
       case LVN_COLUMNCLICK: {
-        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
+        LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
         out_edit->Add(L"LVN_COLUMNCLICK\n");
-        out_edit->Add(L"column = %d\n", nmlistview->iSubItem);
+        out_edit->Add(L"column = %d\n", lv->iSubItem);
         out_edit->Add(L"\n");
       } break;
       case NM_CLICK: {
-        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
+        LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
         out_edit->Add(L"NM_CLICK\n");
-        out_edit->Add(L"item = %d\n", nmlistview->iItem);
+        out_edit->Add(L"item = %d\n", lv->iItem);
         out_edit->Add(L"\n");
       } break;
       case NM_DBLCLK: {
-        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
+        LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
         out_edit->Add(L"NM_DBLCLK\n");
-        out_edit->Add(L"item = %d\n", nmlistview->iItem);
+        out_edit->Add(L"item = %d\n", lv->iItem);
         out_edit->Add(L"\n");
       } break;
+      case NM_CUSTOMDRAW: {
+        LPNMLVCUSTOMDRAW draw = (LPNMLVCUSTOMDRAW)nmhdr;
+out_edit->Add(L"NM_CUSTOMDRAW\n");
+        switch (draw->nmcd.dwDrawStage) {
+          case CDDS_PREPAINT:
+out_edit->Add(L"CDDS_PREPAINT\n");
+            SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NOTIFYITEMDRAW);
+            break;
+          case CDDS_ITEMPREPAINT:
+out_edit->Add(L"CDDS_ITEMPREPAINT\n");
+            assert(color_FG.size() >= draw->nmcd.dwItemSpec);
+            assert(color_BG.size() >= draw->nmcd.dwItemSpec);
+            draw->clrText = color_FG[draw->nmcd.dwItemSpec];
+            draw->clrTextBk = color_BG[draw->nmcd.dwItemSpec];
+            SetWindowLong(hwndDlg, DWL_MSGRESULT, (LONG)CDRF_NEWFONT);
+            break;
+          default:
+            // none.
+            break;
+        }
+      }
       default:
+        // none.
         break;
     }
   }
-  return;
+  return TRUE;
 }
 
 INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
@@ -184,8 +218,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
     HANDLE_DLG_MSG(hwndDlg, WM_CLOSE, Cls_OnClose);
     HANDLE_DLG_MSG(hwndDlg, WM_COMMAND, Cls_OnCommand);
     case WM_NOTIFY:
-      OnNofity(hwndDlg, (NMHDR*)lParam);
-      break;
+      return OnNofity(hwndDlg, (NMHDR*)lParam);
     default:
       return FALSE;
   }
