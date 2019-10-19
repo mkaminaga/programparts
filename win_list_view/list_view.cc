@@ -40,7 +40,7 @@ void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
       // Reserved.
       break;
     case mk::ListView::MODE::REPORT: {
-      DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES;
+      DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT;
       ListView_SetExtendedListViewStyleEx(_hListView, mask, mask);
       ResizeRow(old_row_max, _row_max);
       ResizeColumn(old_column_max, _column_max);

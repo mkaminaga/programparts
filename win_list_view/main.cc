@@ -154,6 +154,20 @@ void OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
         out_edit->Add(L"LVN_COLUMNCLICK\n");
+        out_edit->Add(L"column = %d\n", nmlistview->iSubItem);
+        out_edit->Add(L"\n");
+      } break;
+      case NM_CLICK: {
+        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
+        out_edit->Add(L"NM_CLICK\n");
+        out_edit->Add(L"item = %d\n", nmlistview->iItem);
+        out_edit->Add(L"\n");
+      } break;
+      case NM_DBLCLK: {
+        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
+        out_edit->Add(L"NM_DBLCLK\n");
+        out_edit->Add(L"item = %d\n", nmlistview->iItem);
+        out_edit->Add(L"\n");
       } break;
       default:
         break;
