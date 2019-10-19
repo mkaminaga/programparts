@@ -78,6 +78,10 @@ void ListView::SetColumnText(int column,
   return;
 }
 
+template void ListView::SetColumnData<int>(int, const wchar_t*,
+                                           const std::vector<int>&);
+template void ListView::SetColumnData<double>(int, const wchar_t*,
+                                              const std::vector<double>&);
 template <typename T>
 void ListView::SetColumnData(int column, const wchar_t* format,
                              const std::vector<T>& data) {
@@ -100,11 +104,6 @@ void ListView::SetColumnData(int column, const wchar_t* format,
   }
   return;
 }
-
-template void ListView::SetColumnData<int>(int, const wchar_t*,
-                                           const std::vector<int>&);
-template void ListView::SetColumnData<double>(int, const wchar_t*,
-                                              const std::vector<double>&);
 
 void ListView::ResizeRow(int old_row_max, int new_row_max) {
   assert(old_row_max >= 0);

@@ -86,21 +86,6 @@ void Cls_OnClose(HWND hwnd) {
   return;
 }
 
-void handle_wm_notify(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  assert(wParam);
-  LPNMHDR nmhdr = (LPNMHDR)wParam;
-  if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
-    switch (nmhdr->code) {
-      case LVN_COLUMNCLICK: {
-        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)lParam;
-      } break;
-      default:
-        break;
-    }
-  }
-  return;
-}
-
 void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)hwnd;
   (void)hWndCtl;
@@ -162,6 +147,21 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   return;
 }
 
+void OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
+  assert(nmhdr);
+  if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
+    switch (nmhdr->code) {
+      case LVN_COLUMNCLICK: {
+        LPNMLISTVIEW nmlistview = (LPNMLISTVIEW)nmhdr;
+        out_edit->Add(L"LVN_COLUMNCLICK\n");
+      } break;
+      default:
+        break;
+    }
+  }
+  return;
+}
+
 INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
                             LPARAM lParam) {
   switch (uMsg) {
@@ -170,7 +170,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
     HANDLE_DLG_MSG(hwndDlg, WM_CLOSE, Cls_OnClose);
     HANDLE_DLG_MSG(hwndDlg, WM_COMMAND, Cls_OnCommand);
     case WM_NOTIFY:
-      handle_wm_notify(hwndDlg, uMsg, wParam, lParam);
+      OnNofity(hwndDlg, (NMHDR*)lParam);
       break;
     default:
       return FALSE;
