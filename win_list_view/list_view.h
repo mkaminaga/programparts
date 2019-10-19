@@ -43,6 +43,7 @@ class ListView {
   // Methods for data output.
   HWND GetHandle();
   UINT GetSelectedItem();
+  void GetText(int column, std::vector<std::wstring>* data);
 
   // Methods for global purpose.
   static bool EnableListView();

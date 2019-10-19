@@ -58,13 +58,13 @@ void ListView::SetText(int column, const std::vector<std::wstring>& data) {
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
   lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = column;
   size_t i_max = _row_max;
   if (i_max > data.size()) {
     i_max = data.size();
   }
   for (size_t i = 0; i < i_max; i++) {
     lvi.iItem = i;
-    lvi.iSubItem = column;
     lvi.pszText = (LPWSTR)data[i].c_str();
     lvi.cchTextMax = data[i].size();
     ListView_SetItem(_hListView, &lvi);
@@ -107,6 +107,25 @@ UINT ListView::GetSelectedItem() {
   return result;
 }
 
+void ListView::GetText(int column, std::vector<std::wstring>* data) {
+  assert((column >= 0) && (column <= _column_max));
+  assert(data);
+  LVITEM lvi;
+  ZeroMemory(&lvi, sizeof(lvi));
+  wchar_t buffer[256] = {0};
+  lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = column;
+  lvi.pszText = buffer;
+  lvi.cchTextMax = ARRAYSIZE(buffer);
+  data->resize(_row_max);
+  for (size_t i = 0; i < static_cast<UINT>(_row_max); i++) {
+    lvi.iItem = i;
+    ListView_GetItem(_hListView, &lvi);
+    (*data)[i] = buffer;
+  }
+  return;
+}
+
 template void ListView::SetData<int>(int, const wchar_t*,
                                      const std::vector<int>&);
 template void ListView::SetData<double>(int, const wchar_t*,
@@ -119,6 +138,7 @@ void ListView::SetData(int column, const wchar_t* format,
   ZeroMemory(&lvi, sizeof(lvi));
   wchar_t buffer[256] = {0};
   lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = column;
   lvi.pszText = buffer;
   lvi.cchTextMax = ARRAYSIZE(buffer);
   size_t i_max = _row_max;
@@ -127,7 +147,6 @@ void ListView::SetData(int column, const wchar_t* format,
   }
   for (size_t i = 0; i < i_max; i++) {
     lvi.iItem = i;
-    lvi.iSubItem = column;
     swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
     ListView_SetItem(_hListView, &lvi);
   }

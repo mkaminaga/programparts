@@ -161,20 +161,32 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
     case IDDELETEALL:
       out_edit->Add(L"Reserved\n");
       break;
-    case IDGETITEM:
-      out_edit->Add(L"Reserved\n");
-      break;
+    case IDGETITEM: {
+      out_edit->Add(L"IDGETITEM\n");
+      std::vector<std::wstring> data;
+      for (int i = 0; i < col_max; i++) {
+        list_view->GetText(i, &data);
+        // Debug string output.
+        out_edit->Add(L"  column = %d:\n", i);
+        for (unsigned int j = 0; j < data.size(); j++) {
+          out_edit->Add(L"    item = %s\n", data[j].c_str());
+        }
+      }
+      out_edit->Add(L"\n");
+    } break;
     case IDSETITEM:
       out_edit->Add(L"Reserved\n");
       break;
     case IDSETSIZE: {
       row_max = std::stoi(row_edit->Get());
       col_max = std::stoi(col_edit->Get());
-      data_d.resize(row_max);
-      data_f.resize(row_max);
-      data_s.resize(row_max);
-      color_FG.resize(row_max);
-      color_BG.resize(row_max);
+      if (data_d.size() < static_cast<int>(row_max)) {
+        data_d.resize(row_max);
+        data_f.resize(row_max);
+        data_s.resize(row_max);
+        color_FG.resize(row_max);
+        color_BG.resize(row_max);
+      }
       // Debug string output.
       out_edit->Add(L"IDSETSIZE\n");
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
