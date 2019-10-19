@@ -41,7 +41,7 @@ class ListView {
 
   // Methods for data output.
   HWND GetHandle();
-  UINT GetSelectedRow();
+  UINT GetSelectedItem();
 
   // Methods for global purpose.
   static bool EnableListView();

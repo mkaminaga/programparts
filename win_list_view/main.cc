@@ -30,6 +30,7 @@ std::unique_ptr<mk::Edit> width_edit;
 
 int row_max = 3;
 int col_max = 3;
+int selected_column = 0;
 std::vector<int> data_d;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
@@ -41,6 +42,9 @@ void ResetListViewForReportMode() {
   row_max = 3;
   col_max = 3;
   list_view->Resize(mk::ListView::MODE::REPORT, row_max, col_max);
+  out_edit->Set(L"Reset ListView in REPORT mode.\n");
+  row_edit->Set(L"%d", row_max);
+  col_edit->Set(L"%d", col_max);
 
   // Set default data.
   data_d = {
@@ -63,6 +67,8 @@ void ResetListViewForReportMode() {
   list_view->SetColumnWidth(0, 100);
   list_view->SetColumnWidth(1, 80);
   list_view->SetColumnWidth(2, 40);
+  selected_column = 0;
+  width_edit->Set(L"100\n");
 
   // Prepare user color.
   color_FG.resize(row_max);
@@ -73,14 +79,6 @@ void ResetListViewForReportMode() {
   for (auto& c : color_BG) {
     c = RGB(0xFF, 0xDA, 0x90);
   }
-
-  width_edit->Set(L"100\n");
-  out_edit->Add(L"Reset ListView in REPORT mode.\n");
-  out_edit->Add(L"\n");
-
-  out_edit->Set(L"List view test utility\n");
-  row_edit->Set(L"%d", row_max);
-  col_edit->Set(L"%d", col_max);
 }
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -143,16 +141,22 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       out_edit->Add(L"Reserved\n");
       break;
     case IDCLEAR:
+      out_edit->Add(L"Reserved\n");
       break;
     case IDCLEARALL:
+      out_edit->Add(L"Reserved\n");
       break;
     case IDDELETE:
+      out_edit->Add(L"Reserved\n");
       break;
     case IDDELETEALL:
+      out_edit->Add(L"Reserved\n");
       break;
     case IDGETITEM:
+      out_edit->Add(L"Reserved\n");
       break;
     case IDSETITEM:
+      out_edit->Add(L"Reserved\n");
       break;
     case IDSETSIZE: {
       wchar_t buffer[256] = {0};
@@ -209,7 +213,6 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       } break;
       case NM_CUSTOMDRAW: {
         LPNMLVCUSTOMDRAW draw = (LPNMLVCUSTOMDRAW)nmhdr;
-        out_edit->Add(L"NM_CUSTOMDRAW\n");
         switch (draw->nmcd.dwDrawStage) {
           case CDDS_PREPAINT:
             out_edit->Add(L"CDDS_PREPAINT\n");

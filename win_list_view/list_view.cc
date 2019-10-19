@@ -89,7 +89,7 @@ void ListView::SetColumnText(int column, const wchar_t* text) {
   ListView_SetColumn(_hListView, column, &lvc);
 }
 
-UINT ListView::GetSelectedRow() {
+UINT ListView::GetSelectedItem() {
   int result = -1;
   for (int i = 0; i < _row_max; i++) {
     if ((ListView_GetItemState(_hListView, i, LVIS_SELECTED) & LVIS_SELECTED)) {
