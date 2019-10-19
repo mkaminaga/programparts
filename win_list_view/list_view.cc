@@ -22,6 +22,10 @@ ListView::ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
 
 ListView::~ListView() { return; }
 
+HWND ListView::GetHandle() {
+  return _hListView;
+}
+
 void ListView::Resize(mk::ListView::MODE mode, int row_max, int column_max) {
   const int old_row_max = _row_max;
   const int old_column_max = _column_max;

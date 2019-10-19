@@ -29,6 +29,7 @@ class ListView {
   ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
            int column_max);
   virtual ~ListView();
+  HWND GetHandle();
   void Resize(mk::ListView::MODE mode, int row_max, int column_max);
   void SetColumnWidth(int column, int width);
   void SetColumnText(int column, const std::vector<std::wstring>& data);
