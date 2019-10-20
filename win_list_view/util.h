@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <string>
+#include "./list_view.h"
 
 // Message cracker wrapper for DialogProc.
 #define HANDLE_DLG_MSG(hwndDlg, msg, fn)     \
@@ -22,6 +23,7 @@
 namespace mk {
 
 std::wstring SynthString(const wchar_t* format, ...);
+void ToggleArrow(mk::ListView::ARROW* arrow);
 
 }  // namespace mk
 

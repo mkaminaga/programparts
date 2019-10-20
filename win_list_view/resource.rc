@@ -49,7 +49,7 @@ FONT 8, "Ms Shell Dlg"
     LTEXT           "select ( > 0)", IDC_STATIC, 350, 255, 38, 9, SS_LEFT, WS_EX_LEFT
 }
 
-
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "main.exe.manifest"
 
 //
 // Icon resources

@@ -23,4 +23,22 @@ std::wstring SynthString(const wchar_t* format, ...) {
   return buffer;
 }
 
+void ToggleArrow(mk::ListView::ARROW* arrow) {
+  switch (*arrow) {
+    case mk::ListView::NONE:
+      *arrow = mk::ListView::UP;
+      break;
+    case mk::ListView::UP:
+      *arrow = mk::ListView::DOWN;
+      break;
+    case mk::ListView::DOWN:
+      *arrow = mk::ListView::NONE;
+      break;
+    default:
+      // none.
+      break;
+  };
+  return;
+}
+
 }  // namespace mk

@@ -36,6 +36,7 @@ uint32_t col_max = 3;
 uint32_t select_column = 0;
 std::vector<uint32_t> icon_id;
 std::vector<uint32_t> data_d;
+std::vector<mk::ListView::ARROW> header_arrow;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
 std::vector<COLORREF> color_FG;
@@ -74,7 +75,7 @@ void ResetListViewForReportMode() {
   SHFILEINFO file_info;
   HIMAGELIST hImageList =
       (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &file_info, sizeof(file_info),
-                                SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
+                                SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
   list_view->SetImageList(hImageList);
 
   // Icon image.
@@ -91,15 +92,26 @@ void ResetListViewForReportMode() {
   list_view->SetIcon(0, icon_id);
 
   // Set column.
-  list_view->SetColumnText(0, L"col 0");
-  list_view->SetColumnText(1, L"col 1");
-  list_view->SetColumnText(2, L"col 2");
-  list_view->SetColumnWidth(0, 100);
-  list_view->SetColumnWidth(1, 80);
-  list_view->SetColumnWidth(2, 40);
+  list_view->SetHeaderText(0, L"col 0");
+  list_view->SetHeaderText(1, L"col 1");
+  list_view->SetHeaderText(2, L"col 2");
+  list_view->SetHeaderWidth(0, 100);
+  list_view->SetHeaderWidth(1, 80);
+  list_view->SetHeaderWidth(2, 40);
   select_column = 0;
   width_edit->Set(L"100");
   select_edit->Set(L"0");
+
+  // Set header.
+  list_view->FixHeader(true);
+
+  header_arrow.resize(col_max);
+  header_arrow[0] = mk::ListView::ARROW::UP;
+  header_arrow[1] = mk::ListView::ARROW::DOWN;
+  header_arrow[2] = mk::ListView::ARROW::NONE;
+  list_view->SetHeaderArrow(0, header_arrow[0]);
+  list_view->SetHeaderArrow(1, header_arrow[1]);
+  list_view->SetHeaderArrow(2, header_arrow[2]);
 
   // Prepare user color.
   color_FG.resize(row_max);
@@ -210,6 +222,9 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
         color_FG.resize(row_max);
         color_BG.resize(row_max);
       }
+      if (header_arrow.size() < col_max) {
+        header_arrow.resize(col_max);
+      }
       // Debug string output.
       out_edit->Add(L"IDSETSIZE\n");
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
@@ -219,7 +234,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
     } break;
     case IDSETWIDTH: {
       uint32_t width = std::stoi(width_edit->Get());
-      list_view->SetColumnWidth(0, width);
+      list_view->SetHeaderWidth(0, width);
       // Debug string output.
       out_edit->Add(L"IDSETWIDTH\n");
       out_edit->Add(L"width = %d\n", width);
@@ -232,7 +247,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
         out_edit->Add(L"Invalid range\n");
         break;
       }
-      list_view->SelectItem(item);
+      list_view->SetSelectedItem(item);
       // Debug string output.
       out_edit->Add(L"IDSETSELECT\n");
       out_edit->Add(L"item = %d\n", item);
@@ -247,11 +262,48 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
 
 LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
   assert(nmhdr);
-  // if (nmhdr->hwndFrom == list_view->GetHandle()) {  // Access violation.
-  if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
+  if (nmhdr->hwndFrom == ListView_GetHeader(GetDlgItem(hwndDlg, IDC_LIST1))) {
+    switch (nmhdr->code) {
+      case HDN_ITEMCLICK: {
+        LPNMHEADERA hd = (LPNMHEADERA)nmhdr;
+        // Debug string output.
+        out_edit->Add(L"HDN_ITEMCLICK\n");
+        out_edit->Add(L"index = %d\n", hd->iItem);
+        out_edit->Add(L"\n");
+      } break;
+      default:
+        break;
+    }
+  } else if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
+    // if (nmhdr->hwndFrom == list_view->GetHandle()) {  // Access violation.
     switch (nmhdr->code) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
+        assert(header_arrow.size() >= static_cast<uint32_t>(lv->iSubItem));
+        ToggleArrow(&header_arrow[lv->iSubItem]);
+#if 1
+        for (uint32_t i = 0; i < col_max; i++) {
+          if (i == static_cast<uint32_t>(lv->iSubItem)) {
+            list_view->SetHeaderArrow(lv->iSubItem, header_arrow[lv->iSubItem]);
+          } else {
+            header_arrow[i] = mk::ListView::NONE;
+          }
+        }
+#else
+        HWND hHeader = ListView_GetHeader(GetDlgItem(hwndDlg, IDC_LIST1));
+        HDITEMA hdi;
+        ZeroMemory(&hdi, sizeof(hdi));
+        hdi.mask = HDI_FORMAT;
+        Header_GetItem(hHeader, 0, &hdi);
+        // hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
+        hdi.fmt |= HDF_FIXEDWIDTH;  // HDF_SORTUP;
+        hdi.fmt &= ~HDS_DRAGDROP;   // Disable D&D.
+        hdi.fmt |= HDS_NOSIZING;    // Disable sizing.
+        Header_SetItem(hHeader, 0, &hdi);
+        out_edit->Add(L"Header Handle\n");
+        out_edit->Add(L"hHeader = %d\n", hHeader);
+        out_edit->Add(L"\n");
+#endif
         // Debug string output.
         out_edit->Add(L"LVN_COLUMNCLICK\n");
         out_edit->Add(L"column = %d\n", lv->iSubItem);
@@ -259,16 +311,16 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       } break;
       case NM_CLICK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
-        // Debug string output.
         select_edit->Set(L"%d", lv->iItem);
+        // Debug string output.
         out_edit->Add(L"NM_CLICK\n");
         out_edit->Add(L"item = %d\n", lv->iItem);
         out_edit->Add(L"\n");
       } break;
       case NM_DBLCLK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
-        // Debug string output.
         select_edit->Set(L"%d", lv->iItem);
+        // Debug string output.
         out_edit->Add(L"NM_DBLCLK\n");
         out_edit->Add(L"item = %d\n", lv->iItem);
         out_edit->Add(L"\n");

@@ -11,3 +11,22 @@ resource.rc
 
 resource.h
 #define IDC_LIST1                               40100
+
+/// 没ファンクション 1 ////
+void ListView::EnableHeaderDragDrop() {
+  ListView_SetExtendedListViewStyleEx(_hListView, LVS_EX_HEADERDRAGDROP, 0);
+  return;
+}
+
+void ListView::DisableHeaderDragDrop() {
+  ListView_SetExtendedListViewStyleEx(_hListView, LVS_EX_HEADERDRAGDROP,
+                                      LVS_EX_HEADERDRAGDROP);
+  return;
+}
+第一ヘッダのドラッグアンドドロップを禁止する際に考えていた手段。
+通知コードをトラップする方針に変更。
+
+// Not allow user to move first header.
+if (lv->iItem == 0) {
+  SetWindowLong(hwndDlg, DWL_MSGRESULT, TRUE);  // Fix first column.
+}

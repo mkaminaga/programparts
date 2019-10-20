@@ -18,6 +18,8 @@ ListView::ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
                    uint32_t column_max)
     : _hListView(hListView), _row_max(0), _column_max(0) {
   Resize(mode, row_max, column_max);
+  // Acquire handle of header.
+  _hHeader = ListView_GetHeader(_hListView);
   return;
 }
 
@@ -43,7 +45,8 @@ void ListView::Resize(mk::ListView::MODE mode, uint32_t row_max,
       // Reserved.
       break;
     case mk::ListView::MODE::REPORT: {
-      DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT;
+      DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT |
+                   LVS_EX_HEADERDRAGDROP;
       ListView_SetExtendedListViewStyleEx(_hListView, mask, mask);
       ResizeRow(old_row_max, _row_max);
       ResizeColumn(old_column_max, _column_max);
@@ -71,38 +74,13 @@ void ListView::SetImageList(HIMAGELIST hImageList) {
       // Reserved.
       break;
     case REPORT:
+      // Image list with small icons.
       ListView_SetImageList(_hListView, hImageList, LVSIL_SMALL);
       break;
     default:
       // none.
       break;
   }
-  return;
-}
-
-void ListView::SetColumnWidth(uint32_t column, uint32_t width) {
-  assert(column >= 0);
-  assert(width >= 0);
-  ListView_SetColumnWidth(_hListView, column, width);
-  return;
-}
-
-void ListView::SetColumnText(uint32_t column, const wchar_t* text) {
-  assert((column >= 0) && (column <= _column_max));
-  LVCOLUMNA lvc;
-  ZeroMemory(&lvc, sizeof(lvc));
-  lvc.mask = LVCF_TEXT;
-  lvc.pszText = (LPSTR)text;
-  lvc.cchTextMax = wcslen(text);
-  ListView_SetColumn(_hListView, column, &lvc);
-  return;
-}
-
-void ListView::SelectItem(uint32_t item) {
-  assert((item >= 0) && (item <= _row_max));
-  ListView_SetItemState(_hListView, -1, 0, LVIS_SELECTED);
-  SendMessage(_hListView, LVM_ENSUREVISIBLE, (WPARAM)item, FALSE);
-  ListView_SetItemState(_hListView, item, LVIS_SELECTED, LVIS_SELECTED);
   return;
 }
 
@@ -136,8 +114,72 @@ void ListView::GetText(uint32_t column, std::vector<std::wstring>* data) {
   return;
 }
 
+void ListView::SetHeaderWidth(uint32_t column, uint32_t width) {
+  assert((column >= 0) && (column <= _column_max));
+  assert(width >= 0);
+  ListView_SetColumnWidth(_hListView, column, width);
+  return;
+}
+
+void ListView::SetHeaderText(uint32_t column, const wchar_t* text) {
+  assert((column >= 0) && (column <= _column_max));
+  LVCOLUMNA lvc;
+  ZeroMemory(&lvc, sizeof(lvc));
+  lvc.mask = LVCF_TEXT;
+  lvc.pszText = (LPSTR)text;
+  lvc.cchTextMax = wcslen(text);
+  ListView_SetColumn(_hListView, column, &lvc);
+  return;
+}
+
+void ListView::SetHeaderArrow(uint32_t index, mk::ListView::ARROW arrow) {
+  assert((index >= 0) && (index <= _column_max));
+  HDITEM hdi;
+  ZeroMemory(&hdi, sizeof(hdi));
+  hdi.mask = HDI_FORMAT;
+  Header_GetItem(_hHeader, index, &hdi);
+  hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
+  switch (arrow) {
+    case NONE:
+      // none.
+      break;
+    case UP:
+      hdi.fmt |= HDF_SORTUP;
+      break;
+    case DOWN:
+      hdi.fmt |= HDF_SORTDOWN;
+      break;
+    default:
+      // none.
+      break;
+  }
+  Header_SetItem(_hHeader, index, &hdi);
+  return;
+}
+
+void ListView::FixHeader(bool fixment) {
+  LONG style = (LONG)GetWindowLong(_hHeader, GWL_STYLE);
+  if (fixment) {
+    style &= ~HDS_DRAGDROP;  // Disable D&D.
+    style |= HDS_NOSIZING;   // Disable sizing.
+  } else {
+    style |= HDS_DRAGDROP;   // Enable D&D.
+    style &= ~HDS_NOSIZING;  // Enable sizing.
+  }
+  SetWindowLong(_hHeader, GWL_EXSTYLE, style);
+  return;
+}
+
+void ListView::SetSelectedItem(uint32_t item) {
+  assert((item >= 0) && (item <= _row_max));
+  ListView_SetItemState(_hListView, -1, 0, LVIS_SELECTED);
+  SendMessage(_hListView, LVM_ENSUREVISIBLE, (WPARAM)item, FALSE);
+  ListView_SetItemState(_hListView, item, LVIS_SELECTED, LVIS_SELECTED);
+  return;
+}
+
 void ListView::SetText(uint32_t column, const std::vector<std::wstring>& data) {
-  assert(column >= 0);
+  assert((column >= 0) && (column <= _column_max));
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
   lvi.mask = LVIF_TEXT;

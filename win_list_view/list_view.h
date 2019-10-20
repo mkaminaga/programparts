@@ -31,13 +31,22 @@ class ListView {
 
   // Methods to set properties.
   void Resize(mk::ListView::MODE mode, uint32_t row_max, uint32_t column_max);
-  void SetColumnWidth(uint32_t column, uint32_t width);
-  void SetColumnText(uint32_t column, const wchar_t* text);
-  void SelectItem(uint32_t item);
   void SetFocus();
   void SetImageList(HIMAGELIST hImageList);
 
+  // For headers.
+  void SetHeaderWidth(uint32_t column, uint32_t width);
+  void SetHeaderText(uint32_t column, const wchar_t* text);
+  enum ARROW {
+    NONE,
+    UP,
+    DOWN,
+  };
+  void SetHeaderArrow(uint32_t index, mk::ListView::ARROW arrow);
+  void FixHeader(bool fixment);
+
   // Methods for data input.
+  void SetSelectedItem(uint32_t item);
   void SetText(uint32_t column, const std::vector<std::wstring>& data);
   void SetIcon(uint32_t column, const std::vector<uint32_t>& index);
   template <typename T>
@@ -59,6 +68,7 @@ class ListView {
  private:
   ListView::MODE _mode;
   HWND _hListView;
+  HWND _hHeader;
   uint32_t _row_max;
   uint32_t _column_max;
 };
