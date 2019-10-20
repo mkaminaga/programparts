@@ -23,16 +23,13 @@ std::wstring SynthString(const wchar_t* format, ...) {
   return buffer;
 }
 
-void ToggleArrow(mk::ListView::ARROW* arrow) {
-  switch (*arrow) {
-    case mk::ListView::NONE:
-      *arrow = mk::ListView::DOWN;
+void ToggleSortStatus(mk::ListView::SORT* sort) {
+  switch (*sort) {
+    case mk::ListView::SORT::DESCENDING:
+      *sort = mk::ListView::SORT::ASCENDING;
       break;
-    case mk::ListView::DOWN:
-      *arrow = mk::ListView::UP;
-      break;
-    case mk::ListView::UP:
-      *arrow = mk::ListView::NONE;
+    case mk::ListView::SORT::ASCENDING:
+      *sort = mk::ListView::SORT::DESCENDING;
       break;
     default:
       // none.

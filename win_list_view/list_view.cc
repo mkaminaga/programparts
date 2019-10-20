@@ -12,18 +12,34 @@
 
 #include <commctrl.h>  // Included at last.
 
+#define ASSERT_COLUMN(c) (assert(((c) >= 0) && ((c) <= _column_max)))
+#define ASSERT_RAW(r) (assert(((r) >= 0) && ((r) <= _row_max)))
+
+namespace {
+
+const uint32_t MK_LV_BUF_MAX = 256;
+const uint32_t MK_LV_DEF_COL_WIDTH = 40;
+
+}  // namespace
+
 namespace mk {
 
 ListView::ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
                    uint32_t column_max)
-    : _hListView(hListView), _row_max(0), _column_max(0) {
+    : _hListView(hListView),
+      _sort(mk::ListView::SORT::NONE),
+      _key_column(0),
+      _row_max(0),
+      _column_max(0) {
   Resize(mode, row_max, column_max);
-  // Acquire handle of header.
   _hHeader = ListView_GetHeader(_hListView);
   return;
 }
 
-ListView::~ListView() { return; }
+ListView::~ListView() {
+  ListView::_sort = mk::ListView::SORT::NONE;
+  return;
+}
 
 void ListView::Resize(mk::ListView::MODE mode, uint32_t row_max,
                       uint32_t column_max) {
@@ -64,16 +80,16 @@ void ListView::SetFocus() {
 
 void ListView::SetImageList(HIMAGELIST hImageList) {
   switch (_mode) {
-    case ICON:
+    case mk::ListView::MODE::ICON:
       // Reserved.
       break;
-    case SMALLICON:
+    case mk::ListView::MODE::SMALLICON:
       // Reserved.
       break;
-    case LIST:
+    case mk::ListView::MODE::LIST:
       // Reserved.
       break;
-    case REPORT:
+    case mk::ListView::MODE::REPORT:
       // Image list with small icons.
       ListView_SetImageList(_hListView, hImageList, LVSIL_SMALL);
       break;
@@ -96,11 +112,11 @@ uint32_t ListView::GetSelectedItem() {
 }
 
 void ListView::GetText(uint32_t column, std::vector<std::wstring>* data) {
-  assert((column >= 0) && (column <= _column_max));
+  ASSERT_COLUMN(column);
   assert(data);
   LVITEM lvi;
+  wchar_t buffer[MK_LV_BUF_MAX] = {0};
   ZeroMemory(&lvi, sizeof(lvi));
-  wchar_t buffer[256] = {0};
   lvi.mask = LVIF_TEXT;
   lvi.iSubItem = column;
   lvi.pszText = buffer;
@@ -115,14 +131,14 @@ void ListView::GetText(uint32_t column, std::vector<std::wstring>* data) {
 }
 
 void ListView::SetHeaderWidth(uint32_t column, uint32_t width) {
-  assert((column >= 0) && (column <= _column_max));
+  ASSERT_COLUMN(column);
   assert(width >= 0);
   ListView_SetColumnWidth(_hListView, column, width);
   return;
 }
 
 void ListView::SetHeaderText(uint32_t column, const wchar_t* text) {
-  assert((column >= 0) && (column <= _column_max));
+  ASSERT_COLUMN(column);
   LVCOLUMNA lvc;
   ZeroMemory(&lvc, sizeof(lvc));
   lvc.mask = LVCF_TEXT;
@@ -132,73 +148,16 @@ void ListView::SetHeaderText(uint32_t column, const wchar_t* text) {
   return;
 }
 
-void ListView::SetHeaderArrow(uint32_t index, mk::ListView::ARROW arrow) {
-  assert((index >= 0) && (index <= _column_max));
-  HDITEM hdi;
-  ZeroMemory(&hdi, sizeof(hdi));
-  hdi.mask = HDI_FORMAT;
-  Header_GetItem(_hHeader, index, &hdi);
-  hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
-  switch (arrow) {
-    case NONE:
-      // none.
-      break;
-    case UP:
-      hdi.fmt |= HDF_SORTUP;
-      break;
-    case DOWN:
-      hdi.fmt |= HDF_SORTDOWN;
-      break;
-    default:
-      // none.
-      break;
-  }
-  Header_SetItem(_hHeader, index, &hdi);
-  return;
-}
-
-void ListView::FixHeader(bool fixment) {
-  LONG style = (LONG)GetWindowLong(_hHeader, GWL_STYLE);
-  if (fixment) {
-    style &= ~HDS_DRAGDROP;  // Disable D&D.
-    style |= HDS_NOSIZING;   // Disable sizing.
-  } else {
-    style |= HDS_DRAGDROP;   // Enable D&D.
-    style &= ~HDS_NOSIZING;  // Enable sizing.
-  }
-  SetWindowLong(_hHeader, GWL_EXSTYLE, style);
-  return;
-}
-
 void ListView::SetSelectedItem(uint32_t item) {
-  assert((item >= 0) && (item <= _row_max));
+  ASSERT_RAW(item);
   ListView_SetItemState(_hListView, -1, 0, LVIS_SELECTED);
   SendMessage(_hListView, LVM_ENSUREVISIBLE, (WPARAM)item, FALSE);
   ListView_SetItemState(_hListView, item, LVIS_SELECTED, LVIS_SELECTED);
   return;
 }
 
-void ListView::SetText(uint32_t column, const std::vector<std::wstring>& data) {
-  assert((column >= 0) && (column <= _column_max));
-  LVITEM lvi;
-  ZeroMemory(&lvi, sizeof(lvi));
-  lvi.mask = LVIF_TEXT;
-  lvi.iSubItem = column;
-  uint32_t i_max = _row_max;
-  if (i_max > data.size()) {
-    i_max = data.size();
-  }
-  for (uint32_t i = 0; i < i_max; i++) {
-    lvi.iItem = i;
-    lvi.pszText = (LPWSTR)data[i].c_str();
-    lvi.cchTextMax = data[i].size();
-    ListView_SetItem(_hListView, &lvi);
-  }
-  return;
-}
-
 void ListView::SetIcon(uint32_t column, const std::vector<uint32_t>& index) {
-  assert((column >= 0) && (column <= _column_max));
+  ASSERT_COLUMN(column);
   assert(index.size() >= _row_max);
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
@@ -212,18 +171,54 @@ void ListView::SetIcon(uint32_t column, const std::vector<uint32_t>& index) {
   return;
 }
 
-template void ListView::SetData<uint32_t>(uint32_t, const wchar_t*,
-                                          const std::vector<uint32_t>&);
-template void ListView::SetData<double>(uint32_t, const wchar_t*,
-                                        const std::vector<double>&);
-template <typename T>
-void ListView::SetData(uint32_t column, const wchar_t* format,
-                       const std::vector<T>& data) {
-  assert((column >= 0) && (column <= _column_max));
+void ListView::SetItems_TEXT(uint32_t column,
+                             const std::vector<std::wstring>& data) {
+  ASSERT_COLUMN(column);
   LVITEM lvi;
   ZeroMemory(&lvi, sizeof(lvi));
-  wchar_t buffer[256] = {0};
-  lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = column;
+  uint32_t i_max = _row_max;
+  if (i_max > data.size()) {
+    i_max = data.size();
+  }
+  for (uint32_t i = 0; i < i_max; i++) {
+    lvi.iItem = i;
+    lvi.pszText = (LPWSTR)data[i].c_str();
+    lvi.cchTextMax = data[i].size();
+    if (column == 0) {
+      lvi.mask = LVIF_TEXT | LVIF_PARAM;
+      lvi.lParam = i;  // Referenced in Compare_TEXT.
+    } else {
+      lvi.mask = LVIF_TEXT;
+    }
+    ListView_SetItem(_hListView, &lvi);
+  }
+  return;
+}
+
+void ListView::SortItems_TEXT(uint32_t key_column, mk::ListView::SORT sort) {
+  ASSERT_COLUMN(key_column);
+  // Actually sort data.
+  _sort = sort;
+  _key_column = key_column;
+  ListView_SortItems(_hListView, &ListView::Compare_TEXT, this);
+  // Change header arrow.
+  for (uint32_t i = 0; i < _column_max; i++) {
+    if (i == key_column) {
+      SetHeaderArrow(key_column, sort);
+    } else {
+      SetHeaderArrow(key_column, mk::ListView::SORT::NONE);
+    }
+  }
+  return;
+}
+
+void ListView::SetItems_INT(uint32_t column, const wchar_t* format,
+                            const std::vector<int>& data) {
+  ASSERT_COLUMN(column);
+  LVITEM lvi;
+  ZeroMemory(&lvi, sizeof(lvi));
+  wchar_t buffer[MK_LV_BUF_MAX] = {0};
   lvi.iSubItem = column;
   lvi.pszText = buffer;
   lvi.cchTextMax = ARRAYSIZE(buffer);
@@ -233,8 +228,75 @@ void ListView::SetData(uint32_t column, const wchar_t* format,
   }
   for (uint32_t i = 0; i < i_max; i++) {
     lvi.iItem = i;
+    if (column == 0) {
+      lvi.mask = LVIF_TEXT | LVIF_PARAM;
+      lvi.lParam = i;  // Referenced in Compare_INT.
+    } else {
+      lvi.mask = LVIF_TEXT;
+    }
     swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
     ListView_SetItem(_hListView, &lvi);
+  }
+  return;
+}
+
+void ListView::SortItems_INT(uint32_t key_column, mk::ListView::SORT sort) {
+  ASSERT_COLUMN(key_column);
+  // Actually sort data.
+  _sort = sort;
+  _key_column = key_column;
+  ListView_SortItems(_hListView, &ListView::Compare_INT, this);
+  // Change header arrow.
+  for (uint32_t i = 0; i < _column_max; i++) {
+    if (i == key_column) {
+      SetHeaderArrow(key_column, sort);
+    } else {
+      SetHeaderArrow(key_column, mk::ListView::SORT::NONE);
+    }
+  }
+  return;
+}
+
+void ListView::SetItems_DOUBLE(uint32_t column, const wchar_t* format,
+                               const std::vector<double>& data) {
+  ASSERT_COLUMN(column);
+  LVITEM lvi;
+  ZeroMemory(&lvi, sizeof(lvi));
+  wchar_t buffer[MK_LV_BUF_MAX] = {0};
+  lvi.iSubItem = column;
+  lvi.pszText = buffer;
+  lvi.cchTextMax = ARRAYSIZE(buffer);
+  uint32_t i_max = _row_max;
+  if (i_max > data.size()) {
+    i_max = data.size();
+  }
+  for (uint32_t i = 0; i < i_max; i++) {
+    lvi.iItem = i;
+    if (column == 0) {
+      lvi.mask = LVIF_TEXT | LVIF_PARAM;
+      lvi.lParam = i;  // Referenced in Compare_DOUBLE.
+    } else {
+      lvi.mask = LVIF_TEXT;
+    }
+    swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
+    ListView_SetItem(_hListView, &lvi);
+  }
+  return;
+}
+
+void ListView::SortItems_DOUBLE(uint32_t key_column, mk::ListView::SORT sort) {
+  ASSERT_COLUMN(key_column);
+  // Actually sort data.
+  _sort = sort;
+  _key_column = key_column;
+  ListView_SortItems(_hListView, &ListView::Compare_DOUBLE, this);
+  // Change header arrow.
+  for (uint32_t i = 0; i < _column_max; i++) {
+    if (i == key_column) {
+      SetHeaderArrow(key_column, sort);
+    } else {
+      SetHeaderArrow(key_column, mk::ListView::SORT::NONE);
+    }
   }
   return;
 }
@@ -273,7 +335,7 @@ void ListView::ResizeColumn(uint32_t old_column_max, uint32_t new_column_max) {
     LVCOLUMN lvc;
     ZeroMemory(&lvc, sizeof(lvc));
     lvc.mask = LVCF_TEXT | LVCF_WIDTH;
-    lvc.cx = 40;  // default.
+    lvc.cx = MK_LV_DEF_COL_WIDTH;  // default.
     lvc.pszText = L"";
     for (uint32_t i = 0; i < (new_column_max - old_column_max); i++) {
       ListView_InsertColumn(_hListView, old_column_max + i, &lvc);
@@ -289,8 +351,124 @@ void ListView::ResizeColumn(uint32_t old_column_max, uint32_t new_column_max) {
   return;
 }
 
+void ListView::SetHeaderArrow(uint32_t column, mk::ListView::SORT sort) {
+  ASSERT_COLUMN(column);
+  HDITEM hdi;
+  ZeroMemory(&hdi, sizeof(hdi));
+  hdi.mask = HDI_FORMAT;
+  Header_GetItem(_hHeader, column, &hdi);
+  hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
+  switch (sort) {
+    case mk::ListView::SORT::DESCENDING:
+      hdi.fmt |= HDF_SORTDOWN;
+      break;
+    case mk::ListView::SORT::ASCENDING:
+      hdi.fmt |= HDF_SORTUP;
+      break;
+    default:
+      // none.
+      break;
+  }
+  Header_SetItem(_hHeader, column, &hdi);
+  return;
+}
+
+int CALLBACK ListView::Compare_TEXT(LPARAM lParam1, LPARAM lParam2,
+                                    LPARAM lParamSort) {
+  ListView* list_view = (ListView*)lParamSort;
+  const int item1 = (int)lParam1;
+  const int item2 = (int)lParam2;
+  LVITEM lvi;
+  ZeroMemory(&lvi, sizeof(lvi));
+  lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = list_view->_key_column;
+  // Read first value.
+  lvi.iItem = item1;
+  wchar_t first[MK_LV_BUF_MAX] = {0};
+  lvi.pszText = first;
+  lvi.cchTextMax = ARRAYSIZE(first);
+  ListView_GetItem(list_view->_hListView, &lvi);
+  // Read second value.
+  wchar_t second[MK_LV_BUF_MAX] = {0};
+  lvi.pszText = second;
+  lvi.cchTextMax = ARRAYSIZE(second);
+  lvi.iItem = item2;
+  ListView_GetItem(list_view->_hListView, &lvi);
+  // Comparison.
+  int32_t cmp_result = wcscmp(first, second);
+  if (cmp_result > 0) {
+    return -1;
+  } else if (cmp_result < 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int CALLBACK ListView::Compare_INT(LPARAM lParam1, LPARAM lParam2,
+                                   LPARAM lParamSort) {
+  ListView* list_view = (ListView*)lParamSort;
+  const int item1 = (int)lParam1;
+  const int item2 = (int)lParam2;
+  LVITEM lvi;
+  wchar_t buffer[MK_LV_BUF_MAX] = {0};
+  ZeroMemory(&lvi, sizeof(lvi));
+  lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = list_view->_key_column;
+  lvi.pszText = buffer;
+  lvi.cchTextMax = ARRAYSIZE(buffer);
+  // Read first value.
+  lvi.iItem = item1;
+  ListView_GetItem(list_view->_hListView, &lvi);
+  int first = 0;
+  swscanf_s(buffer, L"%d", &first);
+  // Read second value.
+  lvi.iItem = item2;
+  ListView_GetItem(list_view->_hListView, &lvi);
+  int second = 0;
+  swscanf_s(buffer, L"%d", &second);
+  if (first > second) {
+    return -1;
+  } else if (first < second) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int CALLBACK ListView::Compare_DOUBLE(LPARAM lParam1, LPARAM lParam2,
+                                      LPARAM lParamSort) {
+  ListView* list_view = (ListView*)lParamSort;
+  const int item1 = (int)lParam1;
+  const int item2 = (int)lParam2;
+  LVITEM lvi;
+  wchar_t buffer[MK_LV_BUF_MAX] = {0};
+  ZeroMemory(&lvi, sizeof(lvi));
+  lvi.mask = LVIF_TEXT;
+  lvi.iSubItem = list_view->_key_column;
+  lvi.pszText = buffer;
+  lvi.cchTextMax = ARRAYSIZE(buffer);
+  // Read first value.
+  lvi.iItem = item1;
+  ListView_GetItem(list_view->_hListView, &lvi);
+  double first = 0;
+  swscanf_s(buffer, L"%lf", &first);
+  // Read second value.
+  lvi.iItem = item2;
+  ListView_GetItem(list_view->_hListView, &lvi);
+  double second = 0;
+  swscanf_s(buffer, L"%lf", &second);
+  if (first > second) {
+    return -1;
+  } else if (first < second) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 bool ListView::EnableListView() {
-  // Bit flags for comctl32.dll.
+  // Set flag of comctl32.dll to use ListView control.
   INITCOMMONCONTROLSEX ic;
   ic.dwSize = sizeof(ic);
   ic.dwICC = ICC_LISTVIEW_CLASSES;

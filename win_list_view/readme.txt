@@ -30,3 +30,18 @@ void ListView::DisableHeaderDragDrop() {
 if (lv->iItem == 0) {
   SetWindowLong(hwndDlg, DWL_MSGRESULT, TRUE);  // Fix first column.
 }
+
+/// 没ファンクション 2 ////
+void ListView::FixHeader(bool fixment) {
+  LONG style = (LONG)GetWindowLong(_hHeader, GWL_STYLE);
+  if (fixment) {
+    style &= ~HDS_DRAGDROP;  // Disable D&D.
+    style |= HDS_NOSIZING;   // Disable sizing.
+  } else {
+    style |= HDS_DRAGDROP;   // Enable D&D.
+    style &= ~HDS_NOSIZING;  // Enable sizing.
+  }
+  SetWindowLong(_hHeader, GWL_EXSTYLE, style);
+  return;
+}
+ヘッダを固定できない。

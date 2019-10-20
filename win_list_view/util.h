@@ -23,7 +23,7 @@
 namespace mk {
 
 std::wstring SynthString(const wchar_t* format, ...);
-void ToggleArrow(mk::ListView::ARROW* arrow);
+void ToggleSortStatus(mk::ListView::SORT* sort);
 
 }  // namespace mk
 
