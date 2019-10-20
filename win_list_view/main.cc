@@ -104,10 +104,11 @@ void ResetListViewForReportMode() {
 
   // Set header.
   list_view->FixHeader(true);
-  header_arrow.resize(col_max);
-  header_arrow[0] = mk::ListView::ARROW::UP;
-  header_arrow[1] = mk::ListView::ARROW::DOWN;
-  header_arrow[2] = mk::ListView::ARROW::NONE;
+  header_arrow = {
+      mk::ListView::ARROW::NONE,
+      mk::ListView::ARROW::NONE,
+      mk::ListView::ARROW::NONE,
+  };
 
   // Prepare user color.
   color_FG.resize(row_max);
@@ -260,14 +261,25 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
   assert(nmhdr);
   if (nmhdr->hwndFrom == ListView_GetHeader(GetDlgItem(hwndDlg, IDC_LIST1))) {
     switch (nmhdr->code) {
-      case HDN_ITEMCLICK: {
+      case HDN_ITEMCLICK:
+      case HDN_ITEMDBLCLICK: {
         LPNMHEADERA hd = (LPNMHEADERA)nmhdr;
+        assert(header_arrow.size() >= static_cast<uint32_t>(hd->iItem));
+        for (uint32_t i = 0; i < col_max; i++) {
+          if (i == static_cast<uint32_t>(hd->iItem)) {
+            ToggleArrow(&header_arrow[i]);
+          } else {
+            header_arrow[i] = mk::ListView::NONE;
+          }
+          list_view->SetHeaderArrow(i, header_arrow[i]);
+        }
         // Debug string output.
         out_edit->Add(L"HDN_ITEMCLICK\n");
         out_edit->Add(L"index = %d\n", hd->iItem);
         out_edit->Add(L"\n");
       } break;
       default:
+        // none.
         break;
     }
   } else if (nmhdr->hwndFrom == GetDlgItem(hwndDlg, IDC_LIST1)) {
@@ -275,15 +287,6 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
     switch (nmhdr->code) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
-        assert(header_arrow.size() >= static_cast<uint32_t>(lv->iSubItem));
-        for (uint32_t i = 0; i < col_max; i++) {
-          if (i == static_cast<uint32_t>(lv->iSubItem)) {
-            ToggleArrow(&header_arrow[i]);
-            list_view->SetHeaderArrow(i, header_arrow[lv->iSubItem]);
-          } else {
-            header_arrow[i] = mk::ListView::NONE;
-          }
-        }
         // Debug string output.
         out_edit->Add(L"LVN_COLUMNCLICK\n");
         out_edit->Add(L"column = %d\n", lv->iSubItem);
@@ -347,6 +350,7 @@ INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam,
     case WM_NOTIFY:
       return OnNofity(hwndDlg, (NMHDR*)lParam);
     default:
+      // none.
       return FALSE;
   }
 }
