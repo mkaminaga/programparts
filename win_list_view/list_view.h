@@ -56,19 +56,19 @@ class ListView {
   // SortItems_TEXT must be called to sort column which items are set by
   // SetItems_TEXT.
   void SetItems_TEXT(uint32_t column, const std::vector<std::wstring>& data);
-  void SortItems_TEXT(uint32_t key_column, mk::ListView::SORT sort);
+  void SortItems_TEXT(uint32_t key_column);
 
   // SortItems_INT must be called to sort column which items are set by
   // SetItems_INT.
   void SetItems_INT(uint32_t column, const wchar_t* format,
                     const std::vector<int>& data);
-  void SortItems_INT(uint32_t key_column, mk::ListView::SORT sort);
+  void SortItems_INT(uint32_t key_column);
 
   // SortItems_DOUBLE must be called to sort column which items are set by
   // SetItems_DOUBLE.
   void SetItems_DOUBLE(uint32_t column, const wchar_t* format,
                        const std::vector<double>& data);
-  void SortItems_DOUBLE(uint32_t key_column, mk::ListView::SORT sort);
+  void SortItems_DOUBLE(uint32_t key_column);
 
   //
   // Methods for data output.
@@ -83,7 +83,7 @@ class ListView {
  private:
   void ResizeRow(uint32_t old_row_max, uint32_t new_row_max);
   void ResizeColumn(uint32_t old_column_max, uint32_t new_column_max);
-  void SetHeaderArrow(uint32_t column, mk::ListView::SORT sort);
+  void ToggleSortStatus(uint32_t key_column);
   static int CALLBACK Compare_TEXT(LPARAM lParam1, LPARAM lParam2,
                                    LPARAM lParamSort);
   static int CALLBACK Compare_INT(LPARAM lParam1, LPARAM lParam2,
@@ -93,8 +93,9 @@ class ListView {
 
  private:
   mk::ListView::MODE _mode;
-  mk::ListView::SORT _sort;  // For sort.
-  uint32_t _key_column;      // For sort.
+  mk::ListView::SORT _sort_order;  // For sort.
+  uint32_t _last_key_column;       // For sort.
+  uint32_t _key_column;            // For sort.
   HWND _hListView;
   HWND _hHeader;
   uint32_t _row_max;

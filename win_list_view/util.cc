@@ -23,19 +23,4 @@ std::wstring SynthString(const wchar_t* format, ...) {
   return buffer;
 }
 
-void ToggleSortStatus(mk::ListView::SORT* sort) {
-  switch (*sort) {
-    case mk::ListView::SORT::DESCENDING:
-      *sort = mk::ListView::SORT::ASCENDING;
-      break;
-    case mk::ListView::SORT::ASCENDING:
-      *sort = mk::ListView::SORT::DESCENDING;
-      break;
-    default:
-      // none.
-      break;
-  };
-  return;
-}
-
 }  // namespace mk

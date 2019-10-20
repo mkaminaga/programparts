@@ -27,7 +27,8 @@ namespace mk {
 ListView::ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
                    uint32_t column_max)
     : _hListView(hListView),
-      _sort(mk::ListView::SORT::NONE),
+      _sort_order(mk::ListView::SORT::ASCENDING),
+      _last_key_column(0),
       _key_column(0),
       _row_max(0),
       _column_max(0) {
@@ -37,7 +38,7 @@ ListView::ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
 }
 
 ListView::~ListView() {
-  ListView::_sort = mk::ListView::SORT::NONE;
+  ListView::_sort_order = mk::ListView::SORT::ASCENDING;
   return;
 }
 
@@ -196,20 +197,10 @@ void ListView::SetItems_TEXT(uint32_t column,
   return;
 }
 
-void ListView::SortItems_TEXT(uint32_t key_column, mk::ListView::SORT sort) {
+void ListView::SortItems_TEXT(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
-  // Actually sort data.
-  _sort = sort;
-  _key_column = key_column;
   ListView_SortItems(_hListView, &ListView::Compare_TEXT, this);
-  // Change header arrow.
-  for (uint32_t i = 0; i < _column_max; i++) {
-    if (i == key_column) {
-      SetHeaderArrow(key_column, sort);
-    } else {
-      SetHeaderArrow(key_column, mk::ListView::SORT::NONE);
-    }
-  }
+  ToggleSortStatus(key_column);
   return;
 }
 
@@ -240,20 +231,10 @@ void ListView::SetItems_INT(uint32_t column, const wchar_t* format,
   return;
 }
 
-void ListView::SortItems_INT(uint32_t key_column, mk::ListView::SORT sort) {
+void ListView::SortItems_INT(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
-  // Actually sort data.
-  _sort = sort;
-  _key_column = key_column;
   ListView_SortItems(_hListView, &ListView::Compare_INT, this);
-  // Change header arrow.
-  for (uint32_t i = 0; i < _column_max; i++) {
-    if (i == key_column) {
-      SetHeaderArrow(key_column, sort);
-    } else {
-      SetHeaderArrow(key_column, mk::ListView::SORT::NONE);
-    }
-  }
+  ToggleSortStatus(key_column);
   return;
 }
 
@@ -284,20 +265,10 @@ void ListView::SetItems_DOUBLE(uint32_t column, const wchar_t* format,
   return;
 }
 
-void ListView::SortItems_DOUBLE(uint32_t key_column, mk::ListView::SORT sort) {
+void ListView::SortItems_DOUBLE(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
-  // Actually sort data.
-  _sort = sort;
-  _key_column = key_column;
   ListView_SortItems(_hListView, &ListView::Compare_DOUBLE, this);
-  // Change header arrow.
-  for (uint32_t i = 0; i < _column_max; i++) {
-    if (i == key_column) {
-      SetHeaderArrow(key_column, sort);
-    } else {
-      SetHeaderArrow(key_column, mk::ListView::SORT::NONE);
-    }
-  }
+  ToggleSortStatus(key_column);
   return;
 }
 
@@ -351,25 +322,50 @@ void ListView::ResizeColumn(uint32_t old_column_max, uint32_t new_column_max) {
   return;
 }
 
-void ListView::SetHeaderArrow(uint32_t column, mk::ListView::SORT sort) {
-  ASSERT_COLUMN(column);
+void ListView::ToggleSortStatus(uint32_t key_column) {
   HDITEM hdi;
   ZeroMemory(&hdi, sizeof(hdi));
   hdi.mask = HDI_FORMAT;
-  Header_GetItem(_hHeader, column, &hdi);
+  Header_GetItem(_hHeader, key_column, &hdi);
   hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
-  switch (sort) {
-    case mk::ListView::SORT::DESCENDING:
-      hdi.fmt |= HDF_SORTDOWN;
-      break;
-    case mk::ListView::SORT::ASCENDING:
-      hdi.fmt |= HDF_SORTUP;
-      break;
-    default:
-      // none.
-      break;
+  if (key_column == _last_key_column) {
+    // Sort key column is not changed.
+    // Toggle sort status in current key.
+    switch (_sort_order) {
+      case mk::ListView::SORT::DESCENDING:
+        // Descending order to ascending order.
+        hdi.fmt |= HDF_SORTUP;
+        Header_SetItem(_hHeader, key_column, &hdi);
+        // Set sort status.
+        _sort_order = mk::ListView::SORT::ASCENDING;
+        break;
+      case mk::ListView::SORT::ASCENDING:
+        // Ascending order to descending order.
+        hdi.fmt |= HDF_SORTDOWN;
+        Header_SetItem(_hHeader, key_column, &hdi);
+        // Set sort status.
+        _sort_order = mk::ListView::SORT::DESCENDING;
+        break;
+      default:
+        // none.
+        break;
+    }
+  } else {
+    // Sort key column is changed.
+    // Set new header arrow key.
+    hdi.fmt |= HDF_SORTDOWN;  // Descending.
+    Header_SetItem(_hHeader, key_column, &hdi);
+    // Reset last header arrow key.
+    ZeroMemory(&hdi, sizeof(hdi));
+    hdi.mask = HDI_FORMAT;
+    Header_GetItem(_hHeader, _last_key_column, &hdi);
+    hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
+    Header_SetItem(_hHeader, _last_key_column, &hdi);
+    // Set sort status.
+    _sort_order = mk::ListView::SORT::ASCENDING;
   }
-  Header_SetItem(_hHeader, column, &hdi);
+  _key_column = key_column;
+  _last_key_column = _key_column;
   return;
 }
 

@@ -36,7 +36,6 @@ uint32_t row_max = 3;
 uint32_t col_max = 3;
 uint32_t select_column = 0;
 std::vector<uint32_t> icon_id;
-std::vector<mk::ListView::SORT> sort_status;
 std::vector<std::wstring> data_s;
 std::vector<int> data_d;
 std::vector<double> data_f;
@@ -61,25 +60,21 @@ void ResetListViewForReportMode() {
   };
   data_d = {
       0,
-      2,
       1,
+      2,
   };
   data_f = {
-      4.0,
       3.0,
+      4.0,
       5.0,
   };
   list_view->SetItems_TEXT(0, data_s);
   list_view->SetItems_INT(1, L"%d", data_d);
-  list_view->SetItems_DOUBLE(2, L"%5.1f", data_f);
+  list_view->SetItems_DOUBLE(2, L"%5.3f", data_f);
 
   // Set header.
-  sort_status = {
-      mk::ListView::SORT::ASCENDING,
-      mk::ListView::SORT::NONE,
-      mk::ListView::SORT::NONE,
-  };
-  list_view->SortItems_TEXT(0, sort_status[0]);
+  list_view->SortItems_TEXT(0);
+  list_view->SortItems_TEXT(0);
 
   // Icon image list.
   SHFILEINFO file_info;
@@ -221,9 +216,6 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
         color_FG.resize(row_max);
         color_BG.resize(row_max);
       }
-      if (sort_status.size() < col_max) {
-        sort_status.resize(col_max);
-      }
       // Debug string output.
       out_edit->Add(L"IDSETSIZE\n");
       out_edit->Add(L"row_max = %d, col_max = %d\n", row_max, col_max);
@@ -266,27 +258,25 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       case HDN_ITEMCLICK:
       case HDN_ITEMDBLCLICK: {
         LPNMHEADERA hd = (LPNMHEADERA)nmhdr;
-        assert(sort_status.size() >= static_cast<uint32_t>(hd->iItem));
         // Debug string output.
         out_edit->Add(L"HDN_ITEMCLICK\n");
         out_edit->Add(L"index = %d\n", hd->iItem);
         // Header click sort.
         for (uint32_t i = 0; i < col_max; i++) {
           if (i == static_cast<uint32_t>(hd->iItem)) {
-            mk::ToggleSortStatus(&(sort_status[i]));
             switch (i) {
               case 0:
-                list_view->SortItems_TEXT(0, sort_status[i]);
+                list_view->SortItems_TEXT(0);
                 out_edit->Add(L"sorted by TEXT.\n");
                 out_edit->Add(L"\n");
                 break;
               case 1:
-                list_view->SortItems_INT(1, sort_status[i]);
+                list_view->SortItems_INT(1);
                 out_edit->Add(L"sorted by INT.\n");
                 out_edit->Add(L"\n");
                 break;
               case 2:
-                list_view->SortItems_DOUBLE(2, sort_status[i]);
+                list_view->SortItems_DOUBLE(2);
                 out_edit->Add(L"sorted by DOUBLE.\n");
                 out_edit->Add(L"\n");
                 break;
@@ -294,8 +284,6 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
                 // none.
                 break;
             }
-          } else {
-            sort_status[i] = mk::ListView::SORT::NONE;
           }
         }
       } break;
