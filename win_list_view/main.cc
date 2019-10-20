@@ -104,14 +104,10 @@ void ResetListViewForReportMode() {
 
   // Set header.
   list_view->FixHeader(true);
-
   header_arrow.resize(col_max);
   header_arrow[0] = mk::ListView::ARROW::UP;
   header_arrow[1] = mk::ListView::ARROW::DOWN;
   header_arrow[2] = mk::ListView::ARROW::NONE;
-  list_view->SetHeaderArrow(0, header_arrow[0]);
-  list_view->SetHeaderArrow(1, header_arrow[1]);
-  list_view->SetHeaderArrow(2, header_arrow[2]);
 
   // Prepare user color.
   color_FG.resize(row_max);
@@ -280,30 +276,14 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       case LVN_COLUMNCLICK: {
         LPNMLISTVIEW lv = (LPNMLISTVIEW)nmhdr;
         assert(header_arrow.size() >= static_cast<uint32_t>(lv->iSubItem));
-        ToggleArrow(&header_arrow[lv->iSubItem]);
-#if 1
         for (uint32_t i = 0; i < col_max; i++) {
           if (i == static_cast<uint32_t>(lv->iSubItem)) {
-            list_view->SetHeaderArrow(lv->iSubItem, header_arrow[lv->iSubItem]);
+            ToggleArrow(&header_arrow[i]);
+            list_view->SetHeaderArrow(i, header_arrow[lv->iSubItem]);
           } else {
             header_arrow[i] = mk::ListView::NONE;
           }
         }
-#else
-        HWND hHeader = ListView_GetHeader(GetDlgItem(hwndDlg, IDC_LIST1));
-        HDITEMA hdi;
-        ZeroMemory(&hdi, sizeof(hdi));
-        hdi.mask = HDI_FORMAT;
-        Header_GetItem(hHeader, 0, &hdi);
-        // hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
-        hdi.fmt |= HDF_FIXEDWIDTH;  // HDF_SORTUP;
-        hdi.fmt &= ~HDS_DRAGDROP;   // Disable D&D.
-        hdi.fmt |= HDS_NOSIZING;    // Disable sizing.
-        Header_SetItem(hHeader, 0, &hdi);
-        out_edit->Add(L"Header Handle\n");
-        out_edit->Add(L"hHeader = %d\n", hHeader);
-        out_edit->Add(L"\n");
-#endif
         // Debug string output.
         out_edit->Add(L"LVN_COLUMNCLICK\n");
         out_edit->Add(L"column = %d\n", lv->iSubItem);
