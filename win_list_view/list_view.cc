@@ -27,6 +27,7 @@ void ListView::Resize(mk::ListView::MODE mode, uint32_t row_max,
                       uint32_t column_max) {
   const uint32_t old_row_max = _row_max;
   const uint32_t old_column_max = _column_max;
+  _mode = mode;
   _row_max = row_max;
   _column_max = column_max;
   ListView_SetExtendedListViewStyleEx(
@@ -59,7 +60,23 @@ void ListView::SetFocus() {
 }
 
 void ListView::SetImageList(HIMAGELIST hImageList) {
-  ListView_SetImageList(_hListView, hImageList, LVSIL_NORMAL);
+  switch (_mode) {
+    case ICON:
+      // Reserved.
+      break;
+    case SMALLICON:
+      // Reserved.
+      break;
+    case LIST:
+      // Reserved.
+      break;
+    case REPORT:
+      ListView_SetImageList(_hListView, hImageList, LVSIL_SMALL);
+      break;
+    default:
+      // none.
+      break;
+  }
   return;
 }
 

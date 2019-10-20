@@ -34,6 +34,7 @@ std::unique_ptr<mk::Edit> select_edit;
 uint32_t row_max = 3;
 uint32_t col_max = 3;
 uint32_t select_column = 0;
+std::vector<uint32_t> icon_id;
 std::vector<uint32_t> data_d;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
@@ -68,6 +69,26 @@ void ResetListViewForReportMode() {
   list_view->SetText(0, data_s);
   list_view->SetData(1, L"%d", data_d);
   list_view->SetData(2, L"%5.3f", data_f);
+
+  // Icon image list.
+  SHFILEINFO file_info;
+  HIMAGELIST hImageList =
+      (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &file_info, sizeof(file_info),
+                                SHGFI_SYSICONINDEX | SHGFI_LARGEICON);
+  list_view->SetImageList(hImageList);
+
+  // Icon image.
+  icon_id.resize(3);
+  SHGetFileInfo(L"apple.ico", 0, &file_info, sizeof(file_info),
+                SHGFI_SYSICONINDEX);
+  icon_id[0] = file_info.iIcon;
+  SHGetFileInfo(L"banana.ico", 0, &file_info, sizeof(file_info),
+                SHGFI_SYSICONINDEX);
+  icon_id[1] = file_info.iIcon;
+  SHGetFileInfo(L"grape.ico", 0, &file_info, sizeof(file_info),
+                SHGFI_SYSICONINDEX);
+  icon_id[2] = file_info.iIcon;
+  list_view->SetIcon(0, icon_id);
 
   // Set column.
   list_view->SetColumnText(0, L"col 0");

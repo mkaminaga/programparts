@@ -57,6 +57,7 @@ class ListView {
   void ResizeColumn(uint32_t old_column_max, uint32_t new_column_max);
 
  private:
+  ListView::MODE _mode;
   HWND _hListView;
   uint32_t _row_max;
   uint32_t _column_max;
