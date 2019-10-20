@@ -8,6 +8,7 @@
 #ifndef LIST_VIEW_H_
 #define LIST_VIEW_H_
 
+#include <stdint.h>
 #include <windows.h>
 #include <string>
 #include <vector>
@@ -24,38 +25,41 @@ class ListView {
     LIST,
     REPORT,
   };
-  ListView(HWND hListView, mk::ListView::MODE mode, int row_max,
-           int column_max);
+  ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
+           uint32_t column_max);
   virtual ~ListView();
 
   // Methods to set properties.
-  void Resize(mk::ListView::MODE mode, int row_max, int column_max);
-  void SetColumnWidth(int column, int width);
-  void SetColumnText(int column, const wchar_t* text);
-  void SelectItem(int item);
+  void Resize(mk::ListView::MODE mode, uint32_t row_max, uint32_t column_max);
+  void SetColumnWidth(uint32_t column, uint32_t width);
+  void SetColumnText(uint32_t column, const wchar_t* text);
+  void SelectItem(uint32_t item);
   void SetFocus();
+  void SetImageList(HIMAGELIST hImageList);
 
   // Methods for data input.
-  void SetText(int column, const std::vector<std::wstring>& data);
+  void SetText(uint32_t column, const std::vector<std::wstring>& data);
+  void SetIcon(uint32_t column, const std::vector<uint32_t>& index);
   template <typename T>
-  void SetData(int column, const wchar_t* format, const std::vector<T>& data);
+  void SetData(uint32_t column, const wchar_t* format,
+               const std::vector<T>& data);
 
   // Methods for data output.
   HWND GetHandle();
-  UINT GetSelectedItem();
-  void GetText(int column, std::vector<std::wstring>* data);
+  uint32_t GetSelectedItem();
+  void GetText(uint32_t column, std::vector<std::wstring>* data);
 
   // Methods for global purpose.
   static bool EnableListView();
 
  private:
-  void ResizeRow(int old_row_max, int new_row_max);
-  void ResizeColumn(int old_column_max, int new_column_max);
+  void ResizeRow(uint32_t old_row_max, uint32_t new_row_max);
+  void ResizeColumn(uint32_t old_column_max, uint32_t new_column_max);
 
  private:
   HWND _hListView;
-  int _row_max;
-  int _column_max;
+  uint32_t _row_max;
+  uint32_t _column_max;
 };
 
 }  // namespace mk

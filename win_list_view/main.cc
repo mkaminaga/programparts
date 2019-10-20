@@ -4,7 +4,9 @@
 // @author Mamoru Kaminaga
 // @date 2019-10-12 15:43:10
 // Copyright 2019 Mamoru Kaminaga
+//
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
@@ -29,10 +31,10 @@ std::unique_ptr<mk::Edit> col_edit;
 std::unique_ptr<mk::Edit> width_edit;
 std::unique_ptr<mk::Edit> select_edit;
 
-int row_max = 3;
-int col_max = 3;
-int select_column = 0;
-std::vector<int> data_d;
+uint32_t row_max = 3;
+uint32_t col_max = 3;
+uint32_t select_column = 0;
+std::vector<uint32_t> data_d;
 std::vector<double> data_f;
 std::vector<std::wstring> data_s;
 std::vector<COLORREF> color_FG;
@@ -164,11 +166,11 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
     case IDGETITEM: {
       out_edit->Add(L"IDGETITEM\n");
       std::vector<std::wstring> data;
-      for (int i = 0; i < col_max; i++) {
+      for (uint32_t i = 0; i < col_max; i++) {
         list_view->GetText(i, &data);
         // Debug string output.
         out_edit->Add(L"  column = %d:\n", i);
-        for (unsigned int j = 0; j < data.size(); j++) {
+        for (uint32_t j = 0; j < data.size(); j++) {
           out_edit->Add(L"    item = %s\n", data[j].c_str());
         }
       }
@@ -180,7 +182,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
     case IDSETSIZE: {
       row_max = std::stoi(row_edit->Get());
       col_max = std::stoi(col_edit->Get());
-      if (data_d.size() < static_cast<int>(row_max)) {
+      if (data_d.size() < row_max) {
         data_d.resize(row_max);
         data_f.resize(row_max);
         data_s.resize(row_max);
@@ -195,7 +197,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       list_view->Resize(mk::ListView::MODE::REPORT, row_max, col_max);
     } break;
     case IDSETWIDTH: {
-      int width = std::stoi(width_edit->Get());
+      uint32_t width = std::stoi(width_edit->Get());
       list_view->SetColumnWidth(0, width);
       // Debug string output.
       out_edit->Add(L"IDSETWIDTH\n");
@@ -204,7 +206,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       break;
     }
     case IDSETSELECT: {
-      int item = std::stoi(select_edit->Get());
+      uint32_t item = std::stoi(select_edit->Get());
       if ((item < 0) || (item > row_max)) {
         out_edit->Add(L"Invalid range\n");
         break;
