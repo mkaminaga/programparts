@@ -200,7 +200,7 @@ void ListView::SetItems_TEXT(uint32_t column,
 void ListView::SortItems_TEXT(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
   ListView_SortItems(_hListView, &ListView::Compare_TEXT, this);
-  ToggleSortStatus(key_column);
+  UpdateHeader(key_column);
   return;
 }
 
@@ -234,7 +234,7 @@ void ListView::SetItems_INT(uint32_t column, const wchar_t* format,
 void ListView::SortItems_INT(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
   ListView_SortItems(_hListView, &ListView::Compare_INT, this);
-  ToggleSortStatus(key_column);
+  UpdateHeader(key_column);
   return;
 }
 
@@ -268,7 +268,7 @@ void ListView::SetItems_DOUBLE(uint32_t column, const wchar_t* format,
 void ListView::SortItems_DOUBLE(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
   ListView_SortItems(_hListView, &ListView::Compare_DOUBLE, this);
-  ToggleSortStatus(key_column);
+  UpdateHeader(key_column);
   return;
 }
 
@@ -322,28 +322,16 @@ void ListView::ResizeColumn(uint32_t old_column_max, uint32_t new_column_max) {
   return;
 }
 
-void ListView::ToggleSortStatus(uint32_t key_column) {
-  HDITEM hdi;
-  ZeroMemory(&hdi, sizeof(hdi));
-  hdi.mask = HDI_FORMAT;
-  Header_GetItem(_hHeader, key_column, &hdi);
-  hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
-  if (key_column == _last_key_column) {
-    // Sort key column is not changed.
-    // Toggle sort status in current key.
+void ListView::UpdateHeader(uint32_t new_key_column) {
+  if (new_key_column == _last_key_column) {
+    // Toggle sort state of current sort key column.
     switch (_sort_order) {
       case mk::ListView::SORT::DESCENDING:
-        // Descending order to ascending order.
-        hdi.fmt |= HDF_SORTUP;
-        Header_SetItem(_hHeader, key_column, &hdi);
-        // Set sort status.
+        SetSortArrow(new_key_column, mk::ListView::SORT::ASCENDING);
         _sort_order = mk::ListView::SORT::ASCENDING;
         break;
       case mk::ListView::SORT::ASCENDING:
-        // Ascending order to descending order.
-        hdi.fmt |= HDF_SORTDOWN;
-        Header_SetItem(_hHeader, key_column, &hdi);
-        // Set sort status.
+        SetSortArrow(new_key_column, mk::ListView::SORT::DESCENDING);
         _sort_order = mk::ListView::SORT::DESCENDING;
         break;
       default:
@@ -351,22 +339,36 @@ void ListView::ToggleSortStatus(uint32_t key_column) {
         break;
     }
   } else {
-    // Sort key column is changed.
-    // Set new header arrow key.
-    hdi.fmt |= HDF_SORTDOWN;  // Descending.
-    Header_SetItem(_hHeader, key_column, &hdi);
-    // Reset last header arrow key.
-    ZeroMemory(&hdi, sizeof(hdi));
-    hdi.mask = HDI_FORMAT;
-    Header_GetItem(_hHeader, _last_key_column, &hdi);
-    hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
-    Header_SetItem(_hHeader, _last_key_column, &hdi);
-    // Set sort status.
-    _sort_order = mk::ListView::SORT::ASCENDING;
+    // Set arrow of header key of new sort key column.
+    SetSortArrow(new_key_column, mk::ListView::SORT::DESCENDING);
+    _sort_order = mk::ListView::SORT::DESCENDING;
+    // Clear arrow of header key of last sort key column.
+    SetSortArrow(_last_key_column, mk::ListView::SORT::NONE);
   }
-  _key_column = key_column;
+  _key_column = new_key_column;
   _last_key_column = _key_column;
   return;
+}
+
+void ListView::SetSortArrow(uint32_t column, mk::ListView::SORT sort_order) {
+  ASSERT_COLUMN(column);
+  HDITEM hdi;
+  ZeroMemory(&hdi, sizeof(hdi));
+  hdi.mask = HDI_FORMAT;
+  Header_GetItem(_hHeader, _last_key_column, &hdi);
+  hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
+  switch (sort_order) {
+    case mk::ListView::SORT::DESCENDING:
+      hdi.fmt |= HDF_SORTDOWN;
+      break;
+    case mk::ListView::SORT::ASCENDING:
+      hdi.fmt |= HDF_SORTUP;
+      break;
+    default:
+      // none.
+      break;
+  }
+  Header_SetItem(_hHeader, column, &hdi);
 }
 
 int CALLBACK ListView::Compare_TEXT(LPARAM lParam1, LPARAM lParam2,

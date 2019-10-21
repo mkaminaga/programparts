@@ -83,7 +83,8 @@ class ListView {
  private:
   void ResizeRow(uint32_t old_row_max, uint32_t new_row_max);
   void ResizeColumn(uint32_t old_column_max, uint32_t new_column_max);
-  void ToggleSortStatus(uint32_t key_column);
+  void UpdateHeader(uint32_t key_column);
+  void SetSortArrow(uint32_t column, mk::ListView::SORT sort_order);
   static int CALLBACK Compare_TEXT(LPARAM lParam1, LPARAM lParam2,
                                    LPARAM lParamSort);
   static int CALLBACK Compare_INT(LPARAM lParam1, LPARAM lParam2,
