@@ -45,3 +45,7 @@ void ListView::FixHeader(bool fixment) {
   return;
 }
 ヘッダを固定できない。
+
+/// デバッグコード ///
+MessageBox(NULL, (LPCWSTR)std::to_wstring(_data_sotrage.size()).c_str(), L"Row", MB_OK);
+MessageBox(NULL, (LPCWSTR)std::to_wstring(_data_sotrage[0].size()).c_str(), L"Column", MB_OK);

@@ -71,10 +71,7 @@ void ResetListViewForReportMode() {
   list_view->SetItems_TEXT(0, data_s);
   list_view->SetItems_INT(1, L"%d", data_d);
   list_view->SetItems_DOUBLE(2, L"%5.3f", data_f);
-
-  // Set header.
-  list_view->SortItems_TEXT(0);
-  list_view->SortItems_TEXT(0);
+  list_view->SortItems(0);
 
   // Icon image list.
   SHFILEINFO file_info;
@@ -258,34 +255,11 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       case HDN_ITEMCLICK:
       case HDN_ITEMDBLCLICK: {
         LPNMHEADERA hd = (LPNMHEADERA)nmhdr;
+        list_view->SortItems(hd->iItem);
         // Debug string output.
         out_edit->Add(L"HDN_ITEMCLICK\n");
-        out_edit->Add(L"index = %d\n", hd->iItem);
-        // Header click sort.
-        for (uint32_t i = 0; i < col_max; i++) {
-          if (i == static_cast<uint32_t>(hd->iItem)) {
-            switch (i) {
-              case 0:
-                list_view->SortItems_TEXT(0);
-                out_edit->Add(L"sorted by TEXT.\n");
-                out_edit->Add(L"\n");
-                break;
-              case 1:
-                list_view->SortItems_INT(1);
-                out_edit->Add(L"sorted by INT.\n");
-                out_edit->Add(L"\n");
-                break;
-              case 2:
-                list_view->SortItems_DOUBLE(2);
-                out_edit->Add(L"sorted by DOUBLE.\n");
-                out_edit->Add(L"\n");
-                break;
-              default:
-                // none.
-                break;
-            }
-          }
-        }
+        out_edit->Add(L"sorted by column %d.\n", hd->iItem);
+        out_edit->Add(L"\n");
       } break;
       default:
         // none.

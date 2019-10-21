@@ -27,7 +27,7 @@ namespace mk {
 ListView::ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
                    uint32_t column_max)
     : _hListView(hListView),
-      _sort_order(mk::ListView::SORT::ASCENDING),
+      _sort_order(mk::ListView::SORTORDER::UP),
       _last_key_column(0),
       _key_column(0),
       _row_max(0),
@@ -38,17 +38,14 @@ ListView::ListView(HWND hListView, mk::ListView::MODE mode, uint32_t row_max,
 }
 
 ListView::~ListView() {
-  ListView::_sort_order = mk::ListView::SORT::ASCENDING;
+  ListView::_sort_order = mk::ListView::SORTORDER::UP;
   return;
 }
 
-void ListView::Resize(mk::ListView::MODE mode, uint32_t row_max,
-                      uint32_t column_max) {
+void ListView::Resize(mk::ListView::MODE mode, uint32_t new_row_max,
+                      uint32_t new_column_max) {
   const uint32_t old_row_max = _row_max;
   const uint32_t old_column_max = _column_max;
-  _mode = mode;
-  _row_max = row_max;
-  _column_max = column_max;
   ListView_SetExtendedListViewStyleEx(
       _hListView, LVS_ICON | LVS_SMALLICON | LVS_LIST | LVS_REPORT, 0);
   switch (mode) {
@@ -65,12 +62,22 @@ void ListView::Resize(mk::ListView::MODE mode, uint32_t row_max,
       DWORD mask = LVS_REPORT | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT |
                    LVS_EX_HEADERDRAGDROP;
       ListView_SetExtendedListViewStyleEx(_hListView, mask, mask);
-      ResizeRow(old_row_max, _row_max);
-      ResizeColumn(old_column_max, _column_max);
+      ResizeRow(old_row_max, new_row_max);
+      ResizeColumn(old_column_max, new_column_max);
     } break;
     default:
       break;
   }
+  // Resize data storage.
+  _mirror_data.resize(new_column_max);
+  for (auto& it : _mirror_data) {
+    it.resize(new_row_max);
+  }
+  _data_type.resize(new_column_max);
+  // Copy to member.
+  _mode = mode;
+  _row_max = new_row_max;
+  _column_max = new_column_max;
   return;
 }
 
@@ -188,19 +195,16 @@ void ListView::SetItems_TEXT(uint32_t column,
     lvi.cchTextMax = data[i].size();
     if (column == 0) {
       lvi.mask = LVIF_TEXT | LVIF_PARAM;
-      lvi.lParam = i;  // Referenced in Compare_TEXT.
+      lvi.lParam = i;  // Referred in CompareFunction.
     } else {
       lvi.mask = LVIF_TEXT;
     }
     ListView_SetItem(_hListView, &lvi);
+    _mirror_data[column][i] =
+        (LPARAM)data[i].c_str();  // Referred in CompareFunction.
   }
-  return;
-}
-
-void ListView::SortItems_TEXT(uint32_t key_column) {
-  ASSERT_COLUMN(key_column);
-  ListView_SortItems(_hListView, &ListView::Compare_TEXT, this);
-  UpdateHeader(key_column);
+  // Register data type for efficient sort.
+  _data_type[column] = mk::ListView::DATATYPE::TEXT;
   return;
 }
 
@@ -221,20 +225,16 @@ void ListView::SetItems_INT(uint32_t column, const wchar_t* format,
     lvi.iItem = i;
     if (column == 0) {
       lvi.mask = LVIF_TEXT | LVIF_PARAM;
-      lvi.lParam = i;  // Referenced in Compare_INT.
+      lvi.lParam = i;  // Referred in CompareFunction.
     } else {
       lvi.mask = LVIF_TEXT;
     }
     swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
     ListView_SetItem(_hListView, &lvi);
+    _mirror_data[column][i] = (LPARAM)data[i];  // Referred in CompareFunction.
   }
-  return;
-}
-
-void ListView::SortItems_INT(uint32_t key_column) {
-  ASSERT_COLUMN(key_column);
-  ListView_SortItems(_hListView, &ListView::Compare_INT, this);
-  UpdateHeader(key_column);
+  // Register data type for efficient sort.
+  _data_type[column] = mk::ListView::DATATYPE::INT;
   return;
 }
 
@@ -255,20 +255,48 @@ void ListView::SetItems_DOUBLE(uint32_t column, const wchar_t* format,
     lvi.iItem = i;
     if (column == 0) {
       lvi.mask = LVIF_TEXT | LVIF_PARAM;
-      lvi.lParam = i;  // Referenced in Compare_DOUBLE.
+      lvi.lParam = i;  // Referred in CompareFunction.
     } else {
       lvi.mask = LVIF_TEXT;
     }
     swprintf_s(buffer, ARRAYSIZE(buffer), format, data[i]);
     ListView_SetItem(_hListView, &lvi);
+    _mirror_data[column][i] = (LPARAM)data[i];  // Referred in CompareFunction.
   }
+  // Register data itself and its type for efficient sort.
+  _data_type[column] = mk::ListView::DATATYPE::DOUBLE;
   return;
 }
 
-void ListView::SortItems_DOUBLE(uint32_t key_column) {
+void ListView::SortItems(uint32_t key_column) {
   ASSERT_COLUMN(key_column);
-  ListView_SortItems(_hListView, &ListView::Compare_DOUBLE, this);
-  UpdateHeader(key_column);
+  // Header arrow is updated.
+  if (key_column == _last_key_column) {
+    // Toggle sort state of current sort key column.
+    switch (_sort_order) {
+      case mk::ListView::SORTORDER::DOWN:
+        SetSortArrow(key_column, mk::ListView::SORTORDER::UP);
+        _sort_order = mk::ListView::SORTORDER::UP;
+        break;
+      case mk::ListView::SORTORDER::UP:
+        SetSortArrow(key_column, mk::ListView::SORTORDER::DOWN);
+        _sort_order = mk::ListView::SORTORDER::DOWN;
+        break;
+      default:
+        // none.
+        break;
+    }
+  } else {
+    // Set arrow of header key of new sort key column.
+    SetSortArrow(key_column, mk::ListView::SORTORDER::DOWN);
+    _sort_order = mk::ListView::SORTORDER::DOWN;
+    // Clear arrow of header key of last sort key column.
+    SetSortArrow(_last_key_column, mk::ListView::SORTORDER::NONE);
+  }
+  _key_column = key_column;
+  _last_key_column = _key_column;
+  // Sorted by _key_column.
+  ListView_SortItems(_hListView, &ListView::CompareFunction, this);
   return;
 }
 
@@ -322,35 +350,8 @@ void ListView::ResizeColumn(uint32_t old_column_max, uint32_t new_column_max) {
   return;
 }
 
-void ListView::UpdateHeader(uint32_t new_key_column) {
-  if (new_key_column == _last_key_column) {
-    // Toggle sort state of current sort key column.
-    switch (_sort_order) {
-      case mk::ListView::SORT::DESCENDING:
-        SetSortArrow(new_key_column, mk::ListView::SORT::ASCENDING);
-        _sort_order = mk::ListView::SORT::ASCENDING;
-        break;
-      case mk::ListView::SORT::ASCENDING:
-        SetSortArrow(new_key_column, mk::ListView::SORT::DESCENDING);
-        _sort_order = mk::ListView::SORT::DESCENDING;
-        break;
-      default:
-        // none.
-        break;
-    }
-  } else {
-    // Set arrow of header key of new sort key column.
-    SetSortArrow(new_key_column, mk::ListView::SORT::DESCENDING);
-    _sort_order = mk::ListView::SORT::DESCENDING;
-    // Clear arrow of header key of last sort key column.
-    SetSortArrow(_last_key_column, mk::ListView::SORT::NONE);
-  }
-  _key_column = new_key_column;
-  _last_key_column = _key_column;
-  return;
-}
-
-void ListView::SetSortArrow(uint32_t column, mk::ListView::SORT sort_order) {
+void ListView::SetSortArrow(uint32_t column,
+                            mk::ListView::SORTORDER sort_order) {
   ASSERT_COLUMN(column);
   HDITEM hdi;
   ZeroMemory(&hdi, sizeof(hdi));
@@ -358,10 +359,10 @@ void ListView::SetSortArrow(uint32_t column, mk::ListView::SORT sort_order) {
   Header_GetItem(_hHeader, _last_key_column, &hdi);
   hdi.fmt &= ~(HDF_SORTDOWN | HDF_SORTUP | HDF_IMAGE | HDF_BITMAP);
   switch (sort_order) {
-    case mk::ListView::SORT::DESCENDING:
+    case mk::ListView::SORTORDER::DOWN:
       hdi.fmt |= HDF_SORTDOWN;
       break;
-    case mk::ListView::SORT::ASCENDING:
+    case mk::ListView::SORTORDER::UP:
       hdi.fmt |= HDF_SORTUP;
       break;
     default:
@@ -371,97 +372,66 @@ void ListView::SetSortArrow(uint32_t column, mk::ListView::SORT sort_order) {
   Header_SetItem(_hHeader, column, &hdi);
 }
 
-int CALLBACK ListView::Compare_TEXT(LPARAM lParam1, LPARAM lParam2,
-                                    LPARAM lParamSort) {
+int CALLBACK ListView::CompareFunction(LPARAM lParam1, LPARAM lParam2,
+                                       LPARAM lParamSort) {
   ListView* list_view = (ListView*)lParamSort;
-  const int item1 = (int)lParam1;
-  const int item2 = (int)lParam2;
-  LVITEM lvi;
-  ZeroMemory(&lvi, sizeof(lvi));
-  lvi.mask = LVIF_TEXT;
-  lvi.iSubItem = list_view->_key_column;
-  // Read first value.
-  lvi.iItem = item1;
-  wchar_t first[MK_LV_BUF_MAX] = {0};
-  lvi.pszText = first;
-  lvi.cchTextMax = ARRAYSIZE(first);
-  ListView_GetItem(list_view->_hListView, &lvi);
-  // Read second value.
-  wchar_t second[MK_LV_BUF_MAX] = {0};
-  lvi.pszText = second;
-  lvi.cchTextMax = ARRAYSIZE(second);
-  lvi.iItem = item2;
-  ListView_GetItem(list_view->_hListView, &lvi);
-  // Comparison.
-  int32_t cmp_result = wcscmp(first, second);
-  if (cmp_result > 0) {
-    return -1;
-  } else if (cmp_result < 0) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-int CALLBACK ListView::Compare_INT(LPARAM lParam1, LPARAM lParam2,
-                                   LPARAM lParamSort) {
-  ListView* list_view = (ListView*)lParamSort;
-  const int item1 = (int)lParam1;
-  const int item2 = (int)lParam2;
-  LVITEM lvi;
-  wchar_t buffer[MK_LV_BUF_MAX] = {0};
-  ZeroMemory(&lvi, sizeof(lvi));
-  lvi.mask = LVIF_TEXT;
-  lvi.iSubItem = list_view->_key_column;
-  lvi.pszText = buffer;
-  lvi.cchTextMax = ARRAYSIZE(buffer);
-  // Read first value.
-  lvi.iItem = item1;
-  ListView_GetItem(list_view->_hListView, &lvi);
-  int first = 0;
-  swscanf_s(buffer, L"%d", &first);
-  // Read second value.
-  lvi.iItem = item2;
-  ListView_GetItem(list_view->_hListView, &lvi);
-  int second = 0;
-  swscanf_s(buffer, L"%d", &second);
-  if (first > second) {
-    return -1;
-  } else if (first < second) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-int CALLBACK ListView::Compare_DOUBLE(LPARAM lParam1, LPARAM lParam2,
-                                      LPARAM lParamSort) {
-  ListView* list_view = (ListView*)lParamSort;
-  const int item1 = (int)lParam1;
-  const int item2 = (int)lParam2;
-  LVITEM lvi;
-  wchar_t buffer[MK_LV_BUF_MAX] = {0};
-  ZeroMemory(&lvi, sizeof(lvi));
-  lvi.mask = LVIF_TEXT;
-  lvi.iSubItem = list_view->_key_column;
-  lvi.pszText = buffer;
-  lvi.cchTextMax = ARRAYSIZE(buffer);
-  // Read first value.
-  lvi.iItem = item1;
-  ListView_GetItem(list_view->_hListView, &lvi);
-  double first = 0;
-  swscanf_s(buffer, L"%lf", &first);
-  // Read second value.
-  lvi.iItem = item2;
-  ListView_GetItem(list_view->_hListView, &lvi);
-  double second = 0;
-  swscanf_s(buffer, L"%lf", &second);
-  if (first > second) {
-    return -1;
-  } else if (first < second) {
-    return 1;
-  } else {
-    return 0;
+  assert((list_view->_column_max >= 0) &&
+         (list_view->_column_max <= list_view->_data_type.size()));
+  const uint32_t item1 = (uint32_t)lParam1;
+  const uint32_t item2 = (uint32_t)lParam2;
+  const uint32_t column = list_view->_key_column;
+  switch (list_view->_data_type[column]) {
+    case mk::ListView::DATATYPE::TEXT: {
+      const wchar_t* first =
+          (const wchar_t*)list_view->_mirror_data[column][item1];
+      const wchar_t* second =
+          (const wchar_t*)list_view->_mirror_data[column][item2];
+#if 0
+      MessageBox(NULL, first, L"TEXT first", MB_OK);
+      MessageBox(NULL, second, L"TEXT first", MB_OK);
+#endif
+      const int cmp_result = wcscmp(first, second);
+      if (cmp_result > 0) {
+        return -1;
+      } else if (cmp_result < 0) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } break;
+    case mk::ListView::DATATYPE::INT: {
+      const int first = (int)list_view->_mirror_data[column][item1];
+      const int second = (int)list_view->_mirror_data[column][item2];
+#if 0
+      MessageBox(NULL, std::to_wstring(first).c_str(), L"INT first", MB_OK);
+      MessageBox(NULL, std::to_wstring(second).c_str(), L"INT second", MB_OK);
+#endif
+      if (first > second) {
+        return -1;
+      } else if (first < second) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } break;
+    case mk::ListView::DATATYPE::DOUBLE: {
+      const double first = (double)list_view->_mirror_data[column][item1];
+      const double second = (double)list_view->_mirror_data[column][item2];
+#if 0
+      MessageBox(NULL, std::to_wstring(first).c_str(), L"DOUBLE first", MB_OK);
+      MessageBox(NULL, std::to_wstring(second).c_str(), L"DOUBLE second", MB_OK);
+#endif
+      if (first > second) {
+        return -1;
+      } else if (first < second) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } break;
+    defaut:
+      // none.
+      break;
   }
 }
 
