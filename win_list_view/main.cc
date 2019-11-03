@@ -35,68 +35,49 @@ std::unique_ptr<mk::Edit> select_edit;
 uint32_t row_max = 3;
 uint32_t col_max = 3;
 uint32_t select_column = 0;
-std::vector<uint32_t> icon_id;
-std::vector<std::wstring> data_s;
-std::vector<int> data_d;
-std::vector<double> data_f;
+mk::TestData test_data;
 std::vector<COLORREF> color_FG;
 std::vector<COLORREF> color_BG;
 
+// For sort.
+mk::TestData sorted_data;
+uint32_t last_key_column = 0;
+mk::ListView::SORTORDER sort_order = mk::ListView::SORTORDER::NONE;
+
 }  // namespace
 
-void ResetListViewForReportMode() {
+void ResetListView() {
+  out_edit->Set(L"Reset ListView in REPORT mode.\n");
+
+  // Resize.
   row_max = 3;
   col_max = 3;
   list_view->Resize(mk::ListView::MODE::REPORT, row_max, col_max);
-  out_edit->Set(L"Reset ListView in REPORT mode.\n");
+  out_edit->Add(L"%d x %d.\n", row_max, col_max);
   row_edit->Set(L"%d", row_max);
   col_edit->Set(L"%d", col_max);
 
-  // Set default data.
-  data_s = {
-      L"Apple",
-      L"Banana",
-      L"Grape",
-  };
-  data_d = {
-      0,
-      1,
-      2,
-  };
-  data_f = {
-      3.0,
-      4.0,
-      5.0,
-  };
-  list_view->SetItems_TEXT(0, data_s);
-  list_view->SetItems_INT(1, L"%d", data_d);
-  list_view->SetItems_DOUBLE(2, L"%5.3f", data_f);
-  list_view->SortItems(0);
-
   // Icon image list.
   SHFILEINFO file_info;
-  HIMAGELIST hImageList =
-      (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, &file_info, sizeof(file_info),
-                                SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
-  list_view->SetImageList(hImageList);
+  list_view->SetImageList(mk::GetImageList(&file_info));
+  test_data.icon_id.resize(3);
+  test_data.icon_id[0] = mk::GetIconId(&file_info, L"apple.ico");
+  test_data.icon_id[1] = mk::GetIconId(&file_info, L"grape.ico");
+  test_data.icon_id[2] = mk::GetIconId(&file_info, L"banana.ico");
+  list_view->SetImage(0, test_data.icon_id);
 
-  // Icon image.
-  icon_id.resize(3);
-  SHGetFileInfo(L"apple.ico", 0, &file_info, sizeof(file_info),
-                SHGFI_SYSICONINDEX);
-  icon_id[0] = file_info.iIcon;
-  SHGetFileInfo(L"banana.ico", 0, &file_info, sizeof(file_info),
-                SHGFI_SYSICONINDEX);
-  icon_id[1] = file_info.iIcon;
-  SHGetFileInfo(L"grape.ico", 0, &file_info, sizeof(file_info),
-                SHGFI_SYSICONINDEX);
-  icon_id[2] = file_info.iIcon;
-  list_view->SetIcon(0, icon_id);
+  // Set data.
+  test_data.data_s = {L"Apple", L"Banana", L"Grape"};
+  test_data.data_d = {0, 1, 2};
+  test_data.data_f = {5.0, 4.0, 3.0};
+  list_view->SetData(0, test_data.data_s, L"%s");
+  list_view->SetData(1, test_data.data_d, L"%d");
+  list_view->SetData(2, test_data.data_f, L"%f");
 
   // Set column.
-  list_view->SetHeaderText(0, L"col 0");
-  list_view->SetHeaderText(1, L"col 1");
-  list_view->SetHeaderText(2, L"col 2");
+  list_view->SetHeaderText(0, L"hoge");
+  list_view->SetHeaderText(1, L"hoo");
+  list_view->SetHeaderText(2, L"bar");
   list_view->SetHeaderWidth(0, 100);
   list_view->SetHeaderWidth(1, 80);
   list_view->SetHeaderWidth(2, 40);
@@ -113,6 +94,12 @@ void ResetListViewForReportMode() {
   for (auto& c : color_BG) {
     c = RGB(0xFF, 0xDA, 0x90);
   }
+
+  // Initial sort.
+  last_key_column = -1;
+  sort_order = mk::ListView::SORTORDER::NONE;
+  mk::SortListViewItems(list_view.get(), &test_data, &sorted_data, 0,
+                        &last_key_column, &sort_order);
 }
 
 BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
@@ -138,7 +125,7 @@ BOOL Cls_OnInitDialog(HWND hwnd, HWND hwnd_forcus, LPARAM lp) {
   list_view.reset(new mk::ListView(GetDlgItem(hwnd, IDC_LIST1),
                                    mk::ListView::MODE::REPORT, row_max,
                                    col_max));
-  ResetListViewForReportMode();
+  ResetListView();
 
   return TRUE;
 }
@@ -161,11 +148,11 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
   (void)codeNotify;
   switch (id) {
     case IDLIST:
-      ResetListViewForReportMode();
-      break;
-    case IDREPORT:
       // Reserved.
       out_edit->Add(L"Reserved\n");
+      break;
+    case IDREPORT:
+      ResetListView();
       break;
     case IDICON:
       // Reserved.
@@ -206,10 +193,10 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
     case IDSETSIZE: {
       row_max = std::stoi(row_edit->Get());
       col_max = std::stoi(col_edit->Get());
-      if (data_d.size() < row_max) {
-        data_d.resize(row_max);
-        data_f.resize(row_max);
-        data_s.resize(row_max);
+      if (test_data.data_d.size() < row_max) {
+        test_data.data_d.resize(row_max);
+        test_data.data_f.resize(row_max);
+        test_data.data_s.resize(row_max);
         color_FG.resize(row_max);
         color_BG.resize(row_max);
       }
@@ -235,7 +222,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
         out_edit->Add(L"Invalid range\n");
         break;
       }
-      list_view->SetSelectedItem(item);
+      list_view->SetSelection(item);
       // Debug string output.
       out_edit->Add(L"IDSETSELECT\n");
       out_edit->Add(L"item = %d\n", item);
@@ -255,7 +242,8 @@ LRESULT OnNofity(HWND hwndDlg, NMHDR* nmhdr) {
       case HDN_ITEMCLICK:
       case HDN_ITEMDBLCLICK: {
         LPNMHEADERA hd = (LPNMHEADERA)nmhdr;
-        list_view->SortItems(hd->iItem);
+        mk::SortListViewItems(list_view.get(), &test_data, &sorted_data,
+                              hd->iItem, &last_key_column, &sort_order);
         // Debug string output.
         out_edit->Add(L"HDN_ITEMCLICK\n");
         out_edit->Add(L"sorted by column %d.\n", hd->iItem);
