@@ -41,8 +41,8 @@ std::vector<COLORREF> color_BG;
 
 // For sort.
 mk::TestData sorted_data;
-uint32_t last_key_column = 0;
-mk::ListView::SORTORDER sort_order = mk::ListView::SORTORDER::NONE;
+uint32_t last_key_column;
+mk::ListView::SORTORDER sort_order;
 
 }  // namespace
 
@@ -96,7 +96,7 @@ void ResetListView() {
   }
 
   // Initial sort.
-  last_key_column = -1;
+  last_key_column = 0xffffffff;  // Initial state.
   sort_order = mk::ListView::SORTORDER::NONE;
   mk::SortListViewItems(list_view.get(), &test_data, &sorted_data, 0,
                         &last_key_column, &sort_order);
@@ -194,9 +194,7 @@ void Cls_OnCommand(HWND hwnd, int id, HWND hWndCtl, UINT codeNotify) {
       row_max = std::stoi(row_edit->Get());
       col_max = std::stoi(col_edit->Get());
       if (test_data.data_d.size() < row_max) {
-        test_data.data_d.resize(row_max);
-        test_data.data_f.resize(row_max);
-        test_data.data_s.resize(row_max);
+        test_data.Resize(row_max);
         color_FG.resize(row_max);
         color_BG.resize(row_max);
       }

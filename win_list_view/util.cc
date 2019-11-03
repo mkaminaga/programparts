@@ -27,6 +27,13 @@ std::wstring SynthString(const wchar_t* format, ...) {
   return buffer;
 }
 
+void TestData::Resize(uint32_t row_max) {
+  icon_id.resize(row_max);
+  data_d.resize(row_max);
+  data_f.resize(row_max);
+  data_s.resize(row_max);
+}
+
 HIMAGELIST GetImageList(SHFILEINFO* file_info) {
   assert(file_info);
   return (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, file_info, sizeof(SHFILEINFO),
@@ -130,8 +137,7 @@ void SortListViewItems(mk::ListView* list_view, TestData* src, TestData* dst,
     }
   } else {
     // Clear arrow of last key column header.
-    if ((*last_key_column >= 0) &&
-        (*last_key_column < list_view->GetColumn())) {
+    if (*last_key_column < list_view->GetColumn()) {
       list_view->SetHeaderArrow(*last_key_column,
                                 mk::ListView::SORTORDER::NONE);
     }

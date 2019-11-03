@@ -30,6 +30,7 @@ struct TestData {
   std::vector<std::wstring> data_s;  // column 0.
   std::vector<int> data_d;           // column 1.
   std::vector<double> data_f;        // column 2.
+  void Resize(uint32_t row_max);
 };
 
 HIMAGELIST GetImageList(SHFILEINFO* file_info);
