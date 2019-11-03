@@ -20,7 +20,7 @@
 namespace mk {
 
 std::wstring SynthString(const wchar_t* format, ...) {
-  wchar_t buffer[64] = {0};
+  wchar_t buffer[MAX_PATH] = {0};
   va_list args;
   va_start(args, format);
   vswprintf_s(buffer, ARRAYSIZE(buffer), format, args);
@@ -36,14 +36,15 @@ void TestData::Resize(uint32_t row_max) {
 
 HIMAGELIST GetImageList(SHFILEINFO* file_info) {
   assert(file_info);
-  return (HIMAGELIST)SHGetFileInfo(L"C:\\", 0, file_info, sizeof(SHFILEINFO),
+  return (HIMAGELIST)SHGetFileInfo(L"C:\\", FILE_ATTRIBUTE_NORMAL, file_info,
+                                   sizeof(SHFILEINFO),
                                    SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 }
 
 uint32_t GetIconId(SHFILEINFO* file_info, const wchar_t* file_name) {
   assert(file_info);
-  SHGetFileInfo(file_name, 0, file_info, sizeof(SHFILEINFO),
-                SHGFI_SYSICONINDEX);
+  SHGetFileInfo(file_name, FILE_ATTRIBUTE_NORMAL, file_info, sizeof(SHFILEINFO),
+                SHGFI_ICON | SHGFI_SMALLICON);
   return file_info->iIcon;
 }
 

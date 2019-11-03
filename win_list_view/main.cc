@@ -61,9 +61,15 @@ void ResetListView() {
   SHFILEINFO file_info;
   list_view->SetImageList(mk::GetImageList(&file_info));
   test_data.icon_id.resize(3);
-  test_data.icon_id[0] = mk::GetIconId(&file_info, L"apple.ico");
-  test_data.icon_id[1] = mk::GetIconId(&file_info, L"grape.ico");
-  test_data.icon_id[2] = mk::GetIconId(&file_info, L"banana.ico");
+#if 0
+  test_data.icon_id[0] = mk::GetIconId(&file_info, L"icon/apple.ico");
+  // This code fails!
+  // Back slash must be used rather than separators of file path for
+  // SHGetFileInfo.
+#endif
+  test_data.icon_id[0] = mk::GetIconId(&file_info, L"icon\\apple.ico");
+  test_data.icon_id[1] = mk::GetIconId(&file_info, L"icon\\grape.ico");
+  test_data.icon_id[2] = mk::GetIconId(&file_info, L"icon\\banana.ico");
   list_view->SetImage(0, test_data.icon_id);
 
   // Set data.

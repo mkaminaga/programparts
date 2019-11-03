@@ -17,7 +17,7 @@ OBJ = $(OBJDIR)/main.obj $(OBJDIR)/util.obj $(OBJDIR)/list_view.obj \
 CPPFLAGS = /nologo /W4 /Zi /O2 /EHsc /Fd"$(OBJDIR)/" /D"UNICODE" /D"_UNICODE" \
 					 /D"WINVER=_WIN32_WINNT_WINBLUE" /D"NTDDI_VERSION=NTDDI_WINBLUE" \
 					 /D"_WIN32_WINNT=_WIN32_WINNT_WINBLUE" /D"DEBUG"
-LFLAGS = "kernel32.lib" "user32.lib" "comctl32.lib" "shell32.lib"\
+LFLAGS = "kernel32.lib" "user32.lib" "comctl32.lib" "shell32.lib" "ole32.lib" \
 				 /NOLOGO /SUBSYSTEM:WINDOWS /DEBUG /PDB:"$(PDB)" /MAP:"$(MAP)"
 
 ALL: $(TARGET)
