@@ -181,31 +181,34 @@ class matrix {
   T** data() { return _pp; }
   T** data() const { return _pp; }
 
-  size_t size() const { return _i_siz * _j_siz; }
   size_t row() const { return _i_siz; }
   size_t column() const { return _j_siz; }
-
-  size_t capacity() const { return _i_cap * _j_cap; }
   size_t row_capacity() const { return _i_cap; }
   size_t column_capacity() const { return _j_cap; }
 
  private:
   void move_i(size_t old_i_cap, size_t new_i_cap) {
     assert(new_i_cap > 0);
+    assert(new_i_cap > old_i_cap);
     T** tmp = (T**)realloc(_pp, new_i_cap * sizeof(T*));
+    assert(tmp);
     if (tmp == _pp) {
       // No relocation is occurred.
+      memset(_pp + old_i_cap * sizeof(T*), 0,
+             (new_i_cap - old_i_cap) * sizeof(T*));
       return;
     }
     if (_pp == nullptr) {
       // First time memory allocation.
-      memset(tmp, 0, new_i_cap * sizeof(T));
+      memset(tmp, 0, new_i_cap * sizeof(T*));
       _pp = tmp;
       tmp = nullptr;
       return;
     }
     // Memory relocation is occurred.
-    memcpy(tmp, _pp, old_i_cap * sizeof(T));
+    memcpy(tmp, _pp, old_i_cap * sizeof(T*));
+    memset(tmp + old_i_cap * sizeof(T*), 0,
+           (new_i_cap - old_i_cap) * sizeof(T*));
     free(_pp);
     _pp = tmp;
     tmp = nullptr;
@@ -214,14 +217,15 @@ class matrix {
 
   void move_j(size_t i, size_t old_j_cap, size_t new_j_cap) {
     assert(new_j_cap > 0);
+    assert(new_j_cap > old_j_cap);
     T* tmp = (T*)realloc(_pp[i], new_j_cap * sizeof(T));
+    assert(tmp);
     if (tmp == _pp[i]) {
       // No relocation is occurred.
       return;
     }
     if (_pp[i] == nullptr) {
       // First time memory allocation.
-      memset(tmp, 0, new_j_cap * sizeof(T));
       _pp[i] = tmp;
       tmp = nullptr;
       return;

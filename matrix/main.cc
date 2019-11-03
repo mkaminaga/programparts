@@ -9,52 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./matrix.h"
+#include "./util.h"
 #define _CRTDBG_MAP_ALLOC
-
-namespace {
-void seq(mk::matrix<int>* m) {
-  for (size_t i = 0; i < m->row(); i++) {
-    for (size_t j = 0; j < m->column(); j++) {
-      (*m)[i][j] = i * m->column() + j;
-    }
-  }
-}
-
-void show_data(const mk::matrix<int>& m) {
-  wprintf(L"data information\n");
-  wprintf(L"Total capacity = %d, Total size = %d\n", m.capacity(), m.size());
-  wprintf(L"Row capacity = %d, Column capacity = %d\n", m.row_capacity(),
-          m.column_capacity());
-  wprintf(L"Row size = %d, Column size = %d\n", m.row(), m.column());
-  wprintf(L"----\n");
-  for (size_t i = 0; i < m.row(); i++) {
-    wprintf(L"  ");
-    for (size_t j = 0; j < m.column(); j++) {
-      wprintf(L"%5d", m[i][j]);
-    }
-    wprintf(L"\n");
-  }
-  wprintf(L"\n");
-}
-
-void show_addr(const mk::matrix<int>& m) {
-  wprintf(L"address information\n");
-  wprintf(L"Total capacity = %d, Total size = %d\n", m.capacity(), m.size());
-  wprintf(L"Row capacity = %d, Column capacity = %d\n", m.row_capacity(),
-          m.column_capacity());
-  wprintf(L"Row size = %d, Column size = %d\n", m.row(), m.column());
-  wprintf(L"----\n");
-  for (size_t i = 0; i < m.row_capacity(); i++) {
-    wprintf(L"  ");
-    for (size_t j = 0; j < m.column_capacity(); j++) {
-      wprintf(L"%9p", &(m[i][j]));
-    }
-    wprintf(L"\n");
-  }
-  wprintf(L"\n");
-}
-
-}  // namespace
 
 int main(int argc, char* argv[]) {
   (void)argc;
@@ -65,14 +21,61 @@ int main(int argc, char* argv[]) {
     _CrtMemState s1, s2, s3;
     _CrtMemCheckpoint(&s1);
 
-    wprintf(L"constructor\n");
-    mk::matrix<int> m(3, 4);
-    m[0][0] = 0;
-    m[1][1] = 1;
-    m[2][2] = 2;
-    seq(&m);
-    show_data(m);
-    show_addr(m);
+    wprintf(L"\n");
+
+    mk::matrix<int> m;
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+    // Test for capacity.
+    // new row > 0 && new column > 0.
+    execute(m.reserve(2, 2));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+    // Test for capacity.
+    // new row <= old row && new column <= old column.
+    execute(m.reserve(1, 1));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+    // Test for capacity.
+    // new row == old row && new column < old column.
+    execute(m.reserve(2, 10));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+#if 0
+    // Test for capacity.
+    // new row > old row && new column == old column.
+    execute(m.reserve(3, 3));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+    // Test for capacity.
+    // new row > old row && new column > old column.
+    execute(m.reserve(4, 4));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+    execute(m.resize(1, 1));
+    execute(mk::seq(&m));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+
+    execute(m.resize(3, 4));
+    execute(mk::seq(&m));
+    mk::show_capacity(m);
+    mk::show_size(m);
+    mk::show_addr(m);
+#endif
 
     _CrtMemCheckpoint(&s2);
     if (_CrtMemDifference(&s3, &s1, &s2)) {
